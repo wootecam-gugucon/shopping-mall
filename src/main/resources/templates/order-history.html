@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+<div class="root">
+  <nav class="nav flex justify-end">
+    <div class="flex-center gap-15">
+      <a href="/" class="nav-button">상품</a>
+      <a href="/shopping" class="nav-button">장바구니</a>
+      <a href="/order-history" class="nav-button">주문목록</a>
+      <a href="/login" class="nav-button">로그인</a>
+    </div>
+  </nav>
+
+  <section class="order-section">
+  </section>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const credentials = sessionStorage.getItem('accessToken');
+        if (!credentials) {
+            alert('사용자 정보가 없습니다.');
+            window.location.href = '/login';
+            return;
+        }
+
+        // TODO: [4단계] 주문 목록 조회 스펙에 맞게 변경
+        fetch('', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${credentials}`,
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let element = '';
+            data.forEach(order => {
+                let itemElement = '';
+                order.items.forEach((item) => {
+                    itemElement += `
+                        <div class="order-list-item">
+                          <div class="flex gap-15 mt-10">
+                            <img class="w-144 h-144" /> <!-- 아이템 이미지 -->
+                            <div class="flex-col gap-15">
+                              <span class="order-name"></span> <!-- 아이템 이름 -->
+                              <span class="order-info">원 / 수량: 개</span> <!-- 아이템 가격 및 수량 -->
+                            </div>
+                          </div>
+                        </div>
+
+                    `;
+                });
+
+                element += `
+                    <div class="order-list">
+                      <div class="order-list__header">
+                        <span>주문 번호: </span> <!-- 주문 번호 -->
+                        <a href="">상세보기 ></a> <!-- 주문 상세 페이지로 연결 -->
+                      </div>
+                      ${itemElement}
+                    </div>
+                    `;
+            });
+
+            document.querySelector('.order-section').innerHTML = element;
+        }).catch((error) => {
+            console.error(error);
+        });
+
+    });
+</script>
+</body>
+</html>
