@@ -6,9 +6,6 @@ public final class OrderResponse {
 
     private Long orderId;
 
-    private OrderResponse() {
-    }
-
     private OrderResponse(final Long orderId) {
         this.orderId = orderId;
     }
