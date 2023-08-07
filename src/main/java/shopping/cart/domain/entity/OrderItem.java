@@ -30,11 +30,6 @@ public class OrderItem {
     protected OrderItem() {
     }
 
-    public OrderItem(final Order order, final Money price, final String imageFileName,
-        final Quantity quantity) {
-        this(null, order, price, imageFileName, quantity);
-    }
-
     public OrderItem(final Long id, final Order order, final Money price,
         final String imageFileName, final Quantity quantity) {
         this.id = id;

@@ -1,5 +1,6 @@
 package shopping.cart.domain.entity;
 
+import java.math.BigInteger;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -53,6 +54,11 @@ public class CartItem {
 
     public boolean hasUser(final User user) {
         return this.user == user;
+    }
+
+    public BigInteger getTotalPrice() {
+        return BigInteger.valueOf(product.getPrice().getValue())
+            .multiply(BigInteger.valueOf(quantity.getValue()));
     }
 
     public Long getId() {

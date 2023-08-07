@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import shopping.auth.domain.entity.User;
+import shopping.common.exception.ErrorCode;
+import shopping.common.exception.ShoppingException;
 
 @Entity
 @Table(name = "orders")
@@ -45,11 +47,17 @@ public class Order {
         orderItems.add(orderItem);
     }
 
-    public static boolean validateTotalPrice(final List<CartItem> cartItems) {
+    public static void validateTotalPrice(final List<CartItem> cartItems) {
         final BigInteger totalPrice = cartItems.stream()
             .map(CartItem::getTotalPrice)
             .reduce(BigInteger.ZERO, BigInteger::add);
-        return totalPrice.compareTo(BigInteger.valueOf(MAX_TOTAL_PRICE)) < 0;
+        validateTotalPriceRange(totalPrice);
+    }
+
+    private static void validateTotalPriceRange(final BigInteger totalPrice) {
+        if (totalPrice.compareTo(BigInteger.valueOf(MAX_TOTAL_PRICE)) > 0) {
+            throw new ShoppingException(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
+        }
     }
 
     public Long getId() {
