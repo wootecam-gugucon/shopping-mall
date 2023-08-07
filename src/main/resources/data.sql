@@ -9,5 +9,3 @@ insert into users(id, email, password)
 values (1, 'test_email@woowafriends.com', 'test_password!');
 insert into users(id, email, password)
 values (2, 'other_test_email@woowafriends.com', 'test_password!');
-insert into users(id, email, password)
-values (3, 'test', 'test');
