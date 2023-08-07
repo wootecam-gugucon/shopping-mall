@@ -18,6 +18,7 @@ import shopping.auth.domain.entity.User;
 import shopping.auth.repository.UserRepository;
 import shopping.cart.domain.entity.CartItem;
 import shopping.cart.domain.entity.Product;
+import shopping.cart.domain.vo.Money;
 import shopping.cart.domain.vo.Quantity;
 import shopping.cart.dto.request.CartItemInsertRequest;
 import shopping.cart.dto.request.CartItemUpdateRequest;
@@ -43,7 +44,7 @@ class CartServiceTest {
     void insertCartItem() {
         /* given */
         User user = new User(1L, "test_email@woowafriends.com", "test_password!");
-        Product product = new Product(1L, "치킨", "fried_chicken.png", 20000);
+        Product product = new Product(1L, "치킨", "fried_chicken.png", new Money(20000));
         CartItemInsertRequest cartRequest = new CartItemInsertRequest(product.getId());
         when(userRepository.getReferenceById(user.getId())).thenReturn(user);
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
@@ -60,8 +61,8 @@ class CartServiceTest {
     void readCartItems() {
         /* given */
         User user = new User(1L, "test_email@woowafriends.com", "test_password!");
-        Product chicken = new Product(1L, "치킨", "fried_chicken.png", 20000);
-        Product pizza = new Product(2L, "피자", "pizza.png", 25000);
+        Product chicken = new Product(1L, "치킨", "fried_chicken.png", new Money(20000));
+        Product pizza = new Product(2L, "피자", "pizza.png", new Money(25000));
         CartItem cartItemChicken = new CartItem(1L, user, chicken, 1);
         CartItem cartItemPizza = new CartItem(2L, user, pizza, 1);
         List<CartItem> cartItems = List.of(cartItemChicken, cartItemPizza);
@@ -84,7 +85,7 @@ class CartServiceTest {
     void updateCartItem() {
         /* given */
         User user = new User(1L, "test_email@woowafriends.com", "test_password!");
-        Product product = new Product(1L, "치킨", "fried_chicken.png", 20000);
+        Product product = new Product(1L, "치킨", "fried_chicken.png", new Money(20000));
         CartItem cartItem = new CartItem(1L, user, product, 1);
 
         int updateQuantity = 3;
@@ -104,7 +105,7 @@ class CartServiceTest {
     void deleteCartItem() {
         /* given */
         User user = new User(1L, "test_email@woowafriends.com", "test_password!");
-        Product product = new Product(1L, "치킨", "fried_chicken.png", 20000);
+        Product product = new Product(1L, "치킨", "fried_chicken.png", new Money(20000));
         CartItem cartItem = new CartItem(1L, user, product, 1);
 
         when(cartItemRepository.findById(cartItem.getId())).thenReturn(Optional.of(cartItem));

@@ -7,14 +7,14 @@ public final class CartItemResponse {
     private Long cartItemId;
     private String name;
     private String imageFileName;
-    private int price;
+    private long price;
     private int quantity;
 
     private CartItemResponse() {
     }
 
     private CartItemResponse(final Long cartItemId, final String name,
-        final String imageFileName, final int price,
+        final String imageFileName, final long price,
         final int quantity) {
         this.cartItemId = cartItemId;
         this.name = name;
@@ -28,7 +28,7 @@ public final class CartItemResponse {
             cartItem.getId(),
             cartItem.getProduct().getName(),
             cartItem.getProduct().getImageFileName(),
-            cartItem.getProduct().getPrice(),
+            cartItem.getProduct().getPrice().getValue(),
             cartItem.getQuantity().getValue()
         );
     }
@@ -45,7 +45,7 @@ public final class CartItemResponse {
         return imageFileName;
     }
 
-    public int getPrice() {
+    public long getPrice() {
         return price;
     }
 

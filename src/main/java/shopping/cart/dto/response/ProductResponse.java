@@ -7,10 +7,10 @@ public final class ProductResponse {
     private Long id;
     private String name;
     private String imageFileName;
-    private int price;
+    private long price;
 
     private ProductResponse(final Long id, final String name, final String imageUuid,
-        final int price) {
+        final long price) {
         this.id = id;
         this.name = name;
         this.imageFileName = imageUuid;
@@ -22,7 +22,7 @@ public final class ProductResponse {
             product.getId(),
             product.getName(),
             product.getImageFileName(),
-            product.getPrice()
+            product.getPrice().getValue()
         );
     }
 
@@ -38,7 +38,7 @@ public final class ProductResponse {
         return imageFileName;
     }
 
-    public int getPrice() {
+    public long getPrice() {
         return price;
     }
 }
