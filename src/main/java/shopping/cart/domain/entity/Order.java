@@ -51,10 +51,10 @@ public class Order {
         final BigInteger totalPrice = cartItems.stream()
             .map(CartItem::getTotalPrice)
             .reduce(BigInteger.ZERO, BigInteger::add);
-        validateTotalPriceRange(totalPrice);
+        validateRangeOf(totalPrice);
     }
 
-    private static void validateTotalPriceRange(final BigInteger totalPrice) {
+    private static void validateRangeOf(final BigInteger totalPrice) {
         if (totalPrice.compareTo(BigInteger.valueOf(MAX_TOTAL_PRICE)) > 0) {
             throw new ShoppingException(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
         }
