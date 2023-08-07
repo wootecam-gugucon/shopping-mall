@@ -44,10 +44,11 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public OrderItem(final Money price, final String imageFileName, final Quantity quantity) {
-        this.price = price;
-        this.imageFileName = imageFileName;
-        this.quantity = quantity;
+    public static OrderItem from(final CartItem cartItem, final Order order) {
+        final OrderItem orderItem = new OrderItem(null, order, cartItem.getProduct().getPrice(),
+            cartItem.getProduct().getImageFileName(), cartItem.getQuantity());
+        order.addOrderItem(orderItem);
+        return orderItem;
     }
 
     public Long getId() {
