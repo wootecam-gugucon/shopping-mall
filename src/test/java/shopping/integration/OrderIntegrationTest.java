@@ -84,8 +84,11 @@ class OrderIntegrationTest extends IntegrationTest {
             .as(LoginResponse.class)
             .getAccessToken();
 
-        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
-        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
+        final CartItemInsertRequest cartItemInsertRequest1 = new CartItemInsertRequest(1L);
+        TestUtils.insertCartItem(accessToken, cartItemInsertRequest1);
+
+        final CartItemInsertRequest cartItemInsertRequest2 = new CartItemInsertRequest(2L);
+        TestUtils.insertCartItem(accessToken, cartItemInsertRequest2);
 
         final List<CartItemResponse> cartItemResponses = TestUtils.extractCartItemResponses(
             TestUtils.readCartItems(accessToken));
