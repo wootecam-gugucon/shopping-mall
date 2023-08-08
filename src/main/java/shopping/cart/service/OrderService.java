@@ -41,6 +41,7 @@ public class OrderService {
         cartItems.stream()
             .map(cartItem -> OrderItem.from(cartItem, order))
             .forEach(orderItemRepository::save);
+        cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }
 }
