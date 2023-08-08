@@ -31,7 +31,7 @@
     }
 
     // TODO: [4단계] 주문 목록 조회 스펙에 맞게 변경
-    fetch('', {
+    fetch('/order-history/list', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${credentials}`,
@@ -43,14 +43,14 @@
       let element = '';
       data.forEach(order => {
         let itemElement = '';
-        order.items.forEach((item) => {
+        order.orderItems.forEach((orderItem) => {
           itemElement += `
                         <div class="order-list-item">
                           <div class="flex gap-15 mt-10">
-                            <img class="w-144 h-144" /> <!-- 상품 이미지 -->
+                            <img class="w-144 h-144" src="/assets/${orderItem.imageFileName}"/> <!-- 상품 이미지 -->
                             <div class="flex-col gap-15">
                               <span class="order-name"></span> <!-- 상품 이름 -->
-                              <span class="order-info">원 / 수량: 개</span> <!-- 상품 가격 및 수량 -->
+                              <span class="order-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span> <!-- 상품 가격 및 수량 -->
                             </div>
                           </div>
                         </div>
@@ -61,8 +61,8 @@
         element += `
                     <div class="order-list">
                       <div class="order-list__header">
-                        <span>주문 번호: </span> <!-- 주문 번호 -->
-                        <a href="">상세보기 ></a> <!-- 주문 상세 페이지로 연결 -->
+                        <span>주문 번호: ${order.orderId}</span> <!-- 주문 번호 -->
+                        <a href="/order/${order.orderId}">상세보기 ></a> <!-- 주문 상세 페이지로 연결 -->
                       </div>
                       ${itemElement}
                     </div>

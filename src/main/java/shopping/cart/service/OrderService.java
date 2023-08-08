@@ -1,6 +1,9 @@
 package shopping.cart.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.auth.domain.entity.User;
@@ -55,6 +58,14 @@ public class OrderService {
 
         validateUserHasOrder(user, order);
         return OrderDetailResponse.from(order);
+    }
+
+    public List<OrderDetailResponse> getOrderHistory(final Long userId) {
+        final List<Order> orders = orderRepository.findAllByUserIdWithOrderItems(userId,
+            Sort.by(Direction.DESC, "id"));
+        return orders.stream()
+            .map(OrderDetailResponse::from)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     private void validateUserHasOrder(final User user, final Order order) {

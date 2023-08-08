@@ -1,4 +1,4 @@
-package shopping.cart.controller;
+package shopping.cart.controller.api;
 
 import java.net.URI;
 import org.springframework.http.HttpStatus;

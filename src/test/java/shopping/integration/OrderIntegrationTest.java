@@ -48,7 +48,7 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("주문에 성공한다.")
+    @DisplayName("성공 : 주문한다.")
     void orderSuccess() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
@@ -75,7 +75,7 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("주문 상세 정보를 조회한다.")
+    @DisplayName("성공 : 주문 상세 정보를 조회한다.")
     void readOrderDetailSuccess() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
@@ -110,6 +110,42 @@ class OrderIntegrationTest extends IntegrationTest {
             .map(OrderItemResponse::getProductName)
             .collect(Collectors.toUnmodifiableList());
         assertThat(cartItemNames).containsExactlyInAnyOrderElementsOf(orderItemNames);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("성공 : 주문 목록을 조회한다.")
+    void readOrderHistory() {
+        /* given */
+        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
+            "test_password!");
+        String accessToken = TestUtils.login(loginRequest)
+            .as(LoginResponse.class)
+            .getAccessToken();
+
+        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
+        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
+        final Long firstOrderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+
+        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
+        final Long secondOrderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/order-history/list")
+            .then()
+            .extract();
+
+        /* then */
+        final List<OrderDetailResponse> orderDetailResponses = response.jsonPath()
+            .getList(".", OrderDetailResponse.class);
+        final List<Long> orderIds = orderDetailResponses.stream()
+            .map(OrderDetailResponse::getOrderId)
+            .collect(Collectors.toUnmodifiableList());
+        assertThat(orderIds).containsExactly(secondOrderId, firstOrderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }
