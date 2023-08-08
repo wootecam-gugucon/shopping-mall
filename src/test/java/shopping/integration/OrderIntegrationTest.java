@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,12 +17,15 @@ import shopping.TestUtils;
 import shopping.auth.dto.request.LoginRequest;
 import shopping.auth.dto.response.LoginResponse;
 import shopping.cart.dto.request.CartItemInsertRequest;
+import shopping.cart.dto.response.CartItemResponse;
+import shopping.cart.dto.response.OrderDetailResponse;
+import shopping.cart.dto.response.OrderItemResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
 
 @DisplayName("주문 기능 통합 테스트")
-public class OrderIntegrationTest extends IntegrationTest {
+class OrderIntegrationTest extends IntegrationTest {
 
     @Autowired
     private CartItemRepository cartItemRepository;
@@ -67,5 +72,44 @@ public class OrderIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("주문 상세 정보를 조회한다.")
+    void readOrderDetailSuccess() {
+        /* given */
+        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
+            "test_password!");
+        String accessToken = TestUtils.login(loginRequest)
+            .as(LoginResponse.class)
+            .getAccessToken();
+
+        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
+        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
+
+        final List<CartItemResponse> cartItemResponses = TestUtils.extractCartItemResponses(
+            TestUtils.readCartItems(accessToken));
+        final List<String> cartItemNames = cartItemResponses.stream()
+            .map(CartItemResponse::getName)
+            .collect(Collectors.toUnmodifiableList());
+
+        final Long orderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/order/{orderId}/detail", orderId)
+            .then()
+            .extract();
+
+        /* then */
+        final OrderDetailResponse orderDetailResponse = response.as(OrderDetailResponse.class);
+        final List<String> orderItemNames = orderDetailResponse.getOrderItems().stream()
+            .map(OrderItemResponse::getProductName)
+            .collect(Collectors.toUnmodifiableList());
+        assertThat(cartItemNames).containsExactlyInAnyOrderElementsOf(orderItemNames);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }

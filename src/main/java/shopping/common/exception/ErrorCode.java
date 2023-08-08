@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_CART_ITEM(HttpStatus.BAD_REQUEST, "존재하지 않는 장바구니 상품입니다."),
     INVALID_PRODUCT(HttpStatus.BAD_REQUEST, "존재하지 않는 상품입니다."),
     EXCEED_MAX_TOTAL_PRICE(HttpStatus.BAD_REQUEST, "주문 가능한 최대 금액을 초과합니다."),
+    INVALID_ORDER(HttpStatus.BAD_REQUEST, "존재하지 않는 주문입니다."),
     ;
 
     private final HttpStatus status;

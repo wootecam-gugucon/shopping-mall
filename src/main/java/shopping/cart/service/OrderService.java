@@ -8,10 +8,13 @@ import shopping.auth.repository.UserRepository;
 import shopping.cart.domain.entity.CartItem;
 import shopping.cart.domain.entity.Order;
 import shopping.cart.domain.entity.OrderItem;
+import shopping.cart.dto.response.OrderDetailResponse;
 import shopping.cart.dto.response.OrderResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
+import shopping.common.exception.ErrorCode;
+import shopping.common.exception.ShoppingException;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,5 +46,20 @@ public class OrderService {
             .forEach(orderItemRepository::save);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
+    }
+
+    public OrderDetailResponse getOrderDetail(final Long orderId, final Long userId) {
+        final Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+        final User user = userRepository.getReferenceById(userId);
+
+        validateUserHasOrder(user, order);
+        return OrderDetailResponse.from(order);
+    }
+
+    private void validateUserHasOrder(final User user, final Order order) {
+        if (!order.hasUser(user)) {
+            throw new ShoppingException(ErrorCode.INVALID_ORDER);
+        }
     }
 }
