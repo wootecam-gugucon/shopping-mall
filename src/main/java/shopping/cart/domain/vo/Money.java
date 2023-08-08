@@ -6,6 +6,8 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Money {
 
+    public static final Money ZERO = new Money(0);
+
     private long value;
 
     protected Money() {
@@ -13,6 +15,14 @@ public class Money {
 
     public Money(final long value) {
         this.value = value;
+    }
+
+    public Money add(final Money other) {
+        return new Money(value + other.value);
+    }
+
+    public Money multiply(final Quantity quantity) {
+        return new Money(value * quantity.getValue());
     }
 
     public long getValue() {
