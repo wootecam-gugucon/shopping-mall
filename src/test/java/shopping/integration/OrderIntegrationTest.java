@@ -19,6 +19,7 @@ import shopping.auth.dto.response.LoginResponse;
 import shopping.cart.dto.request.CartItemInsertRequest;
 import shopping.cart.dto.response.CartItemResponse;
 import shopping.cart.dto.response.OrderDetailResponse;
+import shopping.cart.dto.response.OrderHistoryResponse;
 import shopping.cart.dto.response.OrderItemResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
@@ -143,10 +144,10 @@ class OrderIntegrationTest extends IntegrationTest {
             .extract();
 
         /* then */
-        final List<OrderDetailResponse> orderDetailResponses = response.jsonPath()
-            .getList(".", OrderDetailResponse.class);
-        final List<Long> orderIds = orderDetailResponses.stream()
-            .map(OrderDetailResponse::getOrderId)
+        final List<OrderHistoryResponse> orderHistoryResponse = response.jsonPath()
+            .getList(".", OrderHistoryResponse.class);
+        final List<Long> orderIds = orderHistoryResponse.stream()
+            .map(OrderHistoryResponse::getOrderId)
             .collect(Collectors.toUnmodifiableList());
         assertThat(orderIds).containsExactly(secondOrderId, firstOrderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());

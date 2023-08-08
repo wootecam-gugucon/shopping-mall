@@ -13,6 +13,7 @@ import shopping.cart.domain.entity.Order;
 import shopping.cart.domain.entity.OrderItem;
 import shopping.cart.dto.response.OrderCreateResponse;
 import shopping.cart.dto.response.OrderDetailResponse;
+import shopping.cart.dto.response.OrderHistoryResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
@@ -60,11 +61,11 @@ public class OrderService {
         return OrderDetailResponse.from(order);
     }
 
-    public List<OrderDetailResponse> getOrderHistory(final Long userId) {
+    public List<OrderHistoryResponse> getOrderHistory(final Long userId) {
         final List<Order> orders = orderRepository.findAllByUserIdWithOrderItems(userId,
             Sort.by(Direction.DESC, "id"));
         return orders.stream()
-            .map(OrderDetailResponse::from)
+            .map(OrderHistoryResponse::from)
             .collect(Collectors.toUnmodifiableList());
     }
 
