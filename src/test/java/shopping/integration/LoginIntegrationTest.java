@@ -38,7 +38,7 @@ class LoginIntegrationTest extends IntegrationTest {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(loginRequest)
-            .when().post("/login/token")
+            .when().post("/api/v1/login/token")
             .then().log().all()
             .extract();
 
@@ -60,7 +60,7 @@ class LoginIntegrationTest extends IntegrationTest {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(loginRequest)
-            .when().post("/login/token")
+            .when().post("/api/v1/login/token")
             .then().log().all()
             .extract();
 
@@ -82,7 +82,7 @@ class LoginIntegrationTest extends IntegrationTest {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(loginRequest)
-            .when().post("/login/token")
+            .when().post("/api/v1/login/token")
             .then().log().all()
             .extract();
 
@@ -104,7 +104,7 @@ class LoginIntegrationTest extends IntegrationTest {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(loginRequest)
-            .when().post("/login/token")
+            .when().post("/api/v1/login/token")
             .then().log().all()
             .extract();
 
@@ -126,7 +126,7 @@ class LoginIntegrationTest extends IntegrationTest {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(loginRequest)
-            .when().post("/login/token")
+            .when().post("/api/v1/login/token")
             .then().log().all()
             .extract();
 

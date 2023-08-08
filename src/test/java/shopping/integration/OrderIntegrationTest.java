@@ -65,7 +65,7 @@ class OrderIntegrationTest extends IntegrationTest {
             .given().log().all()
             .auth().oauth2(accessToken)
             .when()
-            .post("/order")
+            .post("/api/v1/order")
             .then()
             .extract();
 
@@ -103,7 +103,7 @@ class OrderIntegrationTest extends IntegrationTest {
             .given().log().all()
             .auth().oauth2(accessToken)
             .when()
-            .get("/order/{orderId}/detail", orderId)
+            .get("/api/v1/order/{orderId}", orderId)
             .then()
             .extract();
 
@@ -138,7 +138,7 @@ class OrderIntegrationTest extends IntegrationTest {
             .given().log().all()
             .auth().oauth2(accessToken)
             .when()
-            .get("/order-history/list")
+            .get("/api/v1/order-history")
             .then()
             .extract();
 

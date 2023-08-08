@@ -11,7 +11,7 @@ import shopping.cart.dto.response.OrderDetailResponse;
 import shopping.cart.service.OrderService;
 
 @RestController
-@RequestMapping("/order-history")
+@RequestMapping("/api/v1/order-history")
 public class OrderHistoryController {
 
     private final OrderService orderService;
@@ -20,7 +20,7 @@ public class OrderHistoryController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/list")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<OrderDetailResponse> getOrderHistory(@UserId Long userId) {
         return orderService.getOrderHistory(userId);

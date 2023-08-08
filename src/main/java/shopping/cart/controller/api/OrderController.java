@@ -15,7 +15,7 @@ import shopping.cart.dto.response.OrderDetailResponse;
 import shopping.cart.service.OrderService;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/api/v1/order")
 public class OrderController {
 
     private final OrderService orderService;
@@ -27,11 +27,12 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Void> order(@UserId Long userId) {
         final OrderCreateResponse orderCreateResponse = orderService.order(userId);
-        return ResponseEntity.created(URI.create("/order/" + orderCreateResponse.getOrderId()))
+        return ResponseEntity.created(
+                URI.create("/order/" + orderCreateResponse.getOrderId()))
             .build();
     }
 
-    @GetMapping("/{orderId}/detail")
+    @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
     public OrderDetailResponse getOrderDetail(@PathVariable Long orderId, @UserId Long userId) {
         return orderService.getOrderDetail(orderId, userId);

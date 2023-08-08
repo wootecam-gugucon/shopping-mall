@@ -15,7 +15,7 @@ import shopping.auth.dto.response.LoginResponse;
 import shopping.auth.service.UserService;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/api/v1/login")
 public class LoginController {
 
     private final UserService userService;

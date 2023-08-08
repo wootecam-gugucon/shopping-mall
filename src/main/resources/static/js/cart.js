@@ -6,7 +6,7 @@ const addCartItem = (productId) => {
     return;
   }
 
-  fetch('/cart/items', {
+  fetch('/api/v1/cart/items', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${credentials}`,
@@ -28,7 +28,7 @@ const updateCartItemQuantity = (id, quantity) => {
     return;
   }
 
-  fetch(`/cart/items/${id}/quantity`, {
+  fetch(`/api/v1/cart/items/${id}/quantity`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${credentials}`,
@@ -49,8 +49,8 @@ const removeCartItem = (id) => {
     window.location.href = '/login';
     return;
   }
-  
-  fetch(`/cart/items/${id}`, {
+
+  fetch(`/api/v1/cart/items/${id}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${credentials}`,

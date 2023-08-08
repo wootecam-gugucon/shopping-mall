@@ -7,7 +7,7 @@ const requestOrder = () => {
   }
 
   // TODO: [4단계] 장바구니 상품 추가 스펙에 맞게 변경
-  fetch('/order', {
+  fetch('/api/v1/order', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${credentials}`,

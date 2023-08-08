@@ -25,7 +25,7 @@ public class TestUtils {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(loginRequest)
-            .when().post("/login/token")
+            .when().post("/api/v1/login/token")
             .then().log().all()
             .extract();
     }
@@ -37,7 +37,7 @@ public class TestUtils {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemInsertRequest)
-            .when().post("/cart/items")
+            .when().post("/api/v1/cart/items")
             .then().log().all()
             .extract();
     }
@@ -46,7 +46,7 @@ public class TestUtils {
         return RestAssured
             .given().log().all()
             .auth().oauth2(accessToken)
-            .when().get("/cart/items")
+            .when().get("/api/v1/cart/items")
             .then().log().all()
             .extract();
     }
@@ -56,7 +56,7 @@ public class TestUtils {
             .given().log().all()
             .auth().oauth2(accessToken)
             .when()
-            .post("/order")
+            .post("/api/v1/order")
             .then()
             .extract();
     }

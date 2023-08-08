@@ -51,7 +51,7 @@
 
     const orderId = [[${orderId}]];
 
-    fetch(`/order/${orderId}/detail`, {
+    fetch(`/api/v1/order/${orderId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${credentials}`,

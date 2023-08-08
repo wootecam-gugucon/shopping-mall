@@ -59,7 +59,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemInsertRequest)
-            .when().post("/cart/items")
+            .when().post("/api/v1/cart/items")
             .then().log().all()
             .extract();
 
@@ -86,7 +86,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemInsertRequest)
-            .when().post("/cart/items")
+            .when().post("/api/v1/cart/items")
             .then().log().all()
             .extract();
 
@@ -114,7 +114,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemInsertRequest)
-            .when().post("/cart/items")
+            .when().post("/api/v1/cart/items")
             .then().log().all()
             .extract();
 
@@ -144,7 +144,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemInsertRequest)
-            .when().post("/cart/items")
+            .when().post("/api/v1/cart/items")
             .then().log().all()
             .extract();
 
@@ -173,7 +173,7 @@ class CartIntegrationTest extends IntegrationTest {
         final ExtractableResponse<Response> response = RestAssured
             .given().log().all()
             .auth().oauth2(accessToken)
-            .when().get("/cart/items")
+            .when().get("/api/v1/cart/items")
             .then().log().all()
             .extract();
 
@@ -214,7 +214,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemUpdateRequest)
-            .when().put("/cart/items/{cartItemId}/quantity", cartItemId)
+            .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
             .then().log().all()
             .extract();
 
@@ -252,7 +252,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemUpdateRequest)
-            .when().put("/cart/items/{cartItemId}/quantity", cartItemId)
+            .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
             .then().log().all()
             .extract();
 
@@ -289,7 +289,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemUpdateRequest)
-            .when().put("/cart/items/{cartItemId}/quantity", cartItemId)
+            .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
             .then().log().all()
             .extract();
 
@@ -324,7 +324,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemUpdateRequest)
-            .when().put("/cart/items/{cartItemId}/quantity", cartItemId)
+            .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
             .then().log().all()
             .extract();
 
@@ -365,7 +365,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(otherAccessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemUpdateRequest)
-            .when().put("/cart/items/{cartItemId}/quantity", cartItemId)
+            .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
             .then().log().all()
             .extract();
 
@@ -400,7 +400,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemUpdateRequest)
-            .when().put("/cart/items/{cartItemId}/quantity", cartItemId)
+            .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
             .then().log().all()
             .extract();
 
@@ -429,7 +429,7 @@ class CartIntegrationTest extends IntegrationTest {
             .auth().oauth2(accessToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemUpdateRequest)
-            .when().put("/cart/items/{cartItemId}/quantity", invalidCartItemId)
+            .when().put("/api/v1/cart/items/{cartItemId}/quantity", invalidCartItemId)
             .then().log().all()
             .extract();
 
@@ -461,7 +461,7 @@ class CartIntegrationTest extends IntegrationTest {
         final ExtractableResponse<Response> response = RestAssured
             .given().log().all()
             .auth().oauth2(accessToken)
-            .when().delete("/cart/items/{cartItemId}", cartItemId)
+            .when().delete("/api/v1/cart/items/{cartItemId}", cartItemId)
             .then().log().all()
             .extract();
 
