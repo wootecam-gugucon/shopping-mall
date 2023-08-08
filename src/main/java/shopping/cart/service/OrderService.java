@@ -8,15 +8,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.auth.domain.entity.User;
 import shopping.auth.repository.UserRepository;
+import shopping.cart.domain.MoneyType;
 import shopping.cart.domain.entity.CartItem;
 import shopping.cart.domain.entity.Order;
 import shopping.cart.domain.entity.OrderItem;
+import shopping.cart.domain.vo.ExchangeRate;
+import shopping.cart.domain.vo.ForeignCurrency;
 import shopping.cart.dto.response.OrderCreateResponse;
 import shopping.cart.dto.response.OrderDetailResponse;
 import shopping.cart.dto.response.OrderHistoryResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
+import shopping.cart.utils.currency.ExchangeRateProvider;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
 
@@ -24,18 +28,22 @@ import shopping.common.exception.ShoppingException;
 @Transactional(readOnly = true)
 public class OrderService {
 
+    private final MoneyType conversionTarget = MoneyType.USD;
+
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartItemRepository cartItemRepository;
+    private final ExchangeRateProvider exchangeRateProvider;
 
     public OrderService(final UserRepository userRepository, final OrderRepository orderRepository,
-        final OrderItemRepository orderItemRepository,
-        final CartItemRepository cartItemRepository) {
+        final OrderItemRepository orderItemRepository, final CartItemRepository cartItemRepository,
+        final ExchangeRateProvider exchangeRateProvider) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartItemRepository = cartItemRepository;
+        this.exchangeRateProvider = exchangeRateProvider;
     }
 
     @Transactional
@@ -58,7 +66,11 @@ public class OrderService {
         final User user = userRepository.getReferenceById(userId);
 
         validateUserHasOrder(user, order);
-        return OrderDetailResponse.from(order);
+        final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRateOf(
+            conversionTarget);
+        final ForeignCurrency foreignCurrencyTotalPrice = exchangeRate.convert(
+            order.getTotalPrice(), conversionTarget);
+        return OrderDetailResponse.from(order, foreignCurrencyTotalPrice, exchangeRate);
     }
 
     public List<OrderHistoryResponse> getOrderHistory(final Long userId) {

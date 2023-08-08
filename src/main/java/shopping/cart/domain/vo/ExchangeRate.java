@@ -1,5 +1,7 @@
 package shopping.cart.domain.vo;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import shopping.cart.domain.MoneyType;
 
@@ -36,5 +38,12 @@ public class ExchangeRate {
     @Override
     public int hashCode() {
         return Objects.hash(moneyType, ratio);
+    }
+
+    public ForeignCurrency convert(final Money sourcePrice, final MoneyType foreignMoneyType) {
+        final BigDecimal sourceValue = BigDecimal.valueOf(sourcePrice.getValue());
+        final BigDecimal targetValue = sourceValue.divide(BigDecimal.valueOf(ratio),
+            RoundingMode.HALF_DOWN);
+        return new ForeignCurrency(targetValue, foreignMoneyType);
     }
 }

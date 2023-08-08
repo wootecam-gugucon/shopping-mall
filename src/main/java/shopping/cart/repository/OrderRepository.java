@@ -12,7 +12,7 @@ import shopping.cart.domain.entity.Order;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o " +
-        "JOIN FETCH o.orderItems " +
+        "LEFT OUTER JOIN FETCH o.orderItems " +
         "WHERE o.user.id = :userId")
     List<Order> findAllByUserIdWithOrderItems(@Param("userId") Long userId, Sort sort);
 }

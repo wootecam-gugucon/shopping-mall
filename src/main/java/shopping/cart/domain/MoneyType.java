@@ -11,4 +11,8 @@ public enum MoneyType {
     MoneyType(final String unit) {
         this.unit = unit;
     }
+
+    public String getUnit() {
+        return unit;
+    }
 }

@@ -79,7 +79,7 @@
 
       document.querySelector('.order-item-list').innerHTML = element;
       document.querySelector(
-          '.order-right-section .order-total-price').innerText = `${data.totalPrice}원`; <!-- 상품 가격 및 수량 -->
+          '.order-right-section .order-total-price').innerText = `${data.totalPrice} 원, ${data.foreignCurrencyTotalPrice} ${data.unit}\n(환율 : ${data.exchangeRate} 원/${data.unit})`; <!-- 상품 가격 및 수량 -->
     }).catch((error) => {
       console.error(error);
     });

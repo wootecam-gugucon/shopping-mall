@@ -1,19 +1,20 @@
 package shopping.cart.domain.vo;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import shopping.cart.domain.MoneyType;
 
 public class ForeignCurrency {
 
-    private final long value;
+    private final BigDecimal value;
     private final MoneyType moneyType;
 
-    public ForeignCurrency(final long value, final MoneyType moneyType) {
+    public ForeignCurrency(final BigDecimal value, final MoneyType moneyType) {
         this.value = value;
         this.moneyType = moneyType;
     }
 
-    public long getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
@@ -30,7 +31,7 @@ public class ForeignCurrency {
             return false;
         }
         final ForeignCurrency that = (ForeignCurrency) o;
-        return value == that.value && moneyType == that.moneyType;
+        return Objects.equals(value, that.value) && moneyType == that.moneyType;
     }
 
     @Override
