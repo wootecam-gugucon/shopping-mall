@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import shopping.auth.argumentresolver.annotation.UserId;
+import shopping.cart.dto.response.OrderCreateResponse;
 import shopping.cart.dto.response.OrderDetailResponse;
-import shopping.cart.dto.response.OrderResponse;
 import shopping.cart.service.OrderService;
 
 @RestController
@@ -26,8 +26,9 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<Void> order(@UserId Long userId) {
-        final OrderResponse orderResponse = orderService.order(userId);
-        return ResponseEntity.created(URI.create("/order/" + orderResponse.getOrderId())).build();
+        final OrderCreateResponse orderCreateResponse = orderService.order(userId);
+        return ResponseEntity.created(URI.create("/order/" + orderCreateResponse.getOrderId()))
+            .build();
     }
 
     @GetMapping("/{orderId}/detail")

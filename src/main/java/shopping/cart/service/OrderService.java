@@ -11,8 +11,8 @@ import shopping.auth.repository.UserRepository;
 import shopping.cart.domain.entity.CartItem;
 import shopping.cart.domain.entity.Order;
 import shopping.cart.domain.entity.OrderItem;
+import shopping.cart.dto.response.OrderCreateResponse;
 import shopping.cart.dto.response.OrderDetailResponse;
-import shopping.cart.dto.response.OrderResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
@@ -38,7 +38,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse order(final Long userId) {
+    public OrderCreateResponse order(final Long userId) {
         final User user = userRepository.getReferenceById(userId);
         final List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
 
@@ -48,7 +48,7 @@ public class OrderService {
             .map(cartItem -> OrderItem.from(cartItem, order))
             .forEach(orderItemRepository::save);
         cartItemRepository.deleteAll(cartItems);
-        return OrderResponse.from(orderRepository.save(order));
+        return OrderCreateResponse.from(orderRepository.save(order));
     }
 
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long userId) {
