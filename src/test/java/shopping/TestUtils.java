@@ -5,6 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
 import org.springframework.http.MediaType;
+import shopping.auth.domain.entity.User;
 import shopping.auth.dto.request.LoginRequest;
 import shopping.cart.domain.entity.Product;
 import shopping.cart.domain.vo.Money;
@@ -18,6 +19,11 @@ public class TestUtils {
     public static Product createProduct(String name, long price) {
         sequence++;
         return new Product(sequence, name, "image_file_name_" + sequence, new Money(price));
+    }
+
+    public static User createUser() {
+        sequence++;
+        return new User(sequence, "test_email" + sequence + "@gmail.com", "test_password");
     }
 
     public static ExtractableResponse<Response> login(final LoginRequest loginRequest) {
