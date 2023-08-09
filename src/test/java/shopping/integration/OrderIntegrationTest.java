@@ -24,6 +24,8 @@ import shopping.cart.dto.response.OrderItemResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
+import shopping.common.exception.ErrorCode;
+import shopping.common.exception.ErrorResponse;
 
 @DisplayName("주문 기능 통합 테스트")
 class OrderIntegrationTest extends IntegrationTest {
@@ -73,6 +75,31 @@ class OrderIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("실패 : 빈 장바구니로 주문한다.")
+    void orderWithEmptyCart() {
+        /* given */
+        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
+            "test_password!");
+        String accessToken = TestUtils.login(loginRequest)
+            .as(LoginResponse.class)
+            .getAccessToken();
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .post("/api/v1/order")
+            .then()
+            .extract();
+
+        /* then */
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_CART);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test

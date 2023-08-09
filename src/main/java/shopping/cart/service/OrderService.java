@@ -51,6 +51,7 @@ public class OrderService {
         final User user = userRepository.getReferenceById(userId);
         final List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
 
+        validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
         final Order order = Order.of(user);
         cartItems.stream()
@@ -61,6 +62,7 @@ public class OrderService {
     }
 
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long userId) {
+
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         final User user = userRepository.getReferenceById(userId);
@@ -79,6 +81,12 @@ public class OrderService {
         return orders.stream()
             .map(OrderHistoryResponse::from)
             .collect(Collectors.toUnmodifiableList());
+    }
+
+    private void validateNotEmpty(final List<CartItem> cartItems) {
+        if (cartItems.isEmpty()) {
+            throw new ShoppingException(ErrorCode.EMPTY_CART);
+        }
     }
 
     private void validateUserHasOrder(final User user, final Order order) {
