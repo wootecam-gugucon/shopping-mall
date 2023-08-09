@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import shopping.cart.domain.MoneyType;
 import shopping.cart.domain.vo.ExchangeRate;
 
-@DisplayName("환율 정보를 제공받는 외부 API 테스트")
+@DisplayName("DefaultExchangeRateProvider 단위 테스트")
 class DefaultExchangeRateProviderTest {
 
     DefaultExchangeRateProvider exchangeRateProvider;

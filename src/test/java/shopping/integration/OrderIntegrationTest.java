@@ -145,6 +145,68 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("실패 : 존재하지 않는 주문을 조회한다.")
+    void readInvalidOrderDetail() {
+        /* given */
+        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
+            "test_password!");
+        String accessToken = TestUtils.login(loginRequest)
+            .as(LoginResponse.class)
+            .getAccessToken();
+        final Long invalidOrderId = Long.MAX_VALUE;
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/api/v1/order/{orderId}", invalidOrderId)
+            .then()
+            .extract();
+
+        /* then */
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("실패 : 다른 사용자의 주문을 조회할 수 없다.")
+    void readOrderDetailOfOtherUser() {
+        /* given */
+        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
+            "test_password!");
+        String accessToken = TestUtils.login(loginRequest)
+            .as(LoginResponse.class)
+            .getAccessToken();
+
+        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
+        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
+
+        final Long orderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+
+        final LoginRequest otherLoginRequest = new LoginRequest("other_test_email@woowafriends.com",
+            "test_password!");
+        String otherAccessToken = TestUtils.login(otherLoginRequest)
+            .as(LoginResponse.class)
+            .getAccessToken();
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(otherAccessToken)
+            .when()
+            .get("/api/v1/order/{orderId}", orderId)
+            .then()
+            .extract();
+
+        /* then */
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
     @DisplayName("성공 : 주문 목록을 조회한다.")
     void readOrderHistory() {
         /* given */
