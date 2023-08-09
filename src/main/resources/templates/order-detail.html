@@ -36,7 +36,7 @@
             <span class="highlight-text order-total-price"></span>
           </div>
           <div class="flex justify-between p-20 mt-20">
-            <span class="highlight-text">달러 환산금액</span>
+            <span class="highlight-text">환산 금액</span>
             <span class="highlight-text order-usd-total-price"></span>
           </div>
           <div class="flex justify-between p-20 mt-20">
@@ -92,7 +92,7 @@
           '.order-right-section .order-usd-total-price').innerText = `${data.dollarTotalPrice.toFixed(
           2)} 달러`;
       document.querySelector(
-          '.order-right-section .usd-exchange-rate').innerText = `환율 : ${data.exchangeRate.toFixed(
+          '.order-right-section .usd-exchange-rate').innerText = `${data.exchangeRate.toFixed(
           2)} 원/달러`;
     }).catch((error) => {
       console.error(error);
