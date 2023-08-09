@@ -1,6 +1,5 @@
 package shopping.cart.dto.response;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import shopping.cart.domain.entity.Order;
@@ -10,14 +9,14 @@ public final class OrderDetailResponse {
     private Long orderId;
     private List<OrderItemResponse> orderItems;
     private long totalPrice;
-    private BigDecimal dollarTotalPrice;
+    private double dollarTotalPrice;
     private double exchangeRate;
 
     private OrderDetailResponse() {
     }
 
     private OrderDetailResponse(final Long orderId, final List<OrderItemResponse> orderItems,
-        final long totalPrice, final BigDecimal dollarTotalPrice, final double exchangeRate) {
+        final long totalPrice, final double dollarTotalPrice, final double exchangeRate) {
         this.orderId = orderId;
         this.orderItems = orderItems;
         this.totalPrice = totalPrice;
@@ -47,7 +46,7 @@ public final class OrderDetailResponse {
         return totalPrice;
     }
 
-    public BigDecimal getDollarTotalPrice() {
+    public double getDollarTotalPrice() {
         return dollarTotalPrice;
     }
 

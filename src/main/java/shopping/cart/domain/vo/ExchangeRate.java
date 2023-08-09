@@ -1,9 +1,9 @@
 package shopping.cart.domain.vo;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.Objects;
 import javax.persistence.Embeddable;
+import shopping.common.exception.ErrorCode;
+import shopping.common.exception.ShoppingException;
 
 @Embeddable
 public class ExchangeRate {
@@ -14,14 +14,19 @@ public class ExchangeRate {
     private double value;
 
     public ExchangeRate(final double value) {
+        validatePositive(value);
         this.value = value;
     }
 
     public DollarMoney convert(final Money sourcePrice) {
-        final BigDecimal sourceValue = BigDecimal.valueOf(sourcePrice.getValue());
-        final BigDecimal targetValue = sourceValue.divide(BigDecimal.valueOf(value),
-            MathContext.DECIMAL128);
-        return new DollarMoney(targetValue);
+        validatePositive(value);
+        return new DollarMoney(sourcePrice.getValue() / value);
+    }
+
+    private void validatePositive(final double value) {
+        if (value <= 0) {
+            throw new ShoppingException(ErrorCode.INVALID_EXCHANGE_RATE);
+        }
     }
 
     public double getValue() {

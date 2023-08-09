@@ -12,6 +12,8 @@ import shopping.common.exception.ShoppingException;
 public class DefaultExchangeRateProvider implements ExchangeRateProvider {
 
     private static final String REQUEST_URL = "http://api.currencylayer.com/live";
+    private static final String KRW = "KRW";
+    private static final String USDKRW = "USDKRW";
 
     @Value("${currency-layer.secret-key}")
     private String accessKey;
@@ -23,12 +25,12 @@ public class DefaultExchangeRateProvider implements ExchangeRateProvider {
 
     @Override
     public ExchangeRate fetchExchangeRate() {
-        final String requestUri = REQUEST_URL + "?currencies=KRW&access_key=" + accessKey;
+        final String requestUri = REQUEST_URL + "?currencies=" + KRW + "&access_key=" + accessKey;
         final ResponseEntity<ExchangeRateResponse> response = restTemplate.getForEntity(requestUri,
             ExchangeRateResponse.class);
         validateFetch(response);
         final Map<String, Double> quotes = response.getBody().getQuotes();
-        final Double exchangeRateValue = quotes.get("USDKRW");
+        final Double exchangeRateValue = quotes.get(USDKRW);
         validateNotNull(exchangeRateValue);
         return new ExchangeRate(exchangeRateValue);
     }

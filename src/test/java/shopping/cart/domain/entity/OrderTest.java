@@ -52,7 +52,7 @@ class OrderTest {
         order.addOrderItem(피자);
 
         /* then */
-        assertThat(order.getTotalPriceInDollar().getValue().longValue()).isEqualTo(100L);
+        assertThat(order.getTotalPriceInDollar().getValue()).isEqualTo(100);
     }
 
     @Test

@@ -21,7 +21,7 @@ public enum ErrorCode {
     INVALID_ORDER(HttpStatus.BAD_REQUEST, "존재하지 않는 주문입니다."),
     FAILED_TO_FETCH_EXCHANGE_RATE(HttpStatus.BAD_REQUEST, "환율 정보를 가져올 수 없습니다."),
     EMPTY_CART(HttpStatus.BAD_REQUEST, "장바구니가 비어 있습니다."),
-    ;
+    INVALID_EXCHANGE_RATE(HttpStatus.INTERNAL_SERVER_ERROR, "환율은 양수여야 합니다.");
 
     private final HttpStatus status;
     private final String message;

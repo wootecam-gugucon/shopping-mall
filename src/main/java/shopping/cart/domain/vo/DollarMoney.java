@@ -1,17 +1,16 @@
 package shopping.cart.domain.vo;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 public class DollarMoney {
 
-    private final BigDecimal value;
+    private final double value;
 
-    public DollarMoney(final BigDecimal bigDecimal) {
-        this.value = bigDecimal;
+    public DollarMoney(final double value) {
+        this.value = value;
     }
 
-    public BigDecimal getValue() {
+    public double getValue() {
         return value;
     }
 
@@ -23,8 +22,8 @@ public class DollarMoney {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final DollarMoney dollarMoney = (DollarMoney) o;
-        return Objects.equals(value, dollarMoney.value);
+        final DollarMoney that = (DollarMoney) o;
+        return Double.compare(that.value, value) == 0;
     }
 
     @Override
