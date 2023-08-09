@@ -2,16 +2,16 @@ package shopping.cart.dto.response;
 
 import shopping.cart.domain.entity.Order;
 
-public final class OrderCreateResponse {
+public final class OrderResponse {
 
     private Long orderId;
 
-    private OrderCreateResponse(final Long orderId) {
+    private OrderResponse(final Long orderId) {
         this.orderId = orderId;
     }
 
-    public static OrderCreateResponse from(final Order order) {
-        return new OrderCreateResponse(order.getId());
+    public static OrderResponse from(final Order order) {
+        return new OrderResponse(order.getId());
     }
 
     public Long getOrderId() {
