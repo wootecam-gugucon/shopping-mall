@@ -22,7 +22,7 @@ public class DefaultExchangeRateProvider implements ExchangeRateProvider {
     @Override
     public ExchangeRate fetchExchangeRateOf(final MoneyType moneyType) {
         final String requestUri =
-            REQUEST_URL + "?currencies=" + moneyType.name() + "&access_key=" + accessKey;
+            REQUEST_URL + "?currencies=" + MoneyType.KRW.name() + "&access_key=" + accessKey;
         final RestTemplate restTemplate = new RestTemplate();
         final ResponseEntity<ExchangeRateResponse> response = restTemplate.getForEntity(requestUri,
             ExchangeRateResponse.class);
@@ -34,7 +34,7 @@ public class DefaultExchangeRateProvider implements ExchangeRateProvider {
     }
 
     private void validateFetch(final ResponseEntity<ExchangeRateResponse> response) {
-        if (!response.getBody().isSuccess()) {
+        if (!response.hasBody() || !response.getBody().isSuccess()) {
             throw new ShoppingException(ErrorCode.FAILED_TO_FETCH_EXCHANGE_RATE);
         }
     }
