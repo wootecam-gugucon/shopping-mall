@@ -16,14 +16,19 @@ public class DefaultExchangeRateProvider implements ExchangeRateProvider {
 
     private static final String REQUEST_URL = "http://api.currencylayer.com/live";
 
-    @Value("${currency-layer.secret-key}")
-    private String accessKey;
+    private final RestTemplate restTemplate;
+    private final String accessKey;
+
+    public DefaultExchangeRateProvider(final RestTemplate restTemplate,
+        @Value("${currency-layer.secret-key}") final String accessKey) {
+        this.restTemplate = restTemplate;
+        this.accessKey = accessKey;
+    }
 
     @Override
     public ExchangeRate fetchExchangeRateOf(final MoneyType moneyType) {
         final String requestUri =
             REQUEST_URL + "?currencies=" + MoneyType.KRW.name() + "&access_key=" + accessKey;
-        final RestTemplate restTemplate = new RestTemplate();
         final ResponseEntity<ExchangeRateResponse> response = restTemplate.getForEntity(requestUri,
             ExchangeRateResponse.class);
         validateFetch(response);

@@ -1,25 +1,55 @@
 package shopping.cart.utils.currency;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.client.RestTemplate;
 import shopping.cart.domain.MoneyType;
+import shopping.cart.domain.vo.ExchangeRate;
 
-//@SpringBootTest(classes = DefaultExchangeRateProvider.class)
 @DisplayName("환율 정보를 제공받는 외부 API 테스트")
 class DefaultExchangeRateProviderTest {
 
-    @Autowired
     DefaultExchangeRateProvider exchangeRateProvider;
 
-    //@Test
+    @BeforeEach
+    void setUp() {
+        final RestTemplate restTemplate = new RestTemplate();
+        final String accessKey = "mockAccessKey";
+        final String requestURI =
+            "http://api.currencylayer.com/live?currencies=KRW&access_key=" + accessKey;
+        final double mockExchangeRate = 1234.567890;
+
+        final MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
+        mockServer.expect(ExpectedCount.once(), requestTo(requestURI))
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(MockRestResponseCreators.withSuccess(
+                "{\"success\":true,\"terms\":\"https:\\/\\/currencylayer.com\\/terms\",\"privacy\":\"https:\\/\\/currencylayer.com\\/privacy\",\"timestamp\":1691561942,\"source\":\"USD\",\"quotes\":{\"USDKRW\":"
+                    + mockExchangeRate + "}}",
+                MediaType.APPLICATION_JSON));
+
+        exchangeRateProvider = new DefaultExchangeRateProvider(restTemplate, accessKey);
+    }
+
+    @Test
     @DisplayName("환율 정보를 정상적으로 가져온다.")
     void fetchExchangeRateInfo() {
         /* given */
 
-        /* when & then */
-        assertThatNoException()
-            .isThrownBy(() -> exchangeRateProvider.fetchExchangeRateOf(MoneyType.USD));
+        /* when */
+        final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRateOf(MoneyType.USD);
+
+        /* then */
+        assertThat(exchangeRate.getMoneyType()).isEqualTo(MoneyType.USD);
+        assertThat(exchangeRate.getRatio()).isEqualTo(1234.567890);
     }
 }
