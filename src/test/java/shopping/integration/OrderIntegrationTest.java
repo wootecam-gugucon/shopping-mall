@@ -1,6 +1,12 @@
 package shopping.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static shopping.TestUtils.extractCartItemResponses;
+import static shopping.TestUtils.extractOrderId;
+import static shopping.TestUtils.insertCartItem;
+import static shopping.TestUtils.login;
+import static shopping.TestUtils.placeOrder;
+import static shopping.TestUtils.readCartItems;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -13,7 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import shopping.TestUtils;
 import shopping.auth.dto.request.LoginRequest;
 import shopping.auth.dto.response.LoginResponse;
 import shopping.cart.dto.request.CartItemInsertRequest;
@@ -56,12 +61,12 @@ class OrderIntegrationTest extends IntegrationTest {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
             "test_password!");
-        String accessToken = TestUtils.login(loginRequest)
+        String accessToken = login(loginRequest)
             .as(LoginResponse.class)
             .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
-        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
+        insertCartItem(accessToken, cartItemInsertRequest);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -83,7 +88,7 @@ class OrderIntegrationTest extends IntegrationTest {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
             "test_password!");
-        String accessToken = TestUtils.login(loginRequest)
+        String accessToken = login(loginRequest)
             .as(LoginResponse.class)
             .getAccessToken();
 
@@ -108,23 +113,23 @@ class OrderIntegrationTest extends IntegrationTest {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
             "test_password!");
-        String accessToken = TestUtils.login(loginRequest)
+        String accessToken = login(loginRequest)
             .as(LoginResponse.class)
             .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest1 = new CartItemInsertRequest(1L);
-        TestUtils.insertCartItem(accessToken, cartItemInsertRequest1);
+        insertCartItem(accessToken, cartItemInsertRequest1);
 
         final CartItemInsertRequest cartItemInsertRequest2 = new CartItemInsertRequest(2L);
-        TestUtils.insertCartItem(accessToken, cartItemInsertRequest2);
+        insertCartItem(accessToken, cartItemInsertRequest2);
 
-        final List<CartItemResponse> cartItemResponses = TestUtils.extractCartItemResponses(
-            TestUtils.readCartItems(accessToken));
+        final List<CartItemResponse> cartItemResponses = extractCartItemResponses(
+            readCartItems(accessToken));
         final List<String> cartItemNames = cartItemResponses.stream()
             .map(CartItemResponse::getName)
             .collect(Collectors.toUnmodifiableList());
 
-        final Long orderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+        final Long orderId = extractOrderId(placeOrder(accessToken));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -150,7 +155,7 @@ class OrderIntegrationTest extends IntegrationTest {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
             "test_password!");
-        String accessToken = TestUtils.login(loginRequest)
+        String accessToken = login(loginRequest)
             .as(LoginResponse.class)
             .getAccessToken();
         final Long invalidOrderId = Long.MAX_VALUE;
@@ -176,18 +181,18 @@ class OrderIntegrationTest extends IntegrationTest {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
             "test_password!");
-        String accessToken = TestUtils.login(loginRequest)
+        String accessToken = login(loginRequest)
             .as(LoginResponse.class)
             .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
-        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
+        insertCartItem(accessToken, cartItemInsertRequest);
 
-        final Long orderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+        final Long orderId = extractOrderId(placeOrder(accessToken));
 
         final LoginRequest otherLoginRequest = new LoginRequest("other_test_email@woowafriends.com",
             "test_password!");
-        String otherAccessToken = TestUtils.login(otherLoginRequest)
+        String otherAccessToken = login(otherLoginRequest)
             .as(LoginResponse.class)
             .getAccessToken();
 
@@ -212,16 +217,16 @@ class OrderIntegrationTest extends IntegrationTest {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
             "test_password!");
-        String accessToken = TestUtils.login(loginRequest)
+        String accessToken = login(loginRequest)
             .as(LoginResponse.class)
             .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
-        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
-        final Long firstOrderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+        insertCartItem(accessToken, cartItemInsertRequest);
+        final Long firstOrderId = extractOrderId(placeOrder(accessToken));
 
-        TestUtils.insertCartItem(accessToken, cartItemInsertRequest);
-        final Long secondOrderId = TestUtils.extractOrderId(TestUtils.placeOrder(accessToken));
+        insertCartItem(accessToken, cartItemInsertRequest);
+        final Long secondOrderId = extractOrderId(placeOrder(accessToken));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
