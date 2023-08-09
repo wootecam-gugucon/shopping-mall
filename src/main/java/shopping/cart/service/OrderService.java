@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.auth.domain.entity.User;
 import shopping.auth.repository.UserRepository;
-import shopping.cart.domain.MoneyType;
 import shopping.cart.domain.entity.CartItem;
 import shopping.cart.domain.entity.Order;
 import shopping.cart.domain.entity.OrderItem;
 import shopping.cart.domain.vo.ExchangeRate;
-import shopping.cart.domain.vo.ForeignCurrency;
 import shopping.cart.dto.response.OrderCreateResponse;
 import shopping.cart.dto.response.OrderDetailResponse;
 import shopping.cart.dto.response.OrderHistoryResponse;
@@ -25,10 +23,7 @@ import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
 
 @Service
-@Transactional(readOnly = true)
 public class OrderService {
-
-    private final MoneyType conversionTarget = MoneyType.USD;
 
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
@@ -53,7 +48,8 @@ public class OrderService {
 
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
-        final Order order = Order.of(user);
+        final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRate();
+        final Order order = Order.of(user, exchangeRate);
         cartItems.stream()
             .map(cartItem -> OrderItem.from(cartItem, order))
             .forEach(orderItemRepository::save);
@@ -61,20 +57,17 @@ public class OrderService {
         return OrderCreateResponse.from(orderRepository.save(order));
     }
 
+    @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long userId) {
-
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         final User user = userRepository.getReferenceById(userId);
 
         validateUserHasOrder(user, order);
-        final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRateOf(
-            conversionTarget);
-        final ForeignCurrency foreignCurrencyTotalPrice = exchangeRate.convert(
-            order.getTotalPrice(), conversionTarget);
-        return OrderDetailResponse.from(order, foreignCurrencyTotalPrice, exchangeRate);
+        return OrderDetailResponse.from(order);
     }
 
+    @Transactional(readOnly = true)
     public List<OrderHistoryResponse> getOrderHistory(final Long userId) {
         final List<Order> orders = orderRepository.findAllByUserIdWithOrderItems(userId,
             Sort.by(Direction.DESC, "id"));

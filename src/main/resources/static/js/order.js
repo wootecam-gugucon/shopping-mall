@@ -14,6 +14,7 @@ const requestOrder = () => {
       'Content-Type': 'application/json'
     }
   }).then((response) => {
+    console.log(response);
     // TODO: [4단계] 주문이 성공하면 주문 상세 페이지로 이동 (order.html 사용)
     window.location.href = response.headers.get('Location');
   }).catch((error) => {

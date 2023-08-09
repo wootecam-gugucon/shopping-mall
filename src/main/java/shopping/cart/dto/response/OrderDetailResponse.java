@@ -4,41 +4,35 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import shopping.cart.domain.entity.Order;
-import shopping.cart.domain.vo.ExchangeRate;
-import shopping.cart.domain.vo.ForeignCurrency;
 
 public final class OrderDetailResponse {
 
     private Long orderId;
     private List<OrderItemResponse> orderItems;
     private long totalPrice;
-    private BigDecimal foreignCurrencyTotalPrice;
+    private BigDecimal dollarTotalPrice;
     private double exchangeRate;
-    private String unit;
 
     private OrderDetailResponse() {
     }
 
-    public OrderDetailResponse(final Long orderId, final List<OrderItemResponse> orderItems,
-        final long totalPrice,
-        final BigDecimal foreignCurrencyTotalPrice, final double exchangeRate, final String unit) {
+    private OrderDetailResponse(final Long orderId, final List<OrderItemResponse> orderItems,
+        final long totalPrice, final BigDecimal dollarTotalPrice, final double exchangeRate) {
         this.orderId = orderId;
         this.orderItems = orderItems;
         this.totalPrice = totalPrice;
-        this.foreignCurrencyTotalPrice = foreignCurrencyTotalPrice;
+        this.dollarTotalPrice = dollarTotalPrice;
         this.exchangeRate = exchangeRate;
-        this.unit = unit;
     }
 
-    public static OrderDetailResponse from(final Order order,
-        final ForeignCurrency foreignCurrencyTotalPrice,
-        final ExchangeRate exchangeRate) {
+    public static OrderDetailResponse from(final Order order) {
         final List<OrderItemResponse> orderItemResponses = order.getOrderItems().stream()
             .map(OrderItemResponse::from)
             .collect(Collectors.toUnmodifiableList());
+
         return new OrderDetailResponse(order.getId(), orderItemResponses,
-            order.getTotalPrice().getValue(), foreignCurrencyTotalPrice.getValue(),
-            exchangeRate.getRatio(), foreignCurrencyTotalPrice.getMoneyType().getUnit());
+            order.getTotalPrice().getValue(), order.getTotalPriceInDollar().getValue(),
+            order.getExchangeRate().getValue());
     }
 
     public Long getOrderId() {
@@ -53,15 +47,11 @@ public final class OrderDetailResponse {
         return totalPrice;
     }
 
-    public BigDecimal getForeignCurrencyTotalPrice() {
-        return foreignCurrencyTotalPrice;
+    public BigDecimal getDollarTotalPrice() {
+        return dollarTotalPrice;
     }
 
     public double getExchangeRate() {
         return exchangeRate;
-    }
-
-    public String getUnit() {
-        return unit;
     }
 }

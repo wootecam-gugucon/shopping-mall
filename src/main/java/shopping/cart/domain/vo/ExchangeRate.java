@@ -1,26 +1,31 @@
 package shopping.cart.domain.vo;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.math.MathContext;
 import java.util.Objects;
-import shopping.cart.domain.MoneyType;
+import javax.persistence.Embeddable;
 
+@Embeddable
 public class ExchangeRate {
 
-    private final MoneyType moneyType;
-    private final double ratio;
-
-    public ExchangeRate(final MoneyType moneyType, final double ratio) {
-        this.moneyType = moneyType;
-        this.ratio = ratio;
+    protected ExchangeRate() {
     }
 
-    public MoneyType getMoneyType() {
-        return moneyType;
+    private double value;
+
+    public ExchangeRate(final double value) {
+        this.value = value;
     }
 
-    public double getRatio() {
-        return ratio;
+    public DollarMoney convert(final Money sourcePrice) {
+        final BigDecimal sourceValue = BigDecimal.valueOf(sourcePrice.getValue());
+        final BigDecimal targetValue = sourceValue.divide(BigDecimal.valueOf(value),
+            MathContext.DECIMAL128);
+        return new DollarMoney(targetValue);
+    }
+
+    public double getValue() {
+        return value;
     }
 
     @Override
@@ -32,18 +37,11 @@ public class ExchangeRate {
             return false;
         }
         final ExchangeRate that = (ExchangeRate) o;
-        return Double.compare(that.ratio, ratio) == 0 && moneyType == that.moneyType;
+        return Double.compare(that.value, value) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(moneyType, ratio);
-    }
-
-    public ForeignCurrency convert(final Money sourcePrice, final MoneyType foreignMoneyType) {
-        final BigDecimal sourceValue = BigDecimal.valueOf(sourcePrice.getValue());
-        final BigDecimal targetValue = sourceValue.divide(BigDecimal.valueOf(ratio),
-            RoundingMode.HALF_DOWN);
-        return new ForeignCurrency(targetValue, foreignMoneyType);
+        return Objects.hash(value);
     }
 }

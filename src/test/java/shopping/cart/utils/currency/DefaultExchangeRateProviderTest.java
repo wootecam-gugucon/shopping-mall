@@ -7,24 +7,25 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestTemplate;
-import shopping.cart.domain.MoneyType;
 import shopping.cart.domain.vo.ExchangeRate;
 
 @DisplayName("DefaultExchangeRateProvider 단위 테스트")
 class DefaultExchangeRateProviderTest {
 
     DefaultExchangeRateProvider exchangeRateProvider;
+    @Value("${currency-layer.secret-key}")
+    String accessKey;
 
     @BeforeEach
     void setUp() {
         final RestTemplate restTemplate = new RestTemplate();
-        final String accessKey = "mockAccessKey";
         final String requestURI =
             "http://api.currencylayer.com/live?currencies=KRW&access_key=" + accessKey;
         final double mockExchangeRate = 1234.567890;
@@ -37,7 +38,7 @@ class DefaultExchangeRateProviderTest {
                     + mockExchangeRate + "}}",
                 MediaType.APPLICATION_JSON));
 
-        exchangeRateProvider = new DefaultExchangeRateProvider(restTemplate, accessKey);
+        exchangeRateProvider = new DefaultExchangeRateProvider(restTemplate);
     }
 
     @Test
@@ -46,10 +47,9 @@ class DefaultExchangeRateProviderTest {
         /* given */
 
         /* when */
-        final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRateOf(MoneyType.USD);
+        final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRate();
 
         /* then */
-        assertThat(exchangeRate.getMoneyType()).isEqualTo(MoneyType.USD);
-        assertThat(exchangeRate.getRatio()).isEqualTo(1234.567890);
+        assertThat(exchangeRate.getValue()).isEqualTo(1234.567890);
     }
 }

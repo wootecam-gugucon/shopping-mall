@@ -16,6 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import shopping.auth.domain.entity.User;
+import shopping.cart.domain.vo.DollarMoney;
+import shopping.cart.domain.vo.ExchangeRate;
 import shopping.cart.domain.vo.Money;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
@@ -37,23 +39,31 @@ public class Order {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "total_price"))
     private Money totalPrice;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "exchange_rate"))
+    private ExchangeRate exchangeRate;
 
     protected Order() {
     }
 
-    public Order(final Long id, final User user) {
+    public Order(final Long id, final User user, final ExchangeRate exchangeRate) {
         this.id = id;
         this.user = user;
         this.totalPrice = Money.ZERO;
+        this.exchangeRate = exchangeRate;
     }
 
-    public static Order of(final User user) {
-        return new Order(null, user);
+    public static Order of(final User user, final ExchangeRate exchangeRate) {
+        return new Order(null, user, exchangeRate);
     }
 
     public void addOrderItem(final OrderItem orderItem) {
         orderItems.add(orderItem);
         totalPrice = totalPrice.add(orderItem.getTotalPrice());
+    }
+
+    public DollarMoney getTotalPriceInDollar() {
+        return exchangeRate.convert(totalPrice);
     }
 
     public static void validateTotalPrice(final List<CartItem> cartItems) {
@@ -87,5 +97,9 @@ public class Order {
 
     public Money getTotalPrice() {
         return totalPrice;
+    }
+
+    public ExchangeRate getExchangeRate() {
+        return exchangeRate;
     }
 }

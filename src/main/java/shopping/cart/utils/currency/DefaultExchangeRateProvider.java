@@ -3,39 +3,34 @@ package shopping.cart.utils.currency;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import shopping.cart.domain.MoneyType;
 import shopping.cart.domain.vo.ExchangeRate;
 import shopping.cart.dto.response.ExchangeRateResponse;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
 
-@Component
 public class DefaultExchangeRateProvider implements ExchangeRateProvider {
 
     private static final String REQUEST_URL = "http://api.currencylayer.com/live";
 
+    @Value("${currency-layer.secret-key}")
+    private String accessKey;
     private final RestTemplate restTemplate;
-    private final String accessKey;
 
-    public DefaultExchangeRateProvider(final RestTemplate restTemplate,
-        @Value("${currency-layer.secret-key}") final String accessKey) {
+    public DefaultExchangeRateProvider(final RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        this.accessKey = accessKey;
     }
 
     @Override
-    public ExchangeRate fetchExchangeRateOf(final MoneyType moneyType) {
-        final String requestUri =
-            REQUEST_URL + "?currencies=" + MoneyType.KRW.name() + "&access_key=" + accessKey;
+    public ExchangeRate fetchExchangeRate() {
+        final String requestUri = REQUEST_URL + "?currencies=KRW&access_key=" + accessKey;
         final ResponseEntity<ExchangeRateResponse> response = restTemplate.getForEntity(requestUri,
             ExchangeRateResponse.class);
         validateFetch(response);
         final Map<String, Double> quotes = response.getBody().getQuotes();
-        final Double rawExchangeRate = quotes.get(moneyType.name() + MoneyType.KRW.name());
-        validateNotNull(rawExchangeRate);
-        return new ExchangeRate(moneyType, rawExchangeRate);
+        final Double exchangeRateValue = quotes.get("USDKRW");
+        validateNotNull(exchangeRateValue);
+        return new ExchangeRate(exchangeRateValue);
     }
 
     private void validateFetch(final ResponseEntity<ExchangeRateResponse> response) {
