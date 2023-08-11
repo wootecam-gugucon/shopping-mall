@@ -14,7 +14,7 @@ import shopping.cart.domain.vo.ExchangeRate;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
-import shopping.cart.utils.currency.ExchangeRateProvider;
+import shopping.cart.service.currency.ExchangeRateProvider;
 
 import java.util.List;
 

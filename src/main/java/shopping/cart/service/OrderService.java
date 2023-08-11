@@ -14,7 +14,7 @@ import shopping.cart.dto.response.OrderHistoryResponse;
 import shopping.cart.dto.response.OrderResponse;
 import shopping.cart.repository.CartItemRepository;
 import shopping.cart.repository.OrderRepository;
-import shopping.cart.utils.currency.ExchangeRateProvider;
+import shopping.cart.service.currency.ExchangeRateProvider;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
 

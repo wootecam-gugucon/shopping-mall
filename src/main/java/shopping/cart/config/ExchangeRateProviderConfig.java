@@ -4,8 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
-import shopping.cart.utils.currency.DefaultExchangeRateProvider;
-import shopping.cart.utils.currency.ExchangeRateProvider;
+import shopping.cart.service.currency.DefaultExchangeRateProvider;
+import shopping.cart.service.currency.ExchangeRateProvider;
 
 @Configuration
 public class ExchangeRateProviderConfig {

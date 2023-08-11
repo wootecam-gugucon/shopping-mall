@@ -1,6 +1,5 @@
-package shopping.cart.utils.currency;
+package shopping.cart.service.currency;
 
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -8,6 +7,8 @@ import shopping.cart.domain.vo.ExchangeRate;
 import shopping.cart.dto.response.ExchangeRateResponse;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
+
+import java.util.Map;
 
 public class DefaultExchangeRateProvider implements ExchangeRateProvider {
 
@@ -27,7 +28,7 @@ public class DefaultExchangeRateProvider implements ExchangeRateProvider {
     public ExchangeRate fetchExchangeRate() {
         final String requestUri = REQUEST_URL + "?currencies=" + KRW + "&access_key=" + accessKey;
         final ResponseEntity<ExchangeRateResponse> response = restTemplate.getForEntity(requestUri,
-            ExchangeRateResponse.class);
+                ExchangeRateResponse.class);
         validateFetch(response);
         final Map<String, Double> quotes = response.getBody().getQuotes();
         final Double exchangeRateValue = quotes.get(USDKRW);

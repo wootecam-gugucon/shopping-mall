@@ -1,8 +1,4 @@
-package shopping.cart.utils.currency;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+package shopping.cart.service.currency;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +12,10 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestTemplate;
 import shopping.cart.domain.vo.ExchangeRate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+
 @DisplayName("DefaultExchangeRateProvider 단위 테스트")
 class DefaultExchangeRateProviderTest {
 
@@ -27,16 +27,16 @@ class DefaultExchangeRateProviderTest {
     void setUp() {
         final RestTemplate restTemplate = new RestTemplate();
         final String requestURI =
-            "http://api.currencylayer.com/live?currencies=KRW&access_key=" + accessKey;
+                "http://api.currencylayer.com/live?currencies=KRW&access_key=" + accessKey;
         final double mockExchangeRate = 1234.567890;
 
         final MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
         mockServer.expect(ExpectedCount.once(), requestTo(requestURI))
-            .andExpect(method(HttpMethod.GET))
-            .andRespond(MockRestResponseCreators.withSuccess(
-                "{\"success\":true,\"terms\":\"https:\\/\\/currencylayer.com\\/terms\",\"privacy\":\"https:\\/\\/currencylayer.com\\/privacy\",\"timestamp\":1691561942,\"source\":\"USD\",\"quotes\":{\"USDKRW\":"
-                    + mockExchangeRate + "}}",
-                MediaType.APPLICATION_JSON));
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withSuccess(
+                        "{\"success\":true,\"terms\":\"https:\\/\\/currencylayer.com\\/terms\",\"privacy\":\"https:\\/\\/currencylayer.com\\/privacy\",\"timestamp\":1691561942,\"source\":\"USD\",\"quotes\":{\"USDKRW\":"
+                                + mockExchangeRate + "}}",
+                        MediaType.APPLICATION_JSON));
 
         exchangeRateProvider = new DefaultExchangeRateProvider(restTemplate);
     }
