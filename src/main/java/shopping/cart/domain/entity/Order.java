@@ -43,11 +43,15 @@ public class Order {
         this.exchangeRate = exchangeRate;
     }
 
-    public static Order of(final User user, final ExchangeRate exchangeRate) {
-        return new Order(null, user, exchangeRate);
+    public static Order from(final User user, final List<CartItem> cartItems, final ExchangeRate exchangeRate) {
+        Order order = new Order(null, user, exchangeRate);
+        cartItems.stream()
+                .map(cartItem -> OrderItem.from(cartItem, order))
+                .forEach(order::addOrderItem);
+        return order;
     }
 
-    public void addOrderItem(final OrderItem orderItem) {
+    private void addOrderItem(final OrderItem orderItem) {
         orderItems.add(orderItem);
         totalPrice = totalPrice.add(orderItem.getTotalPrice());
     }

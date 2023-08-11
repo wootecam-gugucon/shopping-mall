@@ -35,11 +35,9 @@ public class OrderItem {
     }
 
     public static OrderItem from(final CartItem cartItem, final Order order) {
-        final OrderItem orderItem = new OrderItem(null, order, cartItem.getProduct().getName(),
+        return new OrderItem(null, order, cartItem.getProduct().getName(),
                 cartItem.getProduct().getPrice(),
                 cartItem.getProduct().getImageFileName(), cartItem.getQuantity());
-        order.addOrderItem(orderItem);
-        return orderItem;
     }
 
     public Long getId() {

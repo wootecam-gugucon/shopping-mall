@@ -1,7 +1,5 @@
 package shopping.cart.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -10,33 +8,30 @@ import shopping.auth.domain.entity.User;
 import shopping.auth.repository.UserRepository;
 import shopping.cart.domain.entity.CartItem;
 import shopping.cart.domain.entity.Order;
-import shopping.cart.domain.entity.OrderItem;
 import shopping.cart.domain.vo.ExchangeRate;
 import shopping.cart.dto.response.OrderDetailResponse;
 import shopping.cart.dto.response.OrderHistoryResponse;
 import shopping.cart.dto.response.OrderResponse;
 import shopping.cart.repository.CartItemRepository;
-import shopping.cart.repository.OrderItemRepository;
 import shopping.cart.repository.OrderRepository;
 import shopping.cart.utils.currency.ExchangeRateProvider;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
 
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final CartItemRepository cartItemRepository;
     private final ExchangeRateProvider exchangeRateProvider;
 
-    public OrderService(final UserRepository userRepository, final OrderRepository orderRepository,
-        final OrderItemRepository orderItemRepository, final CartItemRepository cartItemRepository,
-        final ExchangeRateProvider exchangeRateProvider) {
+    public OrderService(UserRepository userRepository, OrderRepository orderRepository, CartItemRepository cartItemRepository, ExchangeRateProvider exchangeRateProvider) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
         this.cartItemRepository = cartItemRepository;
         this.exchangeRateProvider = exchangeRateProvider;
     }
@@ -49,10 +44,7 @@ public class OrderService {
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
         final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRate();
-        final Order order = Order.of(user, exchangeRate);
-        cartItems.stream()
-            .map(cartItem -> OrderItem.from(cartItem, order))
-            .forEach(orderItemRepository::save);
+        final Order order = Order.from(user, cartItems, exchangeRate);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }
@@ -60,7 +52,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long userId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         final User user = userRepository.getReferenceById(userId);
 
         validateUserHasOrder(user, order);
@@ -70,10 +62,10 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderHistoryResponse> getOrderHistory(final Long userId) {
         final List<Order> orders = orderRepository.findAllByUserIdWithOrderItems(userId,
-            Sort.by(Direction.DESC, "id"));
+                Sort.by(Direction.DESC, "id"));
         return orders.stream()
-            .map(OrderHistoryResponse::from)
-            .collect(Collectors.toUnmodifiableList());
+                .map(OrderHistoryResponse::from)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private void validateNotEmpty(final List<CartItem> cartItems) {

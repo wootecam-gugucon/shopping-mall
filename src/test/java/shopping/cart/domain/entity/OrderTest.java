@@ -2,9 +2,8 @@ package shopping.cart.domain.entity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import shopping.auth.domain.entity.User;
 import shopping.cart.domain.vo.ExchangeRate;
-import shopping.cart.domain.vo.Quantity;
-import shopping.cart.domain.vo.WonMoney;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
 
@@ -20,39 +19,15 @@ import static shopping.TestUtils.createUser;
 class OrderTest {
 
     @Test
-    @DisplayName("주문에 주문상품을 추가한다.")
-    void addOrderItem() {
-        /* given */
-        final Order order = Order.of(createUser(), new ExchangeRate(1300));
-        final OrderItem 치킨 = new OrderItem(1L, order, "치킨", new WonMoney(10000), "chicken.png",
-                new Quantity(3));
-        final OrderItem 피자 = new OrderItem(2L, order, "피자", new WonMoney(20000), "pizza.png",
-                new Quantity(4));
-
-        /* when */
-        order.addOrderItem(치킨);
-        order.addOrderItem(피자);
-
-        /* then */
-        assertThat(order.getOrderItems()).hasSize(2);
-        assertThat(order.getTotalPrice()).isEqualTo(new WonMoney(110000));
-    }
-
-    @Test
     @DisplayName("총 주문 금액을 달러로 환산해서 반환한다.")
     void getTotalPriceInDollar() {
         /* given */
-        final Order order = Order.of(createUser(), new ExchangeRate(1300));
-        final OrderItem 치킨 = new OrderItem(1L, order, "치킨", new WonMoney(10000), "chicken.png",
-                new Quantity(5));
-        final OrderItem 피자 = new OrderItem(2L, order, "피자", new WonMoney(20000), "pizza.png",
-                new Quantity(4));
+        final User user = createUser();
+        final CartItem cartItem1 = new CartItem(1L, user, createProduct("치킨", 10000), 5);
+        final CartItem cartItem2 = new CartItem(2L, user, createProduct("피자", 20000), 4);
+        final Order order = Order.from(user, List.of(cartItem1, cartItem2), new ExchangeRate(1300));
 
-        /* when */
-        order.addOrderItem(치킨);
-        order.addOrderItem(피자);
-
-        /* then */
+        /* when & then */
         assertThat(order.getTotalPriceInDollar().getValue()).isEqualTo(100);
     }
 
