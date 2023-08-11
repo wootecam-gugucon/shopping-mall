@@ -1,26 +1,16 @@
 package shopping.cart.domain.entity;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.AttributeOverride;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import shopping.auth.domain.entity.User;
 import shopping.cart.domain.vo.DollarMoney;
 import shopping.cart.domain.vo.ExchangeRate;
 import shopping.cart.domain.vo.Money;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
+
+import javax.persistence.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -29,7 +19,7 @@ public class Order {
     private static final long MAX_TOTAL_PRICE = 100_000_000_000L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -68,8 +58,8 @@ public class Order {
 
     public static void validateTotalPrice(final List<CartItem> cartItems) {
         final BigInteger totalPrice = cartItems.stream()
-            .map(CartItem::getTotalPrice)
-            .reduce(BigInteger.ZERO, BigInteger::add);
+                .map(CartItem::getTotalPrice)
+                .reduce(BigInteger.ZERO, BigInteger::add);
         validateRangeOf(totalPrice);
     }
 
