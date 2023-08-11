@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
@@ -67,13 +68,15 @@ public class Order {
         validateRangeOf(totalPrice);
     }
 
-    public boolean hasUser(final User user) {
-        return this.user == user;
-    }
-
     private static void validateRangeOf(final BigInteger totalPrice) {
         if (totalPrice.compareTo(BigInteger.valueOf(MAX_TOTAL_PRICE)) > 0) {
             throw new ShoppingException(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
+        }
+    }
+
+    public void validateUserHasId(Long userId) {
+        if (!Objects.equals(user.getId(), userId)) {
+            throw new ShoppingException(ErrorCode.INVALID_ORDER);
         }
     }
 

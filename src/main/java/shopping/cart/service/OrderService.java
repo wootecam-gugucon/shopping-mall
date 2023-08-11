@@ -53,9 +53,8 @@ public class OrderService {
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long userId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
-        final User user = userRepository.getReferenceById(userId);
 
-        validateUserHasOrder(user, order);
+        order.validateUserHasId(userId);
         return OrderDetailResponse.from(order);
     }
 
@@ -71,12 +70,6 @@ public class OrderService {
     private void validateNotEmpty(final List<CartItem> cartItems) {
         if (cartItems.isEmpty()) {
             throw new ShoppingException(ErrorCode.EMPTY_CART);
-        }
-    }
-
-    private void validateUserHasOrder(final User user, final Order order) {
-        if (!order.hasUser(user)) {
-            throw new ShoppingException(ErrorCode.INVALID_ORDER);
         }
     }
 }

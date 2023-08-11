@@ -7,6 +7,7 @@ import shopping.cart.domain.vo.ExchangeRate;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,5 +47,18 @@ class OrderTest {
         final ShoppingException exception = assertThrows(ShoppingException.class,
                 () -> Order.validateTotalPrice(List.of(invalidCartItem)));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
+    }
+
+    @Test
+    @DisplayName("주문자의 ID를 검증한다.")
+    void validateUserHasId() {
+        /* given */
+        User user = createUser();
+        Order order = Order.from(user, Collections.emptyList(), new ExchangeRate(1300));
+
+        /* when & then */
+        assertThatNoException().isThrownBy(() -> order.validateUserHasId(user.getId()));
+        ShoppingException exception = assertThrows(ShoppingException.class, () -> order.validateUserHasId(Long.MAX_VALUE));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
     }
 }
