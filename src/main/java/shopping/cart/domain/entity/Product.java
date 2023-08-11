@@ -1,6 +1,6 @@
 package shopping.cart.domain.entity;
 
-import shopping.cart.domain.vo.Money;
+import shopping.cart.domain.vo.WonMoney;
 
 import javax.persistence.*;
 
@@ -14,20 +14,20 @@ public class Product {
     private String name;
     private String imageFileName;
     @AttributeOverride(name = "value", column = @Column(name = "price"))
-    private Money price;
+    private WonMoney price;
 
     protected Product() {
     }
 
     public Product(final Long id, final String name, final String imageFileName,
-                   final Money price) {
+                   final WonMoney price) {
         this.id = id;
         this.name = name;
         this.imageFileName = imageFileName;
         this.price = price;
     }
 
-    public Product(final String name, final String imageFileName, final Money price) {
+    public Product(final String name, final String imageFileName, final WonMoney price) {
         this(null, name, imageFileName, price);
     }
 
@@ -43,7 +43,7 @@ public class Product {
         return imageFileName;
     }
 
-    public Money getPrice() {
+    public WonMoney getPrice() {
         return price;
     }
 }

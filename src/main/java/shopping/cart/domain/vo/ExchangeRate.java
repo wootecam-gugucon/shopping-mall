@@ -1,9 +1,10 @@
 package shopping.cart.domain.vo;
 
-import java.util.Objects;
-import javax.persistence.Embeddable;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
+
+import javax.persistence.Embeddable;
+import java.util.Objects;
 
 @Embeddable
 public class ExchangeRate {
@@ -18,7 +19,7 @@ public class ExchangeRate {
         this.value = value;
     }
 
-    public DollarMoney convert(final Money sourcePrice) {
+    public DollarMoney convert(final WonMoney sourcePrice) {
         validatePositive(value);
         return new DollarMoney(sourcePrice.getValue() / value);
     }

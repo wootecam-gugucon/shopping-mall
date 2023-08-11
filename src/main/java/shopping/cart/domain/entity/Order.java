@@ -3,7 +3,7 @@ package shopping.cart.domain.entity;
 import shopping.auth.domain.entity.User;
 import shopping.cart.domain.vo.DollarMoney;
 import shopping.cart.domain.vo.ExchangeRate;
-import shopping.cart.domain.vo.Money;
+import shopping.cart.domain.vo.WonMoney;
 import shopping.common.exception.ErrorCode;
 import shopping.common.exception.ShoppingException;
 
@@ -28,7 +28,7 @@ public class Order {
     private List<OrderItem> orderItems = new ArrayList<>();
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "total_price"))
-    private Money totalPrice;
+    private WonMoney totalPrice;
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "exchange_rate"))
     private ExchangeRate exchangeRate;
@@ -39,7 +39,7 @@ public class Order {
     public Order(final Long id, final User user, final ExchangeRate exchangeRate) {
         this.id = id;
         this.user = user;
-        this.totalPrice = Money.ZERO;
+        this.totalPrice = WonMoney.ZERO;
         this.exchangeRate = exchangeRate;
     }
 
@@ -85,7 +85,7 @@ public class Order {
         return orderItems;
     }
 
-    public Money getTotalPrice() {
+    public WonMoney getTotalPrice() {
         return totalPrice;
     }
 

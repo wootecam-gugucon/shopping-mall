@@ -3,14 +3,15 @@ package shopping;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.springframework.http.MediaType;
 import shopping.auth.domain.entity.User;
 import shopping.auth.dto.request.LoginRequest;
 import shopping.cart.domain.entity.Product;
-import shopping.cart.domain.vo.Money;
+import shopping.cart.domain.vo.WonMoney;
 import shopping.cart.dto.request.CartItemInsertRequest;
 import shopping.cart.dto.response.CartItemResponse;
+
+import java.util.List;
 
 public class TestUtils {
 
@@ -18,7 +19,7 @@ public class TestUtils {
 
     public static Product createProduct(String name, long price) {
         sequence++;
-        return new Product(sequence, name, "image_file_name_" + sequence, new Money(price));
+        return new Product(sequence, name, "image_file_name_" + sequence, new WonMoney(price));
     }
 
     public static User createUser() {
@@ -28,43 +29,43 @@ public class TestUtils {
 
     public static ExtractableResponse<Response> login(final LoginRequest loginRequest) {
         return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(loginRequest)
-            .when().post("/api/v1/login/token")
-            .then().log().all()
-            .extract();
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(loginRequest)
+                .when().post("/api/v1/login/token")
+                .then().log().all()
+                .extract();
     }
 
     public static ExtractableResponse<Response> insertCartItem(String accessToken,
-        CartItemInsertRequest cartItemInsertRequest) {
+                                                               CartItemInsertRequest cartItemInsertRequest) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(cartItemInsertRequest)
-            .when().post("/api/v1/cart/items")
-            .then().log().all()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(cartItemInsertRequest)
+                .when().post("/api/v1/cart/items")
+                .then().log().all()
+                .extract();
     }
 
     public static ExtractableResponse<Response> readCartItems(String accessToken) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when().get("/api/v1/cart/items")
-            .then().log().all()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when().get("/api/v1/cart/items")
+                .then().log().all()
+                .extract();
     }
 
     public static ExtractableResponse<Response> placeOrder(String accessToken) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .post("/api/v1/order")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
     }
 
     public static Long extractOrderId(final ExtractableResponse<Response> response) {
@@ -72,7 +73,7 @@ public class TestUtils {
     }
 
     public static List<CartItemResponse> extractCartItemResponses(
-        final ExtractableResponse<Response> response) {
+            final ExtractableResponse<Response> response) {
         return response.jsonPath().getList(".", CartItemResponse.class);
     }
 }

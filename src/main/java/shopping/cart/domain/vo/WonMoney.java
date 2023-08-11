@@ -1,28 +1,28 @@
 package shopping.cart.domain.vo;
 
-import java.util.Objects;
 import javax.persistence.Embeddable;
+import java.util.Objects;
 
 @Embeddable
-public class Money {
+public class WonMoney {
 
-    public static final Money ZERO = new Money(0);
+    public static final WonMoney ZERO = new WonMoney(0);
 
     private long value;
 
-    protected Money() {
+    protected WonMoney() {
     }
 
-    public Money(final long value) {
+    public WonMoney(final long value) {
         this.value = value;
     }
 
-    public Money add(final Money other) {
-        return new Money(value + other.value);
+    public WonMoney add(final WonMoney other) {
+        return new WonMoney(value + other.value);
     }
 
-    public Money multiply(final Quantity quantity) {
-        return new Money(value * quantity.getValue());
+    public WonMoney multiply(final Quantity quantity) {
+        return new WonMoney(value * quantity.getValue());
     }
 
     public long getValue() {
@@ -37,7 +37,7 @@ public class Money {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final Money money = (Money) o;
+        final WonMoney money = (WonMoney) o;
         return value == money.value;
     }
 
