@@ -11,6 +11,8 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "product_id")
+    private Long productId;
     private String productName;
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
@@ -21,9 +23,9 @@ public class OrderItem {
     protected OrderItem() {
     }
 
-    public OrderItem(final Long id, final String productName, final WonMoney price,
-                     final String imageFileName, final Quantity quantity) {
+    public OrderItem(Long id, Long productId, String productName, WonMoney price, String imageFileName, Quantity quantity) {
         this.id = id;
+        this.productId = productId;
         this.productName = productName;
         this.price = price;
         this.imageFileName = imageFileName;
@@ -31,7 +33,7 @@ public class OrderItem {
     }
 
     public static OrderItem from(final CartItem cartItem) {
-        return new OrderItem(null, cartItem.getProduct().getName(),
+        return new OrderItem(null, cartItem.getProduct().getId(), cartItem.getProduct().getName(),
                 cartItem.getProduct().getPrice(),
                 cartItem.getProduct().getImageFileName(), cartItem.getQuantity());
     }
