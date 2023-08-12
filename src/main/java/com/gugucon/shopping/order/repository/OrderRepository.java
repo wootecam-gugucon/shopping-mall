@@ -13,6 +13,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o " +
         "LEFT OUTER JOIN FETCH o.orderItems " +
-        "WHERE o.userId = :userId")
-    List<Order> findAllByUserIdWithOrderItems(@Param("userId") Long userId, Sort sort);
+        "WHERE o.memberId = :memberId")
+    List<Order> findAllByMemberIdWithOrderItems(@Param("memberId") Long memberId, Sort sort);
 }

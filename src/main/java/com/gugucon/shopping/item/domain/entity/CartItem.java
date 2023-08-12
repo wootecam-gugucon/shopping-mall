@@ -24,8 +24,8 @@ public class CartItem extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "member_id")
+    private Long memberId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -34,24 +34,24 @@ public class CartItem extends BaseTimeEntity {
     @Embedded
     private Quantity quantity;
 
-    public CartItem(final Long id, final Long userId, final Product product,
+    public CartItem(final Long id, final Long memberId, final Product product,
                     final int quantity) {
         this.id = id;
-        this.userId = userId;
+        this.memberId = memberId;
         this.product = product;
         this.quantity = new Quantity(quantity);
     }
 
-    public CartItem(final Long userId, final Product product) {
-        this(null, userId, product, DEFAULT_QUANTITY);
+    public CartItem(final Long memberId, final Product product) {
+        this(null, memberId, product, DEFAULT_QUANTITY);
     }
 
     public void updateQuantity(final Quantity quantity) {
         this.quantity = quantity;
     }
 
-    public void validateUserHasId(final Long userId) {
-        if (!Objects.equals(this.userId, userId)) {
+    public void validateUserHasId(final Long memberId) {
+        if (!Objects.equals(this.memberId, memberId)) {
             throw new ShoppingException(ErrorCode.INVALID_CART_ITEM);
         }
     }

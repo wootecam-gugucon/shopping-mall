@@ -26,7 +26,8 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleException() {
+    public ErrorResponse handleException(Exception e) {
+        e.printStackTrace();
         return ErrorResponse.from(ErrorCode.UNKNOWN_ERROR);
     }
 

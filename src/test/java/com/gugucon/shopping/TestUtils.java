@@ -4,10 +4,9 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import com.gugucon.shopping.user.domain.entity.User;
-import com.gugucon.shopping.user.dto.request.LoginRequest;
+import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.item.domain.entity.Product;
-import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 
@@ -22,9 +21,9 @@ public class TestUtils {
         return new Product(sequence, name, "image_file_name_" + sequence, 100, "test_description", price);
     }
 
-    public static User createUser() {
+    public static Member createMember() {
         sequence++;
-        return new User(sequence, "test_email" + sequence + "@gmail.com", "test_password");
+        return new Member(sequence, "test_email" + sequence + "@gmail.com", "test_password");
     }
 
     public static ExtractableResponse<Response> login(final LoginRequest loginRequest) {

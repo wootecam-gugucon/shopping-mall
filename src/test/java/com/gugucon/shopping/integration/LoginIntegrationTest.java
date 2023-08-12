@@ -12,8 +12,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import com.gugucon.shopping.user.dto.request.LoginRequest;
-import com.gugucon.shopping.user.dto.response.LoginResponse;
+import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 

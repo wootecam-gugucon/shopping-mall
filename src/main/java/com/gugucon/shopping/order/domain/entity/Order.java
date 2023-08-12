@@ -30,8 +30,8 @@ public class Order extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "member_id")
+    private Long memberId;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     @OneToMany(cascade = CascadeType.ALL)
@@ -44,16 +44,16 @@ public class Order extends BaseTimeEntity {
     @AttributeOverride(name = "value", column = @Column(name = "exchange_rate"))
     private ExchangeRate exchangeRate;
 
-    public Order(Long id, Long userId, OrderStatus status, ExchangeRate exchangeRate) {
+    public Order(Long id, Long memberId, OrderStatus status, ExchangeRate exchangeRate) {
         this.id = id;
-        this.userId = userId;
+        this.memberId = memberId;
         this.status = status;
         this.totalPrice = WonMoney.ZERO;
         this.exchangeRate = exchangeRate;
     }
 
-    public static Order from(final Long userId, final List<CartItem> cartItems, final ExchangeRate exchangeRate) {
-        Order order = new Order(null, userId, OrderStatus.ORDERED, exchangeRate);
+    public static Order from(final Long memberId, final List<CartItem> cartItems, final ExchangeRate exchangeRate) {
+        Order order = new Order(null, memberId, OrderStatus.ORDERED, exchangeRate);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -82,8 +82,8 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    public void validateUserHasId(Long userId) {
-        if (!Objects.equals(this.userId, userId)) {
+    public void validateUserHasId(Long memberId) {
+        if (!Objects.equals(this.memberId, memberId)) {
             throw new ShoppingException(ErrorCode.INVALID_ORDER);
         }
     }

@@ -4,7 +4,6 @@ import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.order.domain.vo.ExchangeRate;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.order.domain.entity.Order;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.gugucon.shopping.TestUtils.createProduct;
-import static com.gugucon.shopping.TestUtils.createUser;
+import static com.gugucon.shopping.TestUtils.createMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,10 +23,10 @@ class OrderTest {
     @DisplayName("총 주문 금액을 달러로 환산해서 반환한다.")
     void getTotalPriceInDollar() {
         /* given */
-        final Long userId = createUser().getId();
-        final CartItem cartItem1 = new CartItem(1L, userId, createProduct("치킨", 10000), 5);
-        final CartItem cartItem2 = new CartItem(2L, userId, createProduct("피자", 20000), 4);
-        final Order order = Order.from(userId, List.of(cartItem1, cartItem2), new ExchangeRate(1300));
+        final Long memberId = createMember().getId();
+        final CartItem cartItem1 = new CartItem(1L, memberId, createProduct("치킨", 10000), 5);
+        final CartItem cartItem2 = new CartItem(2L, memberId, createProduct("피자", 20000), 4);
+        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2), new ExchangeRate(1300));
 
         /* when & then */
         assertThat(order.getTotalPriceInDollar().getValue()).isEqualTo(100);
@@ -37,10 +36,10 @@ class OrderTest {
     @DisplayName("주문 총액은 100_000_000_000원을 넘을 수 없다.")
     void validateTotalPrice() {
         /* given */
-        final Long userId = createUser().getId();
-        final CartItem validCartItem = new CartItem(1L, userId,
+        final Long memberId = createMember().getId();
+        final CartItem validCartItem = new CartItem(1L, memberId,
                 createProduct("치킨", 100_000_000_000L), 1);
-        final CartItem invalidCartItem = new CartItem(2L, userId,
+        final CartItem invalidCartItem = new CartItem(2L, memberId,
                 createProduct("피자", 100_000_000_001L), 1);
 
         /* when & then */
@@ -55,11 +54,11 @@ class OrderTest {
     @DisplayName("주문자의 ID를 검증한다.")
     void validateUserHasId() {
         /* given */
-        final Long userId = createUser().getId();
-        final Order order = Order.from(userId, Collections.emptyList(), new ExchangeRate(1300));
+        final Long memberId = createMember().getId();
+        final Order order = Order.from(memberId, Collections.emptyList(), new ExchangeRate(1300));
 
         /* when & then */
-        assertThatNoException().isThrownBy(() -> order.validateUserHasId(userId));
+        assertThatNoException().isThrownBy(() -> order.validateUserHasId(memberId));
         ShoppingException exception = assertThrows(ShoppingException.class, () -> order.validateUserHasId(Long.MAX_VALUE));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
     }

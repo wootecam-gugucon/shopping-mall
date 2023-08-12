@@ -32,29 +32,29 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse order(final Long userId) {
-        final List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
+    public OrderResponse order(final Long memberId) {
+        final List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
 
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
         final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRate();
-        final Order order = Order.from(userId, cartItems, exchangeRate);
+        final Order order = Order.from(memberId, cartItems, exchangeRate);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }
 
     @Transactional(readOnly = true)
-    public OrderDetailResponse getOrderDetail(final Long orderId, final Long userId) {
+    public OrderDetailResponse getOrderDetail(final Long orderId, final Long memberId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
 
-        order.validateUserHasId(userId);
+        order.validateUserHasId(memberId);
         return OrderDetailResponse.from(order);
     }
 
     @Transactional(readOnly = true)
-    public List<OrderHistoryResponse> getOrderHistory(final Long userId) {
-        final List<Order> orders = orderRepository.findAllByUserIdWithOrderItems(userId,
+    public List<OrderHistoryResponse> getOrderHistory(final Long memberId) {
+        final List<Order> orders = orderRepository.findAllByMemberIdWithOrderItems(memberId,
                 Sort.by(Direction.DESC, "id"));
         return orders.stream()
                 .map(OrderHistoryResponse::from)

@@ -28,25 +28,25 @@ public class CartService {
     }
 
     @Transactional
-    public void insertCartItem(CartItemInsertRequest cartItemInsertRequest, Long userId) {
+    public void insertCartItem(CartItemInsertRequest cartItemInsertRequest, Long memberId) {
         final Long productId = cartItemInsertRequest.getProductId();
         final Product product = findProductBy(productId);
-        validateProductNotInCart(userId, productId);
+        validateProductNotInCart(memberId, productId);
 
-        final CartItem cartItem = new CartItem(userId, product);
+        final CartItem cartItem = new CartItem(memberId, product);
         cartItemRepository.save(cartItem);
     }
 
-    public List<CartItemResponse> getCartItems(final Long userId) {
-        return cartItemRepository.findByUserId(userId).stream()
+    public List<CartItemResponse> getCartItems(final Long memberId) {
+        return cartItemRepository.findByMemberId(memberId).stream()
                 .map(CartItemResponse::from)
                 .toList();
     }
 
     @Transactional
     public void updateCartItemQuantity(final Long cartItemId,
-                                       final CartItemUpdateRequest cartItemUpdateRequest, final Long userId) {
-        final CartItem cartItem = findCartItemBy(cartItemId, userId);
+                                       final CartItemUpdateRequest cartItemUpdateRequest, final Long memberId) {
+        final CartItem cartItem = findCartItemBy(cartItemId, memberId);
 
         final Quantity updateQuantity = new Quantity(cartItemUpdateRequest.getQuantity());
 
@@ -59,16 +59,16 @@ public class CartService {
     }
 
     @Transactional
-    public void removeCartItem(final Long cartItemId, final Long userId) {
-        final CartItem cartItem = findCartItemBy(cartItemId, userId);
+    public void removeCartItem(final Long cartItemId, final Long memberId) {
+        final CartItem cartItem = findCartItemBy(cartItemId, memberId);
         cartItemRepository.delete(cartItem);
     }
 
-    private CartItem findCartItemBy(final Long cartItemId, final Long userId) {
+    private CartItem findCartItemBy(final Long cartItemId, final Long memberId) {
         final CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_CART_ITEM));
 
-        cartItem.validateUserHasId(userId);
+        cartItem.validateUserHasId(memberId);
         return cartItem;
     }
 
@@ -77,8 +77,8 @@ public class CartService {
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
     }
 
-    private void validateProductNotInCart(final Long userId, final Long productId) {
-        if (cartItemRepository.existsByUserIdAndProductId(userId, productId)) {
+    private void validateProductNotInCart(final Long memberId, final Long productId) {
+        if (cartItemRepository.existsByMemberIdAndProductId(memberId, productId)) {
             throw new ShoppingException(ErrorCode.DUPLICATE_CART_ITEM);
         }
     }

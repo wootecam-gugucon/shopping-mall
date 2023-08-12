@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import com.gugucon.shopping.user.argumentresolver.annotation.UserId;
+import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import com.gugucon.shopping.item.controller.validator.CartItemInsertRequestValidator;
 import com.gugucon.shopping.item.controller.validator.CartItemUpdateRequestValidator;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
@@ -52,26 +52,26 @@ public class CartItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public void insertCartItem(@RequestBody @Validated CartItemInsertRequest cartItemInsertRequest,
-        @UserId Long userId) {
-        cartService.insertCartItem(cartItemInsertRequest, userId);
+        @MemberId Long memberId) {
+        cartService.insertCartItem(cartItemInsertRequest, memberId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CartItemResponse> getCartItems(@UserId Long userId) {
-        return cartService.getCartItems(userId);
+    public List<CartItemResponse> getCartItems(@MemberId Long memberId) {
+        return cartService.getCartItems(memberId);
     }
 
     @PutMapping("/{cartItemId}/quantity")
     @ResponseStatus(HttpStatus.OK)
     public void updateCartItemQuantity(@PathVariable Long cartItemId,
-        @RequestBody @Validated CartItemUpdateRequest cartItemUpdateRequest, @UserId Long userId) {
-        cartService.updateCartItemQuantity(cartItemId, cartItemUpdateRequest, userId);
+        @RequestBody @Validated CartItemUpdateRequest cartItemUpdateRequest, @MemberId Long memberId) {
+        cartService.updateCartItemQuantity(cartItemId, cartItemUpdateRequest, memberId);
     }
 
     @DeleteMapping("/{cartItemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeCartItem(@PathVariable Long cartItemId, @UserId Long userId) {
-        cartService.removeCartItem(cartItemId, userId);
+    public void removeCartItem(@PathVariable Long cartItemId, @MemberId Long memberId) {
+        cartService.removeCartItem(cartItemId, memberId);
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import com.gugucon.shopping.user.argumentresolver.annotation.UserId;
+import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderResponse;
 
@@ -26,8 +26,8 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> order(@UserId Long userId) {
-        final OrderResponse orderResponse = orderService.order(userId);
+    public ResponseEntity<Void> order(@MemberId Long memberId) {
+        final OrderResponse orderResponse = orderService.order(memberId);
         return ResponseEntity.created(
                 URI.create("/order/" + orderResponse.getOrderId()))
             .build();
@@ -35,7 +35,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
-    public OrderDetailResponse getOrderDetail(@PathVariable Long orderId, @UserId Long userId) {
-        return orderService.getOrderDetail(orderId, userId);
+    public OrderDetailResponse getOrderDetail(@PathVariable Long orderId, @MemberId Long memberId) {
+        return orderService.getOrderDetail(orderId, memberId);
     }
 }

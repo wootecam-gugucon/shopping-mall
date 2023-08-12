@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import com.gugucon.shopping.user.argumentresolver.annotation.UserId;
+import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 
 @RestController
@@ -23,7 +23,7 @@ public class OrderHistoryController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderHistoryResponse> getOrderHistory(@UserId Long userId) {
-        return orderService.getOrderHistory(userId);
+    public List<OrderHistoryResponse> getOrderHistory(@MemberId Long memberId) {
+        return orderService.getOrderHistory(memberId);
     }
 }
