@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+<div class="root">
+  <nav class="nav flex justify-end">
+    <div class="flex-center gap-15">
+      <a href="/" class="nav-button">상품</a>
+      <a href="/cart" class="nav-button">장바구니</a>
+      <a href="/order-history" class="nav-button">주문목록</a>
+      <a href="/login" class="nav-button">로그인</a>
+    </div>
+  </nav>
+
+  <section class="order-section">
+    <div class="flex">
+      <section class="order-left-section">
+        <h3 class="order-title" th:text="'주문 번호: ' + ${orderId}"></h3>
+        <div class="order-item-list">
+        </div>
+      </section>
+      <section class="order-right-section">
+        <div class="order-right-section__top">
+          <h3 class="order-title">결제금액</h3>
+        </div>
+        <hr class="divide-line-thin"/>
+        <div class="order-right-section__bottom">
+          <div class="flex justify-between p-20 mt-20">
+            <span class="highlight-text">총 결제금액</span>
+            <span class="highlight-text order-total-price"></span>
+          </div>
+          <div class="flex justify-between p-20 mt-20">
+            <span class="highlight-text">환산 금액</span>
+            <span class="highlight-text order-usd-total-price"></span>
+          </div>
+          <div class="flex justify-between p-20 mt-20">
+            <span class="highlight-text">적용 환율</span>
+            <span class="highlight-text usd-exchange-rate"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const credentials = sessionStorage.getItem('accessToken');
+    if (!credentials) {
+      alert('사용자 정보가 없습니다.');
+      window.location.href = '/login';
+      return;
+    }
+
+    const orderId = [[${orderId}]];
+
+    fetch(`/api/v1/order/${orderId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${credentials}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response.json();
+    }).then((data) => {
+      let element = '<hr class="divide-line-gray mt-10" />';
+      data.orderItems.forEach(orderItem => {
+        console.log(orderItem.imageFileName);
+        element += `
+                    <div class="shopping-container">
+                      <div class="flex gap-15 mt-10">
+                        <img class="w-144 h-144" src="/assets/${orderItem.imageFileName}"/> <!-- 상품 이미지 -->
+                        <div class="flex-col gap-15">
+                          <span class="shopping-name">${orderItem.productName}</span> <!-- 상품 이름 -->
+                          <span class="shopping-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span> <!-- 상품 가격 및 수량 -->
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="divide-line-thin mt-10"/>
+                    `;
+      });
+
+      document.querySelector('.order-item-list').innerHTML = element;
+      document.querySelector(
+          '.order-right-section .order-total-price').innerText = `${data.totalPrice} 원`; <!-- 상품 가격 및 수량 -->
+      document.querySelector(
+          '.order-right-section .order-usd-total-price').innerText = `${data.dollarTotalPrice.toFixed(
+          2)} 달러`;
+      document.querySelector(
+          '.order-right-section .usd-exchange-rate').innerText = `${data.exchangeRate.toFixed(
+          2)} 원/달러`;
+    }).catch((error) => {
+      console.error(error);
+    });
+
+  });
+</script>
+</body>
+</html>

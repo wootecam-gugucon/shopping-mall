@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### properties ###
+**/application-currencylayer.properties
+**/application-jwt.properties
