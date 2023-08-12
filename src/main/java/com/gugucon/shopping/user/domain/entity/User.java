@@ -1,5 +1,6 @@
 package com.gugucon.shopping.user.domain.entity;
 
+import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.user.domain.vo.Email;
 import com.gugucon.shopping.user.domain.vo.Password;
 
@@ -7,7 +8,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

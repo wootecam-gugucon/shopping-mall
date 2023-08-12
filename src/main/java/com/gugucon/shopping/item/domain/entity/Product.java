@@ -1,12 +1,13 @@
 package com.gugucon.shopping.item.domain.entity;
 
+import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "product")
-public class Product {
+public class Product extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

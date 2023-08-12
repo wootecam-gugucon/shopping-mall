@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.domain.entity;
 
+import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
 
@@ -7,7 +8,7 @@ import com.gugucon.shopping.item.domain.entity.CartItem;
 import jakarta.persistence.*;
 
 @Entity
-public class OrderItem {
+public class OrderItem extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

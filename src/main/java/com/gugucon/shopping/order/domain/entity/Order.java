@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.domain.entity;
 
+import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.order.domain.vo.DollarMoney;
 import com.gugucon.shopping.order.domain.vo.ExchangeRate;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
-public class Order {
+public class Order extends BaseTimeEntity {
 
     private static final long MAX_TOTAL_PRICE = 100_000_000_000L;
 

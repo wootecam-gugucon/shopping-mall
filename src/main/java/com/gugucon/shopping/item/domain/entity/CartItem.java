@@ -1,5 +1,6 @@
 package com.gugucon.shopping.item.domain.entity;
 
+import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
@@ -10,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "cart_item")
-public class CartItem {
+public class CartItem extends BaseTimeEntity {
 
     private static final int DEFAULT_QUANTITY = 1;
 
