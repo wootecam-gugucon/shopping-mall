@@ -1,7 +1,5 @@
 package com.gugucon.shopping.cart.service;
 
-import com.gugucon.shopping.auth.domain.entity.User;
-import com.gugucon.shopping.auth.repository.UserRepository;
 import com.gugucon.shopping.cart.domain.entity.CartItem;
 import com.gugucon.shopping.cart.domain.entity.Order;
 import com.gugucon.shopping.cart.domain.vo.ExchangeRate;
@@ -23,13 +21,11 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
     private final ExchangeRateProvider exchangeRateProvider;
 
-    public OrderService(UserRepository userRepository, OrderRepository orderRepository, CartItemRepository cartItemRepository, ExchangeRateProvider exchangeRateProvider) {
-        this.userRepository = userRepository;
+    public OrderService(OrderRepository orderRepository, CartItemRepository cartItemRepository, ExchangeRateProvider exchangeRateProvider) {
         this.orderRepository = orderRepository;
         this.cartItemRepository = cartItemRepository;
         this.exchangeRateProvider = exchangeRateProvider;
@@ -37,13 +33,12 @@ public class OrderService {
 
     @Transactional
     public OrderResponse order(final Long userId) {
-        final User user = userRepository.getReferenceById(userId);
         final List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
 
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
         final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRate();
-        final Order order = Order.from(user, cartItems, exchangeRate);
+        final Order order = Order.from(userId, cartItems, exchangeRate);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }

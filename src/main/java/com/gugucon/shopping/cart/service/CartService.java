@@ -1,7 +1,5 @@
 package com.gugucon.shopping.cart.service;
 
-import com.gugucon.shopping.auth.domain.entity.User;
-import com.gugucon.shopping.auth.repository.UserRepository;
 import com.gugucon.shopping.cart.domain.entity.CartItem;
 import com.gugucon.shopping.cart.domain.entity.Product;
 import com.gugucon.shopping.cart.domain.vo.Quantity;
@@ -22,14 +20,10 @@ import java.util.List;
 public class CartService {
 
     private final CartItemRepository cartItemRepository;
-    private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    public CartService(final CartItemRepository cartItemRepository,
-                       final UserRepository userRepository,
-                       final ProductRepository productRepository) {
+    public CartService(CartItemRepository cartItemRepository, ProductRepository productRepository) {
         this.cartItemRepository = cartItemRepository;
-        this.userRepository = userRepository;
         this.productRepository = productRepository;
     }
 
@@ -39,8 +33,7 @@ public class CartService {
         final Product product = findProductBy(productId);
         validateProductNotInCart(userId, productId);
 
-        final User user = userRepository.getReferenceById(userId);
-        final CartItem cartItem = new CartItem(user, product);
+        final CartItem cartItem = new CartItem(userId, product);
         cartItemRepository.save(cartItem);
     }
 
@@ -74,16 +67,9 @@ public class CartService {
     private CartItem findCartItemBy(final Long cartItemId, final Long userId) {
         final CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_CART_ITEM));
-        final User user = userRepository.getReferenceById(userId);
 
-        validateUserHasCartItem(user, cartItem);
+        cartItem.validateUserHasId(userId);
         return cartItem;
-    }
-
-    private void validateUserHasCartItem(final User user, final CartItem cartItem) {
-        if (!cartItem.hasUser(user)) {
-            throw new ShoppingException(ErrorCode.INVALID_CART_ITEM);
-        }
     }
 
     private Product findProductBy(final Long productId) {

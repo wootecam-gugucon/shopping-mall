@@ -1,10 +1,12 @@
 package com.gugucon.shopping.cart.domain.entity;
 
-import com.gugucon.shopping.auth.domain.entity.User;
 import com.gugucon.shopping.cart.domain.vo.Quantity;
-
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import jakarta.persistence.*;
+
 import java.math.BigInteger;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cart_item")
@@ -16,9 +18,8 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -30,24 +31,26 @@ public class CartItem {
     protected CartItem() {
     }
 
-    public CartItem(final Long id, final User user, final Product product,
+    public CartItem(final Long id, final Long userId, final Product product,
                     final int quantity) {
         this.id = id;
-        this.user = user;
+        this.userId = userId;
         this.product = product;
         this.quantity = new Quantity(quantity);
     }
 
-    public CartItem(final User user, final Product product) {
-        this(null, user, product, DEFAULT_QUANTITY);
+    public CartItem(final Long userId, final Product product) {
+        this(null, userId, product, DEFAULT_QUANTITY);
     }
 
     public void updateQuantity(final Quantity quantity) {
         this.quantity = quantity;
     }
 
-    public boolean hasUser(final User user) {
-        return this.user == user;
+    public void validateUserHasId(final Long userId) {
+        if (!Objects.equals(this.userId, userId)) {
+            throw new ShoppingException(ErrorCode.INVALID_CART_ITEM);
+        }
     }
 
     public BigInteger getTotalPrice() {
@@ -59,8 +62,8 @@ public class CartItem {
         return id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
     public Product getProduct() {

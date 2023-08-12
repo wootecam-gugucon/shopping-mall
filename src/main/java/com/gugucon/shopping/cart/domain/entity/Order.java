@@ -3,11 +3,10 @@ package com.gugucon.shopping.cart.domain.entity;
 import com.gugucon.shopping.cart.domain.vo.DollarMoney;
 import com.gugucon.shopping.cart.domain.vo.ExchangeRate;
 import com.gugucon.shopping.cart.domain.vo.WonMoney;
-import com.gugucon.shopping.auth.domain.entity.User;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-
 import jakarta.persistence.*;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +21,11 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
-    private List<OrderItem> orderItems = new ArrayList<>();
+    private final List<OrderItem> orderItems = new ArrayList<>();
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "total_price"))
     private WonMoney totalPrice;
@@ -38,15 +36,15 @@ public class Order {
     protected Order() {
     }
 
-    public Order(final Long id, final User user, final ExchangeRate exchangeRate) {
+    public Order(final Long id, final Long userId, final ExchangeRate exchangeRate) {
         this.id = id;
-        this.user = user;
+        this.userId = userId;
         this.totalPrice = WonMoney.ZERO;
         this.exchangeRate = exchangeRate;
     }
 
-    public static Order from(final User user, final List<CartItem> cartItems, final ExchangeRate exchangeRate) {
-        Order order = new Order(null, user, exchangeRate);
+    public static Order from(final Long userId, final List<CartItem> cartItems, final ExchangeRate exchangeRate) {
+        Order order = new Order(null, userId, exchangeRate);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -76,7 +74,7 @@ public class Order {
     }
 
     public void validateUserHasId(Long userId) {
-        if (!Objects.equals(user.getId(), userId)) {
+        if (!Objects.equals(this.userId, userId)) {
             throw new ShoppingException(ErrorCode.INVALID_ORDER);
         }
     }
@@ -85,8 +83,8 @@ public class Order {
         return id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
     public List<OrderItem> getOrderItems() {
