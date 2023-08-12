@@ -4,12 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import com.gugucon.shopping.auth.domain.entity.User;
-import com.gugucon.shopping.auth.dto.request.LoginRequest;
-import com.gugucon.shopping.cart.domain.entity.Product;
-import com.gugucon.shopping.cart.domain.vo.WonMoney;
-import com.gugucon.shopping.cart.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.cart.dto.response.CartItemResponse;
+import com.gugucon.shopping.user.domain.entity.User;
+import com.gugucon.shopping.user.dto.request.LoginRequest;
+import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.response.CartItemResponse;
 
 import java.util.List;
 

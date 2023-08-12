@@ -15,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import com.gugucon.shopping.TestUtils;
-import com.gugucon.shopping.auth.dto.request.LoginRequest;
-import com.gugucon.shopping.auth.dto.response.LoginResponse;
-import com.gugucon.shopping.cart.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.cart.dto.request.CartItemUpdateRequest;
-import com.gugucon.shopping.cart.dto.response.CartItemResponse;
-import com.gugucon.shopping.cart.repository.CartItemRepository;
+import com.gugucon.shopping.user.dto.request.LoginRequest;
+import com.gugucon.shopping.user.dto.response.LoginResponse;
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
+import com.gugucon.shopping.item.dto.response.CartItemResponse;
+import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 
