@@ -11,9 +11,6 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
     private String productName;
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
@@ -24,28 +21,23 @@ public class OrderItem {
     protected OrderItem() {
     }
 
-    public OrderItem(final Long id, final Order order, final String productName, final WonMoney price,
+    public OrderItem(final Long id, final String productName, final WonMoney price,
                      final String imageFileName, final Quantity quantity) {
         this.id = id;
-        this.order = order;
         this.productName = productName;
         this.price = price;
         this.imageFileName = imageFileName;
         this.quantity = quantity;
     }
 
-    public static OrderItem from(final CartItem cartItem, final Order order) {
-        return new OrderItem(null, order, cartItem.getProduct().getName(),
+    public static OrderItem from(final CartItem cartItem) {
+        return new OrderItem(null, cartItem.getProduct().getName(),
                 cartItem.getProduct().getPrice(),
                 cartItem.getProduct().getImageFileName(), cartItem.getQuantity());
     }
 
     public Long getId() {
         return id;
-    }
-
-    public Order getOrder() {
-        return order;
     }
 
     public String getProductName() {
