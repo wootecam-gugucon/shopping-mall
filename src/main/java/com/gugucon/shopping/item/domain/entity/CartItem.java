@@ -5,12 +5,17 @@ import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 import java.util.Objects;
 
 @Entity
 @Table(name = "cart_item")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class CartItem extends BaseTimeEntity {
 
     private static final int DEFAULT_QUANTITY = 1;
@@ -28,9 +33,6 @@ public class CartItem extends BaseTimeEntity {
 
     @Embedded
     private Quantity quantity;
-
-    protected CartItem() {
-    }
 
     public CartItem(final Long id, final Long userId, final Product product,
                     final int quantity) {
@@ -57,21 +59,5 @@ public class CartItem extends BaseTimeEntity {
     public BigInteger getTotalPrice() {
         return BigInteger.valueOf(product.getPrice().getValue())
                 .multiply(BigInteger.valueOf(quantity.getValue()));
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public Quantity getQuantity() {
-        return quantity;
     }
 }

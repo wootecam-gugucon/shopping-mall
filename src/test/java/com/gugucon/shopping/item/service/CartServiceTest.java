@@ -1,15 +1,14 @@
 package com.gugucon.shopping.item.service;
 
-import com.gugucon.shopping.user.repository.UserRepository;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
-import com.gugucon.shopping.common.domain.vo.Quantity;
-import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.gugucon.shopping.TestUtils.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -33,8 +33,6 @@ class CartServiceTest {
     @Mock
     private CartItemRepository cartItemRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private ProductRepository productRepository;
     @InjectMocks
     private CartService cartService;
@@ -44,7 +42,7 @@ class CartServiceTest {
     void insertCartItem() {
         /* given */
         final Long userId = 1L;
-        final Product product = new Product(1L, "치킨", "fried_chicken.png", new WonMoney(20000));
+        final Product product = createProduct("치킨", 10000);
         final CartItemInsertRequest cartRequest = new CartItemInsertRequest(product.getId());
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
         when(cartItemRepository.existsByUserIdAndProductId(userId, product.getId())).thenReturn(false);
@@ -61,8 +59,8 @@ class CartServiceTest {
     void readCartItems() {
         /* given */
         final Long userId = 1L;
-        final Product chicken = new Product(1L, "치킨", "fried_chicken.png", new WonMoney(20000));
-        final Product pizza = new Product(2L, "피자", "pizza.png", new WonMoney(25000));
+        final Product chicken = createProduct("치킨", 10000);
+        final Product pizza = createProduct("피자", 20000);
         final CartItem cartItemChicken = new CartItem(1L, userId, chicken, 1);
         final CartItem cartItemPizza = new CartItem(2L, userId, pizza, 1);
         final List<CartItem> cartItems = List.of(cartItemChicken, cartItemPizza);
@@ -85,7 +83,7 @@ class CartServiceTest {
     void updateCartItem() {
         /* given */
         final Long userId = 1L;
-        final Product product = new Product(1L, "치킨", "fried_chicken.png", new WonMoney(20000));
+        final Product product = createProduct("치킨", 10000);
         final CartItem cartItem = new CartItem(1L, userId, product, 1);
 
         final int updateQuantity = 3;
@@ -104,7 +102,7 @@ class CartServiceTest {
     void deleteCartItem() {
         /* given */
         final Long userId = 1L;
-        final Product product = new Product(1L, "치킨", "fried_chicken.png", new WonMoney(20000));
+        final Product product = createProduct("치킨", 10000);
         final CartItem cartItem = new CartItem(1L, userId, product, 1);
 
         when(cartItemRepository.findById(cartItem.getId())).thenReturn(Optional.of(cartItem));

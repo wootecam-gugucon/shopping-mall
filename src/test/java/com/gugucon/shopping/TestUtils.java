@@ -19,7 +19,7 @@ public class TestUtils {
 
     public static Product createProduct(String name, long price) {
         sequence++;
-        return new Product(sequence, name, "image_file_name_" + sequence, new WonMoney(price));
+        return new Product(sequence, name, "image_file_name_" + sequence, 100, "test_description", price);
     }
 
     public static User createUser() {

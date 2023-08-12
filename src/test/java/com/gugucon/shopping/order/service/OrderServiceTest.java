@@ -55,7 +55,7 @@ class OrderServiceTest {
 
         doReturn(cartItems).when(cartItemRepository).findByUserId(userId);
         doReturn(exchangeRate).when(exchangeRateProvider).fetchExchangeRate();
-        doReturn(new Order(1L, userId, exchangeRate)).when(orderRepository).save(any());
+        doReturn(new Order(1L, userId, Order.OrderStatus.ORDERED, exchangeRate)).when(orderRepository).save(any());
 
         /* when */
         orderService.order(userId);

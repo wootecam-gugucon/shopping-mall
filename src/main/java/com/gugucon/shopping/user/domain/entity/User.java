@@ -2,12 +2,18 @@ package com.gugucon.shopping.user.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.user.domain.vo.Email;
+import com.gugucon.shopping.user.domain.vo.Nickname;
 import com.gugucon.shopping.user.domain.vo.Password;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class User extends BaseTimeEntity {
 
     @Id
@@ -17,9 +23,8 @@ public class User extends BaseTimeEntity {
     private Email email;
     @Embedded
     private Password password;
-
-    protected User() {
-    }
+    @Embedded
+    private Nickname nickname;
 
     public User(final Long id, final String email, final String password) {
         this.id = id;
@@ -29,17 +34,5 @@ public class User extends BaseTimeEntity {
 
     public User(final String email, final String password) {
         this(null, email, password);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public Password getPassword() {
-        return password;
     }
 }

@@ -8,6 +8,9 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -16,7 +19,11 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Order extends BaseTimeEntity {
+
+    public enum OrderStatus { ORDERED, PAYED, DELIVERED }
 
     private static final long MAX_TOTAL_PRICE = 100_000_000_000L;
 
@@ -25,6 +32,8 @@ public class Order extends BaseTimeEntity {
     private Long id;
     @Column(name = "user_id")
     private Long userId;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
     private final List<OrderItem> orderItems = new ArrayList<>();
@@ -35,18 +44,16 @@ public class Order extends BaseTimeEntity {
     @AttributeOverride(name = "value", column = @Column(name = "exchange_rate"))
     private ExchangeRate exchangeRate;
 
-    protected Order() {
-    }
-
-    public Order(final Long id, final Long userId, final ExchangeRate exchangeRate) {
+    public Order(Long id, Long userId, OrderStatus status, ExchangeRate exchangeRate) {
         this.id = id;
         this.userId = userId;
+        this.status = status;
         this.totalPrice = WonMoney.ZERO;
         this.exchangeRate = exchangeRate;
     }
 
     public static Order from(final Long userId, final List<CartItem> cartItems, final ExchangeRate exchangeRate) {
-        Order order = new Order(null, userId, exchangeRate);
+        Order order = new Order(null, userId, OrderStatus.ORDERED, exchangeRate);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -79,25 +86,5 @@ public class Order extends BaseTimeEntity {
         if (!Objects.equals(this.userId, userId)) {
             throw new ShoppingException(ErrorCode.INVALID_ORDER);
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
-    }
-
-    public WonMoney getTotalPrice() {
-        return totalPrice;
-    }
-
-    public ExchangeRate getExchangeRate() {
-        return exchangeRate;
     }
 }

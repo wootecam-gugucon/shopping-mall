@@ -16,6 +16,7 @@ public class OrderItem extends BaseTimeEntity {
     @Column(name = "product_id")
     private Long productId;
     private String productName;
+    @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
     private String imageFileName;
