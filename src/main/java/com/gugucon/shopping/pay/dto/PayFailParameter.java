@@ -6,7 +6,7 @@ public final class PayFailParameter {
     private final String message;
     private final String orderId;
 
-    public PayFailParameter(String errorCode, String message, String orderId) {
+    public PayFailParameter(final String errorCode, final String message, final String orderId) {
         this.errorCode = errorCode;
         this.message = message;
         this.orderId = orderId;

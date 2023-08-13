@@ -7,7 +7,10 @@ public final class PaySuccessParameter {
     private final int price;
     private final String paymentType;
 
-    public PaySuccessParameter(String paymentKey, String orderId, int price, String paymentType) {
+    public PaySuccessParameter(final String paymentKey,
+                               final String orderId,
+                               final int price,
+                               final String paymentType) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.price = price;
