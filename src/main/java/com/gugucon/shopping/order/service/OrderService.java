@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OrderService {
 
@@ -35,7 +36,6 @@ public class OrderService {
         return OrderResponse.from(orderRepository.save(order));
     }
 
-    @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long memberId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
@@ -44,7 +44,6 @@ public class OrderService {
         return OrderDetailResponse.from(order);
     }
 
-    @Transactional(readOnly = true)
     public List<OrderHistoryResponse> getOrderHistory(final Long memberId) {
         final List<Order> orders = orderRepository.findAllByMemberIdWithOrderItems(memberId,
                 Sort.by(Direction.DESC, "id"));
