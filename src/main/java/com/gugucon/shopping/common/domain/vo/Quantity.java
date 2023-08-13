@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Quantity {
 
-    private static final int ZERO = 0;
-    private static final int MAX_QUANTITY = 1000;
+    private static final int MIN_VALUE = 0;
+    private static final int MAX_VALUE = 1000;
 
     private int value;
 
@@ -29,7 +29,7 @@ public class Quantity {
     }
 
     public boolean isZero() {
-        return this.value == ZERO;
+        return this.value == MIN_VALUE;
     }
 
     private void validateRange(final int value) {
@@ -39,7 +39,7 @@ public class Quantity {
     }
 
     private boolean isOutOfBound(final int value) {
-        return value < ZERO || MAX_QUANTITY < value;
+        return value < MIN_VALUE || MAX_VALUE < value;
     }
 
     public int getValue() {
