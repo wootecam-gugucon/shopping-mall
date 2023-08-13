@@ -44,7 +44,7 @@ public final class PayController {
 
     @GetMapping("/pay/fail")
     public String getFailPage(@RequestParam("code") String errorCode,
-                              @RequestParam("messgae") String message,
+                              @RequestParam("message") String message,
                               @RequestParam("orderId") String orderId) {
         PayFailParameter payFailParameter = new PayFailParameter(errorCode, message, orderId);
         return "pay-fail";

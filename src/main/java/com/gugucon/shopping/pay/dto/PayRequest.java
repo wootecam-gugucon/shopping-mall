@@ -4,10 +4,12 @@ public final class PayRequest {
 
     private final Long orderId;
     private final Long price;
+    private final String orderName;
 
-    public PayRequest(final Long orderId, final Long price) {
+    public PayRequest(final Long orderId, final Long price, String orderName) {
         this.orderId = orderId;
         this.price = price;
+        this.orderName = orderName;
     }
 
     public Long getOrderId() {
@@ -16,5 +18,9 @@ public final class PayRequest {
 
     public Long getPrice() {
         return price;
+    }
+
+    public String getOrderName() {
+        return orderName;
     }
 }

@@ -1,18 +1,19 @@
 package com.gugucon.shopping.pay.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 import com.gugucon.shopping.pay.dto.PayRequest;
 import com.gugucon.shopping.pay.dto.PayResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 @DisplayName("결제 인수 테스트")
 class PayIntegrationTest extends IntegrationTest {
@@ -21,7 +22,9 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("결제 데이터 검증을 요청한다.")
     void createPayment() {
         // given
-        PayRequest payRequest = new PayRequest(1L, 1000L);
+        Long orderId = 1L;
+        String orderName = "대충 주문 이름";
+        PayRequest payRequest = new PayRequest(1L, 1000L, orderName);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -37,7 +40,7 @@ class PayIntegrationTest extends IntegrationTest {
         PayResponse payResponse = response.as(PayResponse.class);
         assertThat(payResponse)
                 .extracting(PayResponse::getEncodedOrderId, PayResponse::getOrderName)
-                .containsExactly(String.valueOf(payRequest.getOrderId()), String.valueOf(payRequest.getOrderId()));
+                .containsExactly(Base64.getEncoder().encodeToString((orderId + orderName).getBytes()), orderName);
     }
 
     @Test

@@ -16,19 +16,25 @@ public final class Pay {
 
     private Long orderId;
 
+    private String encodedOrderId;
+
+    private String orderName;
+
     private Long price;
 
     public Pay() {
     }
 
-    private Pay(final Long id, final Long orderId, final Long price) {
+    private Pay(final Long id, final Long orderId, final String orderName, final Long price) {
         this.id = id;
         this.orderId = orderId;
+        this.orderName = orderName;
+        this.encodedOrderId = Base64.getEncoder().encodeToString((orderId + orderName).getBytes());
         this.price = price;
     }
 
-    public Pay(final Long orderId, final Long price) {
-        this(null, orderId, price);
+    public Pay(final Long orderId, final String orderName, final Long price) {
+        this(null, orderId, orderName, price);
     }
 
     public Long getId() {
@@ -44,9 +50,12 @@ public final class Pay {
     }
 
     public PayResponse toPayResponse() {
-        // TODO: 주문 이름 가져오기
-        final String orderName = "대충 주문 이름";
-        final String encodedOrderId = Base64.getEncoder().encodeToString((orderId + orderName).getBytes());
         return new PayResponse(encodedOrderId, orderName);
+    }
+
+    public void validateMoney(int price) {
+        if (this.price == price) {
+            throw new RuntimeException();
+        }
     }
 }
