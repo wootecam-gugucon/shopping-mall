@@ -16,6 +16,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     private static final String BEARER_TOKEN_TYPE = "Bearer ";
     private static final String AUTHORIZATION = "Authorization";
     private static final String MEMBER_ID = "memberId";
+
     private final JwtProvider jwtProvider;
 
     @Override
