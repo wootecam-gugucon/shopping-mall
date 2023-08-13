@@ -16,6 +16,11 @@
   <div id="agreement"></div>
   <!-- 결제하기 버튼 -->
   <button id="payment-button">결제하기</button>
+  <label for="orderId">주문 id</label>
+  <input class="text-input mb-10" type="text" id="orderId" name="orderId">
+
+  <label for="orderName">주문 이름</label>
+  <input class="text-input mb-10" type="text" id="orderName" name="orderName">
   <script>
     const money = 15000;
     document.getElementById("payment-value").innerText = money + "원";
@@ -46,7 +51,10 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({"orderId": 1, "price": 1000})
+        body: JSON.stringify({
+          "orderId": document.getElementById("orderId").value,
+          "price": money,
+          "orderName": document.getElementById("orderName").value})
       }).then((response) => {
         return response.json();
       }).then((data) => {

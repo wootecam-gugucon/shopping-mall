@@ -50,6 +50,5 @@ public class TossPayValidator {
         if (!response.getBody().getStatus().equals("DONE")) {
             throw new RuntimeException();
         }
-        System.out.println(response.getBody());
     }
 }
