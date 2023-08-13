@@ -17,13 +17,18 @@ public class OrderItem extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "product_id")
     private Long productId;
+
     private String productName;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
+
     private String imageFileName;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;

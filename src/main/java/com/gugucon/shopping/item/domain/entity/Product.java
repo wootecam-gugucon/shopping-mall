@@ -14,11 +14,16 @@ public class Product extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private String imageFileName;
+
     private int stock;
+
     @Lob
     private String description;
+
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
 
