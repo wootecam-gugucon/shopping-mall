@@ -1,16 +1,14 @@
 package com.gugucon.shopping.order.service;
 
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
+import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
-import com.gugucon.shopping.order.domain.vo.ExchangeRate;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.dto.response.OrderResponse;
-import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
-import com.gugucon.shopping.order.service.currency.ExchangeRateProvider;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -25,7 +23,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
-    private final ExchangeRateProvider exchangeRateProvider;
 
     @Transactional
     public OrderResponse order(final Long memberId) {
@@ -33,8 +30,7 @@ public class OrderService {
 
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
-        final ExchangeRate exchangeRate = exchangeRateProvider.fetchExchangeRate();
-        final Order order = Order.from(memberId, cartItems, exchangeRate);
+        final Order order = Order.from(memberId, cartItems);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }

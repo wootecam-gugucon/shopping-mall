@@ -2,12 +2,8 @@ package com.gugucon.shopping.order.service;
 
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.repository.CartItemRepository;
-import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
-import com.gugucon.shopping.order.domain.vo.ExchangeRate;
-import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
-import com.gugucon.shopping.order.service.currency.ExchangeRateProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,17 +23,11 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderService 단위 테스트")
 class OrderServiceTest {
-
-    @Mock
-    MemberRepository memberRepository;
+    
     @Mock
     OrderRepository orderRepository;
     @Mock
-    OrderItemRepository orderItemRepository;
-    @Mock
     CartItemRepository cartItemRepository;
-    @Mock
-    ExchangeRateProvider exchangeRateProvider;
     @InjectMocks
     OrderService orderService;
 
@@ -59,15 +49,12 @@ class OrderServiceTest {
                 .quantity(2)
                 .build();
         final List<CartItem> cartItems = List.of(cartItem1, cartItem2);
-        final ExchangeRate exchangeRate = ExchangeRate.from(1300);
 
         doReturn(cartItems).when(cartItemRepository).findByMemberId(memberId);
-        doReturn(exchangeRate).when(exchangeRateProvider).fetchExchangeRate();
         doReturn(Order.builder()
                 .id(1L)
                 .memberId(memberId)
                 .status(ORDERED)
-                .exchangeRate(exchangeRate)
                 .build())
                 .when(orderRepository).save(any());
 

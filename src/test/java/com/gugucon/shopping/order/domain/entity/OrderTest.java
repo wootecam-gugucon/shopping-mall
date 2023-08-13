@@ -1,10 +1,9 @@
 package com.gugucon.shopping.order.domain.entity;
 
+import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
-import com.gugucon.shopping.order.domain.vo.DollarMoney;
-import com.gugucon.shopping.order.domain.vo.ExchangeRate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class OrderTest {
 
     @Test
-    @DisplayName("총 주문 금액을 달러로 환산해서 반환한다.")
-    void getTotalPriceInDollar() {
+    @DisplayName("총 주문 금액을 반환한다.")
+    void getTotalPrice() {
         /* given */
         final Long memberId = createMember().getId();
         final CartItem cartItem1 = CartItem.builder()
@@ -37,10 +36,10 @@ class OrderTest {
                 .product(createProduct("피자", 20000))
                 .quantity(4)
                 .build();
-        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2), ExchangeRate.from(1300));
+        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
 
         /* when & then */
-        assertThat(order.getTotalPriceInDollar()).isEqualTo(DollarMoney.from(100));
+        assertThat(order.getTotalPrice()).isEqualTo(WonMoney.from(130000));
     }
 
     @Test
@@ -74,7 +73,7 @@ class OrderTest {
     void validateUserHasId() {
         /* given */
         final Long memberId = createMember().getId();
-        final Order order = Order.from(memberId, Collections.emptyList(), ExchangeRate.from(1300));
+        final Order order = Order.from(memberId, Collections.emptyList());
 
         /* when & then */
         assertThatNoException().isThrownBy(() -> order.validateUserHasId(memberId));

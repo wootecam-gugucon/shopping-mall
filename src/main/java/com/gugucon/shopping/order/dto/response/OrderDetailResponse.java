@@ -16,8 +16,6 @@ public final class OrderDetailResponse {
     private Long orderId;
     private List<OrderItemResponse> orderItems;
     private long totalPrice;
-    private double dollarTotalPrice;
-    private double exchangeRate;
 
     public static OrderDetailResponse from(final Order order) {
         final List<OrderItemResponse> orderItemResponses = order.getOrderItems().stream()
@@ -25,7 +23,6 @@ public final class OrderDetailResponse {
                 .toList();
 
         return new OrderDetailResponse(order.getId(), orderItemResponses,
-                order.getTotalPrice().getValue(), order.getTotalPriceInDollar().getValue(),
-                order.getExchangeRate().getValue());
+                order.getTotalPrice().getValue());
     }
 }
