@@ -1,10 +1,5 @@
 package com.gugucon.shopping.common.exception;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
@@ -17,13 +12,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalControllerAdvice {
 
     private final MessageSource messageSource;
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
         e.printStackTrace();
@@ -44,8 +44,8 @@ public class GlobalControllerAdvice {
 
     private String joinFieldErrorMessages(final MethodArgumentNotValidException e) {
         return e.getFieldErrors().stream()
-            .map(this::resolveFieldErrorMessage)
-            .collect(Collectors.joining(", "));
+                .map(this::resolveFieldErrorMessage)
+                .collect(Collectors.joining(", "));
     }
 
     private String resolveFieldErrorMessage(FieldError error) {
@@ -53,14 +53,14 @@ public class GlobalControllerAdvice {
         Locale locale = LocaleContextHolder.getLocale();
 
         return Arrays.stream(error.getCodes())
-            .map(c -> {
-                try {
-                    return messageSource.getMessage(c, arguments, locale);
-                } catch (NoSuchMessageException e) {
-                    return null;
-                }
-            }).filter(Objects::nonNull)
-            .findFirst()
-            .orElse(error.getDefaultMessage());
+                .map(c -> {
+                    try {
+                        return messageSource.getMessage(c, arguments, locale);
+                    } catch (NoSuchMessageException e) {
+                        return null;
+                    }
+                }).filter(Objects::nonNull)
+                .findFirst()
+                .orElse(error.getDefaultMessage());
     }
 }
