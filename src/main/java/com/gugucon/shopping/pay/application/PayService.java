@@ -6,7 +6,6 @@ import com.gugucon.shopping.pay.dto.PayResponse;
 import com.gugucon.shopping.pay.dto.PaySuccessParameter;
 import com.gugucon.shopping.pay.infrastructure.TossPayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

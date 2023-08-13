@@ -2,7 +2,9 @@ package com.gugucon.shopping.pay.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
+@Getter
 public final class TossValidationResponse {
 
     private final String paymentKey;
@@ -22,25 +24,5 @@ public final class TossValidationResponse {
         this.orderId = orderId;
         this.orderName = orderName;
         this.method = method;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public String getOrderName() {
-        return orderName;
-    }
-
-    public String getMethod() {
-        return method;
     }
 }

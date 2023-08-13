@@ -6,8 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Base64;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Pay {
 
     @Id
@@ -22,31 +29,8 @@ public final class Pay {
 
     private Long price;
 
-    public Pay() {
-    }
-
-    private Pay(final Long id, final Long orderId, final String orderName, final Long price) {
-        this.id = id;
-        this.orderId = orderId;
-        this.orderName = orderName;
-        this.encodedOrderId = Base64.getEncoder().encodeToString((orderId + orderName).getBytes());
-        this.price = price;
-    }
-
     public Pay(final Long orderId, final String orderName, final Long price) {
-        this(null, orderId, orderName, price);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public Long getPrice() {
-        return price;
+        this(null, orderId, Base64.getEncoder().encodeToString((orderId + orderName).getBytes()), orderName, price);
     }
 
     public PayResponse toPayResponse() {

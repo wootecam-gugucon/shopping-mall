@@ -1,5 +1,8 @@
 package com.gugucon.shopping.pay.dto;
 
+import lombok.Getter;
+
+@Getter
 public final class PayResponse {
 
     private final String encodedOrderId;
@@ -13,29 +16,5 @@ public final class PayResponse {
     public PayResponse(final String encodedOrderId, final String orderName) {
         this.encodedOrderId = encodedOrderId;
         this.orderName = orderName;
-    }
-
-    public String getEncodedOrderId() {
-        return encodedOrderId;
-    }
-
-    public String getOrderName() {
-        return orderName;
-    }
-
-    public String getSuccessUrl() {
-        return successUrl;
-    }
-
-    public String getFailUrl() {
-        return failUrl;
-    }
-
-    public String getCustomerEmail() {
-        return customerEmail;
-    }
-
-    public String getCustomerName() {
-        return customerName;
     }
 }
