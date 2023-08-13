@@ -1,21 +1,21 @@
 package com.gugucon.shopping.member.domain.vo;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EmailTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"valid_email99@woowafriends.com", "Qwerty@gmail.com"})
-    @DisplayName("올바른 이메일 형식으로 생성할 수 있다.")
-    void createSuccess(final String value) {
+    @DisplayName("이메일을 생성한다.")
+    void create(final String value) {
         /* given */
 
         /* when & then */
@@ -24,14 +24,14 @@ class EmailTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"Qwerty!!@gmail.com", "Qwerty@@gmail.com", "Qwerty@gmail",
-        "Qwerty@gmail.c"})
-    @DisplayName("올바른 이메일 형식이 아닌 경우 생성할 수 없다.")
-    void createFailure(final String value) {
+            "Qwerty@gmail.c"})
+    @DisplayName("올바른 이메일 형식이 아닌 경우 이메일을 생성할 때 예외가 발생한다.")
+    void createFail_invalidPattern(final String value) {
         /* given */
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-            () -> Email.from(value));
+                () -> Email.from(value));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_EMAIL_PATTERN);
     }
 }

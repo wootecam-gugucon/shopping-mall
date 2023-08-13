@@ -1,36 +1,31 @@
 package com.gugucon.shopping.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static com.gugucon.shopping.TestUtils.extractCartItemResponses;
-import static com.gugucon.shopping.TestUtils.extractOrderId;
-import static com.gugucon.shopping.TestUtils.insertCartItem;
-import static com.gugucon.shopping.TestUtils.login;
-import static com.gugucon.shopping.TestUtils.placeOrder;
-import static com.gugucon.shopping.TestUtils.readCartItems;
-
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.response.CartItemResponse;
+import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.response.LoginResponse;
+import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
+import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
+import com.gugucon.shopping.order.dto.response.OrderItemResponse;
+import com.gugucon.shopping.order.repository.OrderItemRepository;
+import com.gugucon.shopping.order.repository.OrderRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.response.LoginResponse;
-import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.item.dto.response.CartItemResponse;
-import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
-import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
-import com.gugucon.shopping.order.dto.response.OrderItemResponse;
-import com.gugucon.shopping.item.repository.CartItemRepository;
-import com.gugucon.shopping.order.repository.OrderItemRepository;
-import com.gugucon.shopping.order.repository.OrderRepository;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ErrorResponse;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.gugucon.shopping.TestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("주문 기능 통합 테스트")
 class OrderIntegrationTest extends IntegrationTest {
@@ -50,26 +45,26 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("성공 : 주문한다.")
-    void orderSuccess() {
+    @DisplayName("주문한다.")
+    void order() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-            "test_password!");
+                "test_password!");
         String accessToken = login(loginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .as(LoginResponse.class)
+                .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
         insertCartItem(accessToken, cartItemInsertRequest);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .post("/api/v1/order")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -77,23 +72,23 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("실패 : 빈 장바구니로 주문한다.")
-    void orderWithEmptyCart() {
+    @DisplayName("빈 장바구니로 주문할 수 없다.")
+    void orderFail_emptyCart() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-            "test_password!");
+                "test_password!");
         String accessToken = login(loginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .as(LoginResponse.class)
+                .getAccessToken();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .post("/api/v1/order")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -102,14 +97,14 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("성공 : 주문 상세 정보를 조회한다.")
-    void readOrderDetailSuccess() {
+    @DisplayName("주문 상세 정보를 조회한다.")
+    void readOrderDetail() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-            "test_password!");
+                "test_password!");
         String accessToken = login(loginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .as(LoginResponse.class)
+                .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest1 = new CartItemInsertRequest(1L);
         insertCartItem(accessToken, cartItemInsertRequest1);
@@ -118,50 +113,50 @@ class OrderIntegrationTest extends IntegrationTest {
         insertCartItem(accessToken, cartItemInsertRequest2);
 
         final List<CartItemResponse> cartItemResponses = extractCartItemResponses(
-            readCartItems(accessToken));
+                readCartItems(accessToken));
         final List<String> cartItemNames = cartItemResponses.stream()
-            .map(CartItemResponse::getName)
-            .collect(Collectors.toUnmodifiableList());
+                .map(CartItemResponse::getName)
+                .collect(Collectors.toUnmodifiableList());
 
         final Long orderId = extractOrderId(placeOrder(accessToken));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/order/{orderId}", orderId)
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/order/{orderId}", orderId)
+                .then()
+                .extract();
 
         /* then */
         final OrderDetailResponse orderDetailResponse = response.as(OrderDetailResponse.class);
         final List<String> orderItemNames = orderDetailResponse.getOrderItems().stream()
-            .map(OrderItemResponse::getProductName)
-            .collect(Collectors.toUnmodifiableList());
+                .map(OrderItemResponse::getProductName)
+                .collect(Collectors.toUnmodifiableList());
         assertThat(cartItemNames).containsExactlyInAnyOrderElementsOf(orderItemNames);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @Test
-    @DisplayName("실패 : 존재하지 않는 주문을 조회한다.")
-    void readInvalidOrderDetail() {
+    @DisplayName("존재하지 않는 주문을 조회할 수 없다.")
+    void readOrderDetailFail_invalidOrderId() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-            "test_password!");
+                "test_password!");
         String accessToken = login(loginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .as(LoginResponse.class)
+                .getAccessToken();
         final Long invalidOrderId = Long.MAX_VALUE;
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/order/{orderId}", invalidOrderId)
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/order/{orderId}", invalidOrderId)
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -170,14 +165,14 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("실패 : 다른 사용자의 주문을 조회할 수 없다.")
-    void readOrderDetailOfOtherUser() {
+    @DisplayName("다른 사용자의 주문을 조회할 수 없다.")
+    void readOrderDetailFail_orderOfOtherUser() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-            "test_password!");
+                "test_password!");
         String accessToken = login(loginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .as(LoginResponse.class)
+                .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
         insertCartItem(accessToken, cartItemInsertRequest);
@@ -185,19 +180,19 @@ class OrderIntegrationTest extends IntegrationTest {
         final Long orderId = extractOrderId(placeOrder(accessToken));
 
         final LoginRequest otherLoginRequest = new LoginRequest("other_test_email@woowafriends.com",
-            "test_password!");
+                "test_password!");
         String otherAccessToken = login(otherLoginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .as(LoginResponse.class)
+                .getAccessToken();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(otherAccessToken)
-            .when()
-            .get("/api/v1/order/{orderId}", orderId)
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(otherAccessToken)
+                .when()
+                .get("/api/v1/order/{orderId}", orderId)
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -206,14 +201,14 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("성공 : 주문 목록을 조회한다.")
+    @DisplayName("주문 목록을 조회한다.")
     void readOrderHistory() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-            "test_password!");
+                "test_password!");
         String accessToken = login(loginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .as(LoginResponse.class)
+                .getAccessToken();
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
         insertCartItem(accessToken, cartItemInsertRequest);
@@ -224,19 +219,19 @@ class OrderIntegrationTest extends IntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/order-history")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/order-history")
+                .then()
+                .extract();
 
         /* then */
         final List<OrderHistoryResponse> orderHistoryResponse = response.jsonPath()
-            .getList(".", OrderHistoryResponse.class);
+                .getList(".", OrderHistoryResponse.class);
         final List<Long> orderIds = orderHistoryResponse.stream()
-            .map(OrderHistoryResponse::getOrderId)
-            .collect(Collectors.toUnmodifiableList());
+                .map(OrderHistoryResponse::getOrderId)
+                .collect(Collectors.toUnmodifiableList());
         assertThat(orderIds).containsExactly(secondOrderId, firstOrderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }

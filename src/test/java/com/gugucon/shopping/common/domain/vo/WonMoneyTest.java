@@ -1,12 +1,11 @@
 package com.gugucon.shopping.common.domain.vo;
 
-import com.gugucon.shopping.common.domain.vo.Quantity;
-import com.gugucon.shopping.common.domain.vo.WonMoney;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("WonMoney 단위 테스트")
 class WonMoneyTest {
 
     @Test

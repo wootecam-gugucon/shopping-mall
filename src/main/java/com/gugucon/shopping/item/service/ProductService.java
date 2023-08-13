@@ -15,7 +15,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public List<ProductResponse> findAllProducts() {
+    public List<ProductResponse> readAllProducts() {
         return productRepository.findAll().stream()
                 .map(ProductResponse::from)
                 .toList();

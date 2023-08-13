@@ -76,7 +76,7 @@ class CartServiceTest {
         when(cartItemRepository.findByMemberId(memberId)).thenReturn(cartItems);
 
         /* when */
-        final List<CartItemResponse> cartItemResponses = cartService.getCartItems(memberId);
+        final List<CartItemResponse> cartItemResponses = cartService.readCartItems(memberId);
 
         /* then */
         final List<String> productNames = cartItemResponses.stream()
@@ -89,7 +89,7 @@ class CartServiceTest {
 
     @Test
     @DisplayName("장바구니 상품 수량을 수정한다.")
-    void updateCartItem() {
+    void updateCartItemQuantity() {
         /* given */
         final Long memberId = 1L;
         final Product product = createProduct("치킨", 10000);
@@ -113,7 +113,7 @@ class CartServiceTest {
 
     @Test
     @DisplayName("장바구니 상품을 삭제한다.")
-    void deleteCartItem() {
+    void removeCartItem() {
         /* given */
         final Long memberId = 1L;
         final Product product = createProduct("치킨", 10000);

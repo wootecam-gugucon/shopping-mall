@@ -1,12 +1,8 @@
 package com.gugucon.shopping.member.interceptor;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.member.utils.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,9 +11,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.gugucon.shopping.member.utils.JwtProvider;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthInterceptor 단위 테스트")
@@ -29,8 +27,8 @@ class AuthInterceptorTest {
     private AuthInterceptor authInterceptor;
 
     @Test
-    @DisplayName("유효한 토큰인 경우 예외가 발생하지 않는다.")
-    void validToken() {
+    @DisplayName("Authorization 헤더에서 토큰 정보를 파싱해서 Request 객체에 넣는다.")
+    void preHandle() {
         /* given */
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getHeader("Authorization")).thenReturn("Bearer valid_token");
@@ -41,7 +39,7 @@ class AuthInterceptorTest {
 
         /* when & then */
         assertThatNoException()
-            .isThrownBy(() -> authInterceptor.preHandle(request, null, null));
+                .isThrownBy(() -> authInterceptor.preHandle(request, null, null));
         verify(request).setAttribute(headerCaptor.capture(), memberIdCaptor.capture());
         assertThat(headerCaptor.getValue()).isEqualTo("memberId");
         assertThat(memberIdCaptor.getValue()).isEqualTo(1L);
@@ -56,7 +54,7 @@ class AuthInterceptorTest {
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-            () -> authInterceptor.preHandle(request, null, null));
+                () -> authInterceptor.preHandle(request, null, null));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NO_AUTHORIZATION_HEADER);
     }
 
@@ -69,7 +67,7 @@ class AuthInterceptorTest {
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-            () -> authInterceptor.preHandle(request, null, null));
+                () -> authInterceptor.preHandle(request, null, null));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_TOKEN_TYPE);
     }
 
@@ -83,7 +81,7 @@ class AuthInterceptorTest {
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-            () -> authInterceptor.preHandle(request, null, null));
+                () -> authInterceptor.preHandle(request, null, null));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_TOKEN);
     }
 }

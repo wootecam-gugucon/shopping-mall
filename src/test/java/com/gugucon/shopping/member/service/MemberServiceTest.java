@@ -30,7 +30,7 @@ class MemberServiceTest {
     private MemberService memberService;
 
     @Test
-    @DisplayName("로그인에 성공한다.")
+    @DisplayName("로그인한다.")
     void login() {
         /* given */
         final Long memberId = 1L;

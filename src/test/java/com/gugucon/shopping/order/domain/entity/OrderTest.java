@@ -43,8 +43,8 @@ class OrderTest {
     }
 
     @Test
-    @DisplayName("주문 총액은 100_000_000_000원을 넘을 수 없다.")
-    void validateTotalPrice() {
+    @DisplayName("주문 총액이 100_000_000_000원을 넘으면 검증 시 예외가 발생한다.")
+    void validateTotalPriceFail_outOfBound() {
         /* given */
         final Long memberId = createMember().getId();
         final CartItem validCartItem = CartItem.builder()
@@ -69,7 +69,7 @@ class OrderTest {
     }
 
     @Test
-    @DisplayName("주문자의 ID를 검증한다.")
+    @DisplayName("주어진 ID가 주문자의 ID와 다르면 검증 시 예외가 발생한다.")
     void validateUserHasId() {
         /* given */
         final Long memberId = createMember().getId();

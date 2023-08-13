@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderService 단위 테스트")
 class OrderServiceTest {
-    
+
     @Mock
     OrderRepository orderRepository;
     @Mock
@@ -32,8 +32,8 @@ class OrderServiceTest {
     OrderService orderService;
 
     @Test
-    @DisplayName("주문에 성공한다.")
-    void orderSuccess() {
+    @DisplayName("주문한다.")
+    void order() {
         /* given */
         final Long memberId = createMember().getId();
         final CartItem cartItem1 = CartItem.builder()

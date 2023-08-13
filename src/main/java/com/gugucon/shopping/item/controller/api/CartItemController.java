@@ -44,7 +44,7 @@ public class CartItemController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CartItemResponse> getCartItems(@MemberId Long memberId) {
-        return cartService.getCartItems(memberId);
+        return cartService.readCartItems(memberId);
     }
 
     @PutMapping("/{cartItemId}/quantity")
