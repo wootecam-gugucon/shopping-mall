@@ -13,27 +13,27 @@ class WonMoneyTest {
     @DisplayName("두 금액을 더한다.")
     void add() {
         /* given */
-        final WonMoney wonMoney = new WonMoney(10000);
-        final WonMoney other = new WonMoney(20000);
+        final WonMoney wonMoney = WonMoney.from(10000);
+        final WonMoney other = WonMoney.from(20000);
 
         /* when */
         final WonMoney result = wonMoney.add(other);
 
         /* then */
-        assertThat(result).isEqualTo(new WonMoney(30000));
+        assertThat(result).isEqualTo(WonMoney.from(30000));
     }
 
     @Test
     @DisplayName("금액을 수량만큼 곱한다.")
     void multiply() {
         /* given */
-        final WonMoney wonMoney = new WonMoney(10000);
-        final Quantity quantity = new Quantity(7);
+        final WonMoney wonMoney = WonMoney.from(10000);
+        final Quantity quantity = Quantity.from(7);
 
         /* when */
         final WonMoney result = wonMoney.multiply(quantity);
 
         /* then */
-        assertThat(result).isEqualTo(new WonMoney(70000));
+        assertThat(result).isEqualTo(WonMoney.from(70000));
     }
 }

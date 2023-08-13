@@ -5,12 +5,16 @@ import jakarta.persistence.Embeddable;
 import lombok.*;
 
 @Embeddable
-@Getter
-@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
+@Getter
 public class Nickname {
 
     @Column(name = "nickname")
     private String value;
+
+    public static Nickname from(String value) {
+        return new Nickname(value);
+    }
 }

@@ -3,6 +3,7 @@ package com.gugucon.shopping.order.controller.api;
 import java.util.List;
 
 import com.gugucon.shopping.order.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,14 +13,11 @@ import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/order-history")
 public class OrderHistoryController {
 
     private final OrderService orderService;
-
-    public OrderHistoryController(final OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

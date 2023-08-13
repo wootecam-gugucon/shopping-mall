@@ -6,6 +6,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,12 +14,9 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 @Entity
-@Table(name = "cart_item")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class CartItem extends BaseTimeEntity {
-
-    private static final int DEFAULT_QUANTITY = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,18 +30,18 @@ public class CartItem extends BaseTimeEntity {
     private Product product;
 
     @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;
 
-    public CartItem(final Long id, final Long memberId, final Product product,
-                    final int quantity) {
+    @Builder
+    private CartItem(final Long id,
+                     final Long memberId,
+                     final Product product,
+                     final int quantity) {
         this.id = id;
         this.memberId = memberId;
         this.product = product;
-        this.quantity = new Quantity(quantity);
-    }
-
-    public CartItem(final Long memberId, final Product product) {
-        this(null, memberId, product, DEFAULT_QUANTITY);
+        this.quantity = Quantity.from(quantity);
     }
 
     public void updateQuantity(final Quantity quantity) {

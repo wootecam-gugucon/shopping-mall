@@ -3,6 +3,7 @@ package com.gugucon.shopping.order.service.currency;
 import com.gugucon.shopping.order.domain.vo.ExchangeRate;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -10,6 +11,7 @@ import com.gugucon.shopping.order.dto.response.ExchangeRateResponse;
 
 import java.util.Map;
 
+@RequiredArgsConstructor
 public class DefaultExchangeRateProvider implements ExchangeRateProvider {
 
     private static final String REQUEST_URL = "http://api.currencylayer.com/live";
@@ -20,10 +22,6 @@ public class DefaultExchangeRateProvider implements ExchangeRateProvider {
     private String accessKey;
     private final RestTemplate restTemplate;
 
-    public DefaultExchangeRateProvider(final RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
     @Override
     public ExchangeRate fetchExchangeRate() {
         final String requestUri = REQUEST_URL + "?currencies=" + KRW + "&access_key=" + accessKey;
@@ -33,7 +31,7 @@ public class DefaultExchangeRateProvider implements ExchangeRateProvider {
         final Map<String, Double> quotes = response.getBody().getQuotes();
         final Double exchangeRateValue = quotes.get(USDKRW);
         validateNotNull(exchangeRateValue);
-        return new ExchangeRate(exchangeRateValue);
+        return ExchangeRate.from(exchangeRateValue);
     }
 
     private void validateFetch(final ResponseEntity<ExchangeRateResponse> response) {

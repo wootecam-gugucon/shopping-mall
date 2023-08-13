@@ -15,7 +15,12 @@ class CartItemTest {
     @DisplayName("상품 금액과 주문 수량을 곱한 총 금액을 구한다.")
     void getTotalPrice() {
         /* given */
-        final CartItem cartItem = new CartItem(1L, 1L, createProduct("치킨", 10000), 4);
+        final CartItem cartItem = CartItem.builder()
+                .id(1L)
+                .memberId(1L)
+                .product(createProduct("치킨", 10000))
+                .quantity(4)
+                .build();
 
         /* when */
         final BigInteger totalPrice = cartItem.getTotalPrice();

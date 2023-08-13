@@ -5,19 +5,17 @@ import java.util.List;
 import com.gugucon.shopping.member.argumentresolver.MemberIdArgumentResolver;
 import com.gugucon.shopping.member.interceptor.AuthInterceptor;
 import com.gugucon.shopping.member.utils.JwtProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final JwtProvider jwtProvider;
-
-    public WebMvcConfig(final JwtProvider jwtProvider) {
-        this.jwtProvider = jwtProvider;
-    }
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {

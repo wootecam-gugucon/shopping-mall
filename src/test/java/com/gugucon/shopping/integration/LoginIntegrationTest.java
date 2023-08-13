@@ -20,12 +20,6 @@ import com.gugucon.shopping.common.exception.ErrorResponse;
 @DisplayName("로그인 기능 통합 테스트")
 class LoginIntegrationTest extends IntegrationTest {
 
-    @BeforeEach
-    @Override
-    public void setUp() {
-        super.setUp();
-    }
-
     @Test
     @DisplayName("로그인에 성공한다.")
     void loginSuccess() {

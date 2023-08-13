@@ -42,12 +42,6 @@ class OrderIntegrationTest extends IntegrationTest {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
-    @BeforeEach
-    @Override
-    void setUp() {
-        super.setUp();
-    }
-
     @AfterEach
     void tearDown() {
         cartItemRepository.deleteAll();

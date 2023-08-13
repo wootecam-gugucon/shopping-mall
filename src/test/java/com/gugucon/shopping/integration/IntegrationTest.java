@@ -15,7 +15,7 @@ import com.gugucon.shopping.TestConfig;
 public class IntegrationTest {
 
     @LocalServerPort
-    int port;
+    private int port;
 
     @BeforeEach
     void setUp() {

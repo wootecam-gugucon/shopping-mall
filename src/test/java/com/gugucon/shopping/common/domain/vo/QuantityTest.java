@@ -23,7 +23,7 @@ class QuantityTest {
 
         /* when & then */
         Assertions.assertThatNoException()
-            .isThrownBy(() -> new Quantity(value));
+            .isThrownBy(() -> Quantity.from(value));
     }
 
     @ParameterizedTest
@@ -34,7 +34,7 @@ class QuantityTest {
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-            () -> new Quantity(value));
+            () -> Quantity.from(value));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_QUANTITY);
     }
 
@@ -42,7 +42,7 @@ class QuantityTest {
     @DisplayName("값이 0이다.")
     void isZero() {
         /* given */
-        final Quantity zero = new Quantity(0);
+        final Quantity zero = Quantity.from(0);
 
         /* when & then */
         assertThat(zero.isZero()).isTrue();

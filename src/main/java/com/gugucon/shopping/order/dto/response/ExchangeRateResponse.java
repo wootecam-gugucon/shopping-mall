@@ -1,32 +1,16 @@
 package com.gugucon.shopping.order.dto.response;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.Map;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public final class ExchangeRateResponse {
 
     private boolean success;
     private String source;
     private Map<String, Double> quotes;
-
-    private ExchangeRateResponse() {
-    }
-
-    public ExchangeRateResponse(final boolean success, final String source,
-        final Map<String, Double> quotes) {
-        this.success = success;
-        this.source = source;
-        this.quotes = quotes;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public Map<String, Double> getQuotes() {
-        return quotes;
-    }
 }

@@ -30,12 +30,6 @@ class CartIntegrationTest extends IntegrationTest {
     @Autowired
     private CartItemRepository cartItemRepository;
 
-    @BeforeEach
-    @Override
-    void setUp() {
-        super.setUp();
-    }
-
     @AfterEach
     void tearDown() {
         cartItemRepository.deleteAll();

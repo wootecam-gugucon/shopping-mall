@@ -6,12 +6,9 @@ import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Member extends BaseTimeEntity {
@@ -26,13 +23,11 @@ public class Member extends BaseTimeEntity {
     @Embedded
     private Nickname nickname;
 
-    public Member(final Long id, final String email, final String password) {
+    @Builder
+    public Member(final Long id, final String email, final String password, final String nickname) {
         this.id = id;
-        this.email = new Email(email);
-        this.password = new Password(password);
-    }
-
-    public Member(final String email, final String password) {
-        this(null, email, password);
+        this.email = Email.from(email);
+        this.password = Password.from(password);
+        this.nickname = Nickname.from(nickname);
     }
 }

@@ -21,7 +21,7 @@ class PasswordTest {
         /* given */
 
         /* when & then */
-        assertThatNoException().isThrownBy(() -> new Password(value));
+        assertThatNoException().isThrownBy(() -> Password.from(value));
     }
 
     @ParameterizedTest
@@ -32,7 +32,7 @@ class PasswordTest {
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-            () -> new Password(value));
+            () -> Password.from(value));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_PATTERN);
     }
 
@@ -40,7 +40,7 @@ class PasswordTest {
     @DisplayName("해당 비밀번호 값을 가진다.")
     void hasValue() {
         /* given */
-        final Password password = new Password("test_password");
+        final Password password = Password.from("test_password");
 
         /* when & then*/
         assertThat(password.hasValue("test_password")).isTrue();

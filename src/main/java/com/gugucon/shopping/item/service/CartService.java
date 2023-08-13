@@ -1,15 +1,16 @@
 package com.gugucon.shopping.item.service;
 
+import com.gugucon.shopping.common.domain.vo.Quantity;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
-import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,15 +18,11 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class CartService {
 
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
-
-    public CartService(CartItemRepository cartItemRepository, ProductRepository productRepository) {
-        this.cartItemRepository = cartItemRepository;
-        this.productRepository = productRepository;
-    }
 
     @Transactional
     public void insertCartItem(CartItemInsertRequest cartItemInsertRequest, Long memberId) {
@@ -33,7 +30,11 @@ public class CartService {
         final Product product = findProductBy(productId);
         validateProductNotInCart(memberId, productId);
 
-        final CartItem cartItem = new CartItem(memberId, product);
+        final CartItem cartItem = CartItem.builder()
+                .memberId(memberId)
+                .product(product)
+                .quantity(1)
+                .build();
         cartItemRepository.save(cartItem);
     }
 
@@ -45,10 +46,11 @@ public class CartService {
 
     @Transactional
     public void updateCartItemQuantity(final Long cartItemId,
-                                       final CartItemUpdateRequest cartItemUpdateRequest, final Long memberId) {
+                                       final CartItemUpdateRequest cartItemUpdateRequest,
+                                       final Long memberId) {
         final CartItem cartItem = findCartItemBy(cartItemId, memberId);
 
-        final Quantity updateQuantity = new Quantity(cartItemUpdateRequest.getQuantity());
+        final Quantity updateQuantity = Quantity.from(cartItemUpdateRequest.getQuantity());
 
         if (updateQuantity.isZero()) {
             cartItemRepository.delete(cartItem);

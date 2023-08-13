@@ -60,8 +60,18 @@ class CartServiceTest {
         final Long memberId = 1L;
         final Product chicken = createProduct("치킨", 10000);
         final Product pizza = createProduct("피자", 20000);
-        final CartItem cartItemChicken = new CartItem(1L, memberId, chicken, 1);
-        final CartItem cartItemPizza = new CartItem(2L, memberId, pizza, 1);
+        final CartItem cartItemChicken = CartItem.builder()
+                .id(1L)
+                .memberId(memberId)
+                .product(chicken)
+                .quantity(1)
+                .build();
+        final CartItem cartItemPizza = CartItem.builder()
+                .id(2L)
+                .memberId(memberId)
+                .product(pizza)
+                .quantity(1)
+                .build();
         final List<CartItem> cartItems = List.of(cartItemChicken, cartItemPizza);
         when(cartItemRepository.findByMemberId(memberId)).thenReturn(cartItems);
 
@@ -83,7 +93,12 @@ class CartServiceTest {
         /* given */
         final Long memberId = 1L;
         final Product product = createProduct("치킨", 10000);
-        final CartItem cartItem = new CartItem(1L, memberId, product, 1);
+        final CartItem cartItem = CartItem.builder()
+                .id(1L)
+                .memberId(memberId)
+                .product(product)
+                .quantity(1)
+                .build();
 
         final int updateQuantity = 3;
         when(cartItemRepository.findById(cartItem.getId())).thenReturn(Optional.of(cartItem));
@@ -93,7 +108,7 @@ class CartServiceTest {
                 new CartItemUpdateRequest(updateQuantity), memberId);
 
         /* then */
-        assertThat(cartItem.getQuantity()).isEqualTo(new Quantity(updateQuantity));
+        assertThat(cartItem.getQuantity()).isEqualTo(Quantity.from(updateQuantity));
     }
 
     @Test
@@ -102,7 +117,12 @@ class CartServiceTest {
         /* given */
         final Long memberId = 1L;
         final Product product = createProduct("치킨", 10000);
-        final CartItem cartItem = new CartItem(1L, memberId, product, 1);
+        final CartItem cartItem = CartItem.builder()
+                .id(1L)
+                .memberId(memberId)
+                .product(product)
+                .quantity(1)
+                .build();
 
         when(cartItemRepository.findById(cartItem.getId())).thenReturn(Optional.of(cartItem));
 

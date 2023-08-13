@@ -1,14 +1,16 @@
 package com.gugucon.shopping.member.interceptor;
 
-import java.util.Objects;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.member.utils.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.servlet.HandlerInterceptor;
-import com.gugucon.shopping.member.utils.JwtProvider;
 
+import java.util.Objects;
+
+@RequiredArgsConstructor
 public class AuthInterceptor implements HandlerInterceptor {
 
     private static final String BEARER_TOKEN_TYPE = "Bearer ";
@@ -16,13 +18,10 @@ public class AuthInterceptor implements HandlerInterceptor {
     private static final String MEMBER_ID = "memberId";
     private final JwtProvider jwtProvider;
 
-    public AuthInterceptor(final JwtProvider jwtProvider) {
-        this.jwtProvider = jwtProvider;
-    }
-
     @Override
-    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response,
-        final Object handler) {
+    public boolean preHandle(final HttpServletRequest request,
+                             final HttpServletResponse response,
+                             final Object handler) {
 
         final String header = request.getHeader(AUTHORIZATION);
         validateAuthorizationHeader(header);

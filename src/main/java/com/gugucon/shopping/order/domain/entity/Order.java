@@ -8,9 +8,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,6 +18,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Getter
 public class Order extends BaseTimeEntity {
 
@@ -44,16 +44,8 @@ public class Order extends BaseTimeEntity {
     @AttributeOverride(name = "value", column = @Column(name = "exchange_rate"))
     private ExchangeRate exchangeRate;
 
-    public Order(Long id, Long memberId, OrderStatus status, ExchangeRate exchangeRate) {
-        this.id = id;
-        this.memberId = memberId;
-        this.status = status;
-        this.totalPrice = WonMoney.ZERO;
-        this.exchangeRate = exchangeRate;
-    }
-
     public static Order from(final Long memberId, final List<CartItem> cartItems, final ExchangeRate exchangeRate) {
-        Order order = new Order(null, memberId, OrderStatus.ORDERED, exchangeRate);
+        Order order = new Order(null, memberId, OrderStatus.ORDERED, WonMoney.ZERO, exchangeRate);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);

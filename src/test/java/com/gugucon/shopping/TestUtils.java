@@ -1,14 +1,14 @@
 package com.gugucon.shopping;
 
+import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.response.CartItemResponse;
+import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.dto.request.LoginRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import com.gugucon.shopping.member.domain.entity.Member;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.item.domain.entity.Product;
-import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.item.dto.response.CartItemResponse;
 
 import java.util.List;
 
@@ -18,12 +18,24 @@ public class TestUtils {
 
     public static Product createProduct(String name, long price) {
         sequence++;
-        return new Product(sequence, name, "image_file_name_" + sequence, 100, "test_description", price);
+        return Product.builder()
+                .id(sequence)
+                .name(name)
+                .imageFileName("image_file_name_" + sequence)
+                .stock(100)
+                .description("test_description")
+                .price(price)
+                .build();
     }
 
     public static Member createMember() {
         sequence++;
-        return new Member(sequence, "test_email" + sequence + "@gmail.com", "test_password");
+        return Member.builder()
+                .id(sequence)
+                .email("test_email" + sequence + "@gmail.com")
+                .password("test_password")
+                .nickname("test_nickname_" + sequence)
+                .build();
     }
 
     public static ExtractableResponse<Response> login(final LoginRequest loginRequest) {

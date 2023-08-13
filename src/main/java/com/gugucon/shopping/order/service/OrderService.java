@@ -11,6 +11,7 @@ import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.order.service.currency.ExchangeRateProvider;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -19,17 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
     private final ExchangeRateProvider exchangeRateProvider;
-
-    public OrderService(OrderRepository orderRepository, CartItemRepository cartItemRepository, ExchangeRateProvider exchangeRateProvider) {
-        this.orderRepository = orderRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.exchangeRateProvider = exchangeRateProvider;
-    }
 
     @Transactional
     public OrderResponse order(final Long memberId) {

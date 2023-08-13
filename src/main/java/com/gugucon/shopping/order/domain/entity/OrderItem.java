@@ -3,11 +3,15 @@ package com.gugucon.shopping.order.domain.entity;
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
-
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@Getter
 public class OrderItem extends BaseTimeEntity {
 
     @Id
@@ -21,19 +25,8 @@ public class OrderItem extends BaseTimeEntity {
     private WonMoney price;
     private String imageFileName;
     @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;
-
-    protected OrderItem() {
-    }
-
-    public OrderItem(Long id, Long productId, String productName, WonMoney price, String imageFileName, Quantity quantity) {
-        this.id = id;
-        this.productId = productId;
-        this.productName = productName;
-        this.price = price;
-        this.imageFileName = imageFileName;
-        this.quantity = quantity;
-    }
 
     public static OrderItem from(final CartItem cartItem) {
         return new OrderItem(null, cartItem.getProduct().getId(), cartItem.getProduct().getName(),
@@ -41,27 +34,7 @@ public class OrderItem extends BaseTimeEntity {
                 cartItem.getProduct().getImageFileName(), cartItem.getQuantity());
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public WonMoney getPrice() {
-        return price;
-    }
-
     public WonMoney getTotalPrice() {
         return price.multiply(quantity);
-    }
-
-    public String getImageFileName() {
-        return imageFileName;
-    }
-
-    public Quantity getQuantity() {
-        return quantity;
     }
 }

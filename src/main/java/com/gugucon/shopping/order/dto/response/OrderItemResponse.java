@@ -1,7 +1,14 @@
 package com.gugucon.shopping.order.dto.response;
 
 import com.gugucon.shopping.order.domain.entity.OrderItem;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public final class OrderItemResponse {
 
     private String productName;
@@ -9,35 +16,8 @@ public final class OrderItemResponse {
     private String imageFileName;
     private int quantity;
 
-    private OrderItemResponse() {
-    }
-
-    private OrderItemResponse(final String productName, final long price,
-        final String imageFileName, final int quantity) {
-        this.productName = productName;
-        this.price = price;
-        this.imageFileName = imageFileName;
-        this.quantity = quantity;
-    }
-
     public static OrderItemResponse from(final OrderItem orderItem) {
         return new OrderItemResponse(orderItem.getProductName(), orderItem.getPrice().getValue(),
             orderItem.getImageFileName(), orderItem.getQuantity().getValue());
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public long getPrice() {
-        return price;
-    }
-
-    public String getImageFileName() {
-        return imageFileName;
-    }
-
-    public int getQuantity() {
-        return quantity;
     }
 }

@@ -1,17 +1,18 @@
 package com.gugucon.shopping.order.domain.entity;
 
-import com.gugucon.shopping.item.domain.entity.CartItem;
-import com.gugucon.shopping.order.domain.vo.ExchangeRate;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.item.domain.entity.CartItem;
+import com.gugucon.shopping.order.domain.vo.DollarMoney;
+import com.gugucon.shopping.order.domain.vo.ExchangeRate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
-import static com.gugucon.shopping.TestUtils.createProduct;
 import static com.gugucon.shopping.TestUtils.createMember;
+import static com.gugucon.shopping.TestUtils.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,12 +25,22 @@ class OrderTest {
     void getTotalPriceInDollar() {
         /* given */
         final Long memberId = createMember().getId();
-        final CartItem cartItem1 = new CartItem(1L, memberId, createProduct("치킨", 10000), 5);
-        final CartItem cartItem2 = new CartItem(2L, memberId, createProduct("피자", 20000), 4);
-        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2), new ExchangeRate(1300));
+        final CartItem cartItem1 = CartItem.builder()
+                .id(1L)
+                .memberId(memberId)
+                .product(createProduct("치킨", 10000))
+                .quantity(5)
+                .build();
+        final CartItem cartItem2 = CartItem.builder()
+                .id(2L)
+                .memberId(memberId)
+                .product(createProduct("피자", 20000))
+                .quantity(4)
+                .build();
+        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2), ExchangeRate.from(1300));
 
         /* when & then */
-        assertThat(order.getTotalPriceInDollar().getValue()).isEqualTo(100);
+        assertThat(order.getTotalPriceInDollar()).isEqualTo(DollarMoney.from(100));
     }
 
     @Test
@@ -37,10 +48,18 @@ class OrderTest {
     void validateTotalPrice() {
         /* given */
         final Long memberId = createMember().getId();
-        final CartItem validCartItem = new CartItem(1L, memberId,
-                createProduct("치킨", 100_000_000_000L), 1);
-        final CartItem invalidCartItem = new CartItem(2L, memberId,
-                createProduct("피자", 100_000_000_001L), 1);
+        final CartItem validCartItem = CartItem.builder()
+                .id(1L)
+                .memberId(memberId)
+                .product(createProduct("치킨", 100_000_000_000L))
+                .quantity(1)
+                .build();
+        final CartItem invalidCartItem = CartItem.builder()
+                .id(2L)
+                .memberId(memberId)
+                .product(createProduct("피자", 100_000_000_001L))
+                .quantity(1)
+                .build();
 
         /* when & then */
         assertThatNoException()
@@ -55,7 +74,7 @@ class OrderTest {
     void validateUserHasId() {
         /* given */
         final Long memberId = createMember().getId();
-        final Order order = Order.from(memberId, Collections.emptyList(), new ExchangeRate(1300));
+        final Order order = Order.from(memberId, Collections.emptyList(), ExchangeRate.from(1300));
 
         /* when & then */
         assertThatNoException().isThrownBy(() -> order.validateUserHasId(memberId));

@@ -5,6 +5,7 @@ import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.gugucon.shopping.member.domain.entity.Member;
@@ -13,18 +14,14 @@ import com.gugucon.shopping.member.utils.JwtProvider;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
 
-    public MemberService(final MemberRepository memberRepository, final JwtProvider jwtProvider) {
-        this.memberRepository = memberRepository;
-        this.jwtProvider = jwtProvider;
-    }
-
     public LoginResponse login(final LoginRequest loginRequest) {
-        Member member = memberRepository.findByEmail(new Email(loginRequest.getEmail()))
+        Member member = memberRepository.findByEmail(Email.from(loginRequest.getEmail()))
             .orElseThrow(() -> new ShoppingException(ErrorCode.EMAIL_NOT_REGISTERED));
         validatePassword(loginRequest, member);
 

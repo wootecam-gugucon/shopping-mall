@@ -14,12 +14,6 @@ import org.springframework.http.HttpStatus;
 @DisplayName("상품 기능 통합 테스트")
 class ProductIntegrationTest extends IntegrationTest {
 
-    @BeforeEach
-    @Override
-    public void setUp() {
-        super.setUp();
-    }
-
     @Test
     @DisplayName("성공 : 상품 전체 목록을 조회한다.")
     void findAllProducts() {

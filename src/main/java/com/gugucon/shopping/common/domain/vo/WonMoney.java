@@ -1,20 +1,27 @@
 package com.gugucon.shopping.common.domain.vo;
 
 import jakarta.persistence.Embeddable;
-import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
+@Getter
 public class WonMoney {
 
     public static final WonMoney ZERO = new WonMoney(0);
 
     private long value;
 
-    protected WonMoney() {
+    private WonMoney(final long value) {
+        this.value = value;
     }
 
-    public WonMoney(final long value) {
-        this.value = value;
+    public static WonMoney from(final long value) {
+        return new WonMoney(value);
     }
 
     public WonMoney add(final WonMoney other) {
@@ -23,26 +30,5 @@ public class WonMoney {
 
     public WonMoney multiply(final Quantity quantity) {
         return new WonMoney(value * quantity.getValue());
-    }
-
-    public long getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final WonMoney money = (WonMoney) o;
-        return value == money.value;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 }

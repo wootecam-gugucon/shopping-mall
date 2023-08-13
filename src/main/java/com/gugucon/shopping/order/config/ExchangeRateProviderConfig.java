@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -8,13 +9,10 @@ import com.gugucon.shopping.order.service.currency.DefaultExchangeRateProvider;
 import com.gugucon.shopping.order.service.currency.ExchangeRateProvider;
 
 @Configuration
+@RequiredArgsConstructor
 public class ExchangeRateProviderConfig {
 
     private final RestTemplate restTemplate;
-
-    public ExchangeRateProviderConfig(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     @Bean
     @Profile("!test")

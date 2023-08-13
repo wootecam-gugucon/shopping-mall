@@ -3,6 +3,7 @@ package com.gugucon.shopping.order.controller.api;
 import java.net.URI;
 
 import com.gugucon.shopping.order.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,14 +17,11 @@ import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderResponse;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/order")
 public class OrderController {
 
     private final OrderService orderService;
-
-    public OrderController(final OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     @PostMapping
     public ResponseEntity<Void> order(@MemberId Long memberId) {

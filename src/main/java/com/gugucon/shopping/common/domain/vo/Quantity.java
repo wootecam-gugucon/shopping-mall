@@ -1,27 +1,31 @@
 package com.gugucon.shopping.common.domain.vo;
 
-import java.util.Objects;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
+@Getter
 public class Quantity {
 
     private static final int ZERO = 0;
     private static final int MAX_QUANTITY = 1000;
 
-    @Column(name = "quantity")
     private int value;
 
-    protected Quantity() {
-    }
-
-    public Quantity(final int value) {
+    private Quantity(final int value) {
         validateRange(value);
         this.value = value;
+    }
+
+    public static Quantity from(final int value) {
+        return new Quantity(value);
     }
 
     public boolean isZero() {
@@ -40,22 +44,5 @@ public class Quantity {
 
     public int getValue() {
         return value;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final Quantity quantity = (Quantity) o;
-        return value == quantity.value;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 }
