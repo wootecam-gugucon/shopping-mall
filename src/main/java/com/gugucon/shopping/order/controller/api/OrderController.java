@@ -1,20 +1,15 @@
 package com.gugucon.shopping.order.controller.api;
 
-import java.net.URI;
-
+import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
+import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
+import com.gugucon.shopping.order.dto.response.OrderResponse;
 import com.gugucon.shopping.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
-import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
-import com.gugucon.shopping.order.dto.response.OrderResponse;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,16 +19,16 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Void> order(@MemberId Long memberId) {
+    public ResponseEntity<Void> order(@MemberId final Long memberId) {
         final OrderResponse orderResponse = orderService.order(memberId);
         return ResponseEntity.created(
-                URI.create("/order/" + orderResponse.getOrderId()))
-            .build();
+                        URI.create("/order/" + orderResponse.getOrderId()))
+                .build();
     }
 
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
-    public OrderDetailResponse getOrderDetail(@PathVariable Long orderId, @MemberId Long memberId) {
+    public OrderDetailResponse getOrderDetail(@PathVariable final Long orderId, @MemberId final Long memberId) {
         return orderService.getOrderDetail(orderId, memberId);
     }
 }

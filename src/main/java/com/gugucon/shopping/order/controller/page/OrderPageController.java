@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class OrderPageController {
 
     @GetMapping("/order/{orderId}")
-    public String getOrderDetailPage(@PathVariable Long orderId) {
+    public String getOrderDetailPage(@PathVariable final Long orderId) {
         return "order-detail";
     }
 

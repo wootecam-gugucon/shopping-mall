@@ -25,7 +25,7 @@ public class CartService {
     private final ProductRepository productRepository;
 
     @Transactional
-    public void insertCartItem(CartItemInsertRequest cartItemInsertRequest, Long memberId) {
+    public void insertCartItem(final CartItemInsertRequest cartItemInsertRequest, final Long memberId) {
         final Long productId = cartItemInsertRequest.getProductId();
         final Product product = findProductBy(productId);
         validateProductNotInCart(memberId, productId);

@@ -1,5 +1,6 @@
 package com.gugucon.shopping.member.controlller;
 
+import com.gugucon.shopping.member.controlller.validator.LoginRequestValidator;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.member.service.MemberService;
@@ -7,13 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import com.gugucon.shopping.member.controlller.validator.LoginRequestValidator;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +25,7 @@ public class LoginController {
 
     @PostMapping("/token")
     @ResponseStatus(HttpStatus.OK)
-    public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest) {
+    public LoginResponse login(@RequestBody @Validated final LoginRequest loginRequest) {
         return memberService.login(loginRequest);
     }
 }

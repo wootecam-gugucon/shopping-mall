@@ -25,19 +25,19 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleException(Exception e) {
+    public ErrorResponse handleException(final Exception e) {
         e.printStackTrace();
         return ErrorResponse.from(ErrorCode.UNKNOWN_ERROR);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
+    public ErrorResponse handleValidationException(final MethodArgumentNotValidException e) {
         return ErrorResponse.of(ErrorCode.REQUIRED_FIELD_MISSING, joinFieldErrorMessages(e));
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleApplicationException(ShoppingException e) {
+    public ResponseEntity<ErrorResponse> handleApplicationException(final ShoppingException e) {
         final ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.from(errorCode));
     }
@@ -48,9 +48,9 @@ public class GlobalControllerAdvice {
                 .collect(Collectors.joining(", "));
     }
 
-    private String resolveFieldErrorMessage(FieldError error) {
-        Object[] arguments = error.getArguments();
-        Locale locale = LocaleContextHolder.getLocale();
+    private String resolveFieldErrorMessage(final FieldError error) {
+        final Object[] arguments = error.getArguments();
+        final Locale locale = LocaleContextHolder.getLocale();
 
         return Arrays.stream(error.getCodes())
                 .map(c -> {

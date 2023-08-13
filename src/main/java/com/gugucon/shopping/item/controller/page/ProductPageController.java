@@ -16,8 +16,8 @@ public class ProductPageController {
     private final ProductService productService;
 
     @GetMapping("/")
-    public String readAllProducts(Model model) {
-        List<ProductResponse> products = productService.readAllProducts();
+    public String readAllProducts(final Model model) {
+        final List<ProductResponse> products = productService.readAllProducts();
         model.addAttribute("products", products);
         return "index";
     }
