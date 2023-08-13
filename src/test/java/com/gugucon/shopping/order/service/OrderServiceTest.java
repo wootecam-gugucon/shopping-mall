@@ -25,11 +25,11 @@ import static org.mockito.Mockito.verify;
 class OrderServiceTest {
 
     @Mock
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
     @Mock
-    CartItemRepository cartItemRepository;
+    private CartItemRepository cartItemRepository;
     @InjectMocks
-    OrderService orderService;
+    private OrderService orderService;
 
     @Test
     @DisplayName("주문한다.")
