@@ -22,7 +22,7 @@ public final class TossPayValidator implements PayValidator {
     private final HttpHeaders httpHeaders;
     private final Encoder encoder;
 
-    @Value("${toss.pay.secret-key}")
+    @Value("${pay.toss.secret-key}")
     private String secretKey;
 
     public TossPayValidator() {
