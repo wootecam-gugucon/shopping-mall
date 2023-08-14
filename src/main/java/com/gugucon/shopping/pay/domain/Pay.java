@@ -38,7 +38,7 @@ public final class Pay {
     }
 
     public void validateMoney(int price) {
-        if (this.price == price) {
+        if (this.price != price) {
             throw new RuntimeException();
         }
     }
