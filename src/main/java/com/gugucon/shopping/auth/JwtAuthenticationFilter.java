@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -47,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveJwtToken(final HttpServletRequest request) {
         final String bearerToken = request.getHeader(AUTHORIZATION);
-        if (bearerToken.startsWith(BEARER_TOKEN_TYPE)) {
+        if (Objects.nonNull(bearerToken) && bearerToken.startsWith(BEARER_TOKEN_TYPE)) {
             return bearerToken.substring(BEARER_TOKEN_TYPE.length());
         }
         return "";

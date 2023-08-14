@@ -22,10 +22,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            .securityMatchers(matchers -> matchers
-                .requestMatchers("/api/v1/cart/items/**", "/api/v1/order/**", "/api/v1/order-history/**")
-            )
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/v1/login/token").permitAll()
                 .anyRequest().authenticated()
             )
             .authenticationProvider(jwtAuthenticationProvider)
