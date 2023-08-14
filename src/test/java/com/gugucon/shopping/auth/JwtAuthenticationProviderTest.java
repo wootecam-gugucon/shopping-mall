@@ -51,7 +51,7 @@ class JwtAuthenticationProviderTest {
     void authenticate() {
         // given
         final String jwtToken = "validJwtToken";
-        final String principal = "userPrincipal";
+        final String principal = "12";
         final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwtToken);
 
         when(jwtProvider.validate(jwtToken)).thenReturn(true);
@@ -63,7 +63,7 @@ class JwtAuthenticationProviderTest {
         // then
         assertThat(result).isInstanceOf(JwtAuthenticationToken.class);
         assertThat(result.isAuthenticated()).isTrue();
-        assertThat(result.getPrincipal()).isEqualTo(principal);
+        assertThat(result.getPrincipal()).isEqualTo(Long.valueOf(principal));
     }
 
     @Test

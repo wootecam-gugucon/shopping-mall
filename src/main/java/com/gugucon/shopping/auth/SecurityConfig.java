@@ -27,7 +27,8 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/login/token")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/"), new AntPathRequestMatcher("/api/v1/login/token"))
+                .permitAll()
                 .anyRequest().authenticated()
             )
             .authenticationProvider(jwtAuthenticationProvider)
