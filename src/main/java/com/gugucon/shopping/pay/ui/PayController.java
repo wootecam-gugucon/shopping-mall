@@ -35,7 +35,7 @@ public final class PayController {
     @GetMapping("/pay/success")
     public String getSuccessPage(@RequestParam("paymentKey") final String paymentKey,
                                  @RequestParam("orderId") final String orderId,
-                                 @RequestParam("amount") final int price,
+                                 @RequestParam("amount") final Long price,
                                  @RequestParam("paymentType") final String paymentType) {
         final PaySuccessParameter paySuccessParameter = new PaySuccessParameter(paymentKey,
                                                                                 orderId,

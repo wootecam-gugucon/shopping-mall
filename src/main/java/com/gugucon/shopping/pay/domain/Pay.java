@@ -29,8 +29,8 @@ public final class Pay {
 
     private Long price;
 
-    public void validateMoney(final int price) {
-        if (this.price != price) {
+    public void validateMoney(final Long price) {
+        if (!this.price.equals(price)) {
             throw new RuntimeException();
         }
     }

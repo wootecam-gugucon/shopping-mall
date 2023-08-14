@@ -9,6 +9,6 @@ public final class PaySuccessParameter {
 
     private final String paymentKey;
     private final String orderId;
-    private final int price;
+    private final Long price;
     private final String paymentType;
 }

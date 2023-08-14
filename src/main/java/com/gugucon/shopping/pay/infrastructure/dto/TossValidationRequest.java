@@ -10,9 +10,9 @@ public final class TossValidationRequest {
 
     private final String paymentKey;
     private final String orderId;
-    private final int amount;
+    private final Long amount;
 
-    public static TossValidationRequest of(PaySuccessParameter paySuccessParameter) {
+    public static TossValidationRequest of(final PaySuccessParameter paySuccessParameter) {
         return new TossValidationRequest(paySuccessParameter.getPaymentKey(),
                                          paySuccessParameter.getOrderId(),
                                          paySuccessParameter.getPrice());

@@ -33,7 +33,7 @@ class PayTest {
                      .build();
 
         // when & then
-        assertThatNoException().isThrownBy(() -> pay.validateMoney(1000));
+        assertThatNoException().isThrownBy(() -> pay.validateMoney(1000L));
     }
 
     @Test
@@ -48,7 +48,7 @@ class PayTest {
                      .build();
 
         // when
-        Exception exception = catchException(() -> pay.validateMoney(500));
+        Exception exception = catchException(() -> pay.validateMoney(500L));
 
         // then
         assertThat(exception).isInstanceOf(RuntimeException.class);
