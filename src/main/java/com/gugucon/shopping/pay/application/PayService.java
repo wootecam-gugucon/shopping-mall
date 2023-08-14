@@ -5,7 +5,7 @@ import com.gugucon.shopping.pay.dto.PayRequest;
 import com.gugucon.shopping.pay.dto.PayResponse;
 import com.gugucon.shopping.pay.dto.PayValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.OrderIdTranslator;
-import com.gugucon.shopping.pay.infrastructure.TossPayValidator;
+import com.gugucon.shopping.pay.infrastructure.PayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,14 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class PayService {
 
     private final PayRepository payRepository;
-    private final TossPayValidator tossPayValidator;
+    private final PayValidator payValidator;
     private final OrderIdTranslator orderIdTranslator;
 
     public PayService(final PayRepository payRepository,
-                      final TossPayValidator tossPayValidator,
+                      final PayValidator payValidator,
                       final OrderIdTranslator orderIdTranslator) {
         this.payRepository = payRepository;
-        this.tossPayValidator = tossPayValidator;
+        this.payValidator = payValidator;
         this.orderIdTranslator = orderIdTranslator;
     }
 
@@ -43,10 +43,10 @@ public class PayService {
     }
 
     public void validatePay(final PayValidationRequest payValidationRequest) {
-        Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
+        final Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
         final Pay pay = payRepository.findByOrderId(orderId)
-                               .orElseThrow(RuntimeException::new);
+                                     .orElseThrow(RuntimeException::new);
         pay.validateMoney(payValidationRequest.getAmount());
-        tossPayValidator.validatePayment(payValidationRequest);
+        payValidator.validatePayment(payValidationRequest);
     }
 }
