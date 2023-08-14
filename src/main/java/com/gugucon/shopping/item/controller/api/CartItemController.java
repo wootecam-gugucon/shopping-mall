@@ -1,7 +1,5 @@
 package com.gugucon.shopping.item.controller.api;
 
-import com.gugucon.shopping.item.controller.validator.CartItemInsertRequestValidator;
-import com.gugucon.shopping.item.controller.validator.CartItemUpdateRequestValidator;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
@@ -10,7 +8,6 @@ import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,18 +18,6 @@ import java.util.List;
 public class CartItemController {
 
     private final CartService cartService;
-    private final CartItemInsertRequestValidator insertRequestValidator;
-    private final CartItemUpdateRequestValidator updateRequestValidator;
-
-    @InitBinder("cartItemInsertRequest")
-    public void initCartItemInsertRequest(final WebDataBinder dataBinder) {
-        dataBinder.addValidators(insertRequestValidator);
-    }
-
-    @InitBinder("cartItemUpdateRequest")
-    public void initCartItemUpdateRequest(final WebDataBinder dataBinder) {
-        dataBinder.addValidators(updateRequestValidator);
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
