@@ -29,13 +29,17 @@ public class PayService {
     @Transactional
     public PayResponse createPay(final PayRequest payRequest) {
         // TODO: 결제 금액이 실제 주문 금액과 같은지 확인
-        Long orderId = payRequest.getOrderId();
-        String orderName = payRequest.getOrderName();
-        Long price = payRequest.getPrice();
+        final Long orderId = payRequest.getOrderId();
+        final String orderName = payRequest.getOrderName();
+        final Long price = payRequest.getPrice();
         final String encodedOrderId = orderIdTranslator.encode(orderId, orderName);
-        final Pay pay = new Pay(orderId, orderName, encodedOrderId, price);
-        return payRepository.save(pay)
-                .toPayResponse();
+        final Pay pay = Pay.builder()
+                           .orderId(orderId)
+                           .encodedOrderId(encodedOrderId)
+                           .orderName(orderName)
+                           .price(price)
+                           .build();
+        return PayResponse.of(payRepository.save(pay));
     }
 
     public void validatePay(final PaySuccessParameter paySuccessParameter) {
