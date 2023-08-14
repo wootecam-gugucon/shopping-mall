@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PayRepository extends JpaRepository<Pay, Long> {
 
-    Optional<Pay> findByEncodedOrderId(String encodedOrderId);
+    Optional<Pay> findByEncodedOrderId(final String encodedOrderId);
 }

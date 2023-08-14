@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class TossPayValidator {
+public final class TossPayValidator {
 
     private static final String VALIDATE_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
@@ -30,17 +30,17 @@ public class TossPayValidator {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
     }
 
-    public void validatePayment(PaySuccessParameter paySuccessParameter) {
+    public void validatePayment(final PaySuccessParameter paySuccessParameter) {
         httpHeaders.setBasicAuth(Base64.getEncoder().encodeToString((secretKey + ":").getBytes()));
-        TossValidationRequest tossValidationRequest = TossValidationRequest.of(paySuccessParameter);
-        HttpEntity<TossValidationRequest> request = new HttpEntity<>(tossValidationRequest, httpHeaders);
-        ResponseEntity<TossValidationResponse> response = restTemplate.postForEntity(VALIDATE_URL,
+        final TossValidationRequest tossValidationRequest = TossValidationRequest.of(paySuccessParameter);
+        final HttpEntity<TossValidationRequest> request = new HttpEntity<>(tossValidationRequest, httpHeaders);
+        final ResponseEntity<TossValidationResponse> response = restTemplate.postForEntity(VALIDATE_URL,
                                                                                      request,
                                                                                      TossValidationResponse.class);
         validateSuccess(response);
     }
 
-    private void validateSuccess(ResponseEntity<TossValidationResponse> response) {
+    private void validateSuccess(final ResponseEntity<TossValidationResponse> response) {
         if (response.getStatusCode() != HttpStatus.OK) {
             throw new RuntimeException();
         }

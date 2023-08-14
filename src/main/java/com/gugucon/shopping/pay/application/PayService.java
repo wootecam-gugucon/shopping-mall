@@ -16,21 +16,21 @@ public class PayService {
     private final PayRepository payRepository;
     private final TossPayValidator tossPayValidator;
 
-    public PayService(PayRepository payRepository, TossPayValidator tossPayValidator) {
+    public PayService(final PayRepository payRepository, final TossPayValidator tossPayValidator) {
         this.payRepository = payRepository;
         this.tossPayValidator = tossPayValidator;
     }
 
     @Transactional
-    public PayResponse createPay(PayRequest payRequest) {
+    public PayResponse createPay(final PayRequest payRequest) {
         // TODO: 결제 금액이 실제 주문 금액과 같은지 확인
         final Pay pay = new Pay(payRequest.getOrderId(), payRequest.getOrderName(), payRequest.getPrice());
         return payRepository.save(pay)
                 .toPayResponse();
     }
 
-    public void validatePay(PaySuccessParameter paySuccessParameter) {
-        Pay pay = payRepository.findByEncodedOrderId(paySuccessParameter.getOrderId())
+    public void validatePay(final PaySuccessParameter paySuccessParameter) {
+        final Pay pay = payRepository.findByEncodedOrderId(paySuccessParameter.getOrderId())
                                .orElseThrow(RuntimeException::new);
         pay.validateMoney(paySuccessParameter.getPrice());
         tossPayValidator.validatePayment(paySuccessParameter);

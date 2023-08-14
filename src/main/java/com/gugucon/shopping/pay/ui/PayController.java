@@ -17,7 +17,7 @@ public final class PayController {
 
     private final PayService payService;
 
-    public PayController(PayService payService) {
+    public PayController(final PayService payService) {
         this.payService = payService;
     }
 
@@ -27,26 +27,29 @@ public final class PayController {
     }
 
     @PostMapping("/api/pay")
-    public ResponseEntity<PayResponse> createPayment(@RequestBody PayRequest payRequest) {
-        PayResponse payResponse = payService.createPay(payRequest);
+    public ResponseEntity<PayResponse> createPayment(@RequestBody final PayRequest payRequest) {
+        final PayResponse payResponse = payService.createPay(payRequest);
         return ResponseEntity.ok(payResponse);
     }
 
     @GetMapping("/pay/success")
-    public String getSuccessPage(@RequestParam("paymentKey") String paymentKey,
-                                 @RequestParam("orderId") String orderId,
-                                 @RequestParam("amount") int price,
-                                 @RequestParam("paymentType") String paymentType) {
-        PaySuccessParameter paySuccessParameter = new PaySuccessParameter(paymentKey, orderId, price, paymentType);
+    public String getSuccessPage(@RequestParam("paymentKey") final String paymentKey,
+                                 @RequestParam("orderId") final String orderId,
+                                 @RequestParam("amount") final int price,
+                                 @RequestParam("paymentType") final String paymentType) {
+        final PaySuccessParameter paySuccessParameter = new PaySuccessParameter(paymentKey,
+                                                                                orderId,
+                                                                                price,
+                                                                                paymentType);
         payService.validatePay(paySuccessParameter);
         return "pay-success";
     }
 
     @GetMapping("/pay/fail")
-    public String getFailPage(@RequestParam("code") String errorCode,
-                              @RequestParam("message") String message,
-                              @RequestParam("orderId") String orderId) {
-        PayFailParameter payFailParameter = new PayFailParameter(errorCode, message, orderId);
+    public String getFailPage(@RequestParam("code") final String errorCode,
+                              @RequestParam("message") final String message,
+                              @RequestParam("orderId") final String orderId) {
+        final PayFailParameter payFailParameter = new PayFailParameter(errorCode, message, orderId);
         return "pay-fail";
     }
 

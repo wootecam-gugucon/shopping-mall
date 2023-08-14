@@ -37,7 +37,7 @@ public final class Pay {
         return new PayResponse(encodedOrderId, orderName);
     }
 
-    public void validateMoney(int price) {
+    public void validateMoney(final int price) {
         if (this.price != price) {
             throw new RuntimeException();
         }
