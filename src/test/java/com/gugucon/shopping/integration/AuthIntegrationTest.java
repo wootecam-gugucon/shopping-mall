@@ -7,7 +7,6 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.response.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -25,9 +24,7 @@ class AuthIntegrationTest extends IntegrationTest {
         // given
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
             "test_password!");
-        String accessToken = TestUtils.login(loginRequest)
-            .as(LoginResponse.class)
-            .getAccessToken();
+        String accessToken = TestUtils.login(loginRequest);
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
 
