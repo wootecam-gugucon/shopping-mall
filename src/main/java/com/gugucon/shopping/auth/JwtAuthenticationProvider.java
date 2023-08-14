@@ -20,7 +20,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         final String jwtToken = ((JwtAuthenticationToken) authentication).getJwtToken();
         validateToken(jwtToken);
-        String principal = jwtProvider.parseToken(jwtToken);
+        final Long principal = Long.valueOf(jwtProvider.parseToken(jwtToken));
         return new JwtAuthenticationToken(principal, "", new ArrayList<>());
     }
 
