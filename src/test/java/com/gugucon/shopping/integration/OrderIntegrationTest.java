@@ -49,7 +49,7 @@ class OrderIntegrationTest extends IntegrationTest {
     void order() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "test_password!");
+                                                           "test_password!");
         String accessToken = login(loginRequest)
                 .as(LoginResponse.class)
                 .getAccessToken();
@@ -72,11 +72,11 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("빈 장바구니로 주문할 수 없다.")
+    @DisplayName("장바구니가 비어 있으면 주문을 요청했을 때 400 상태코드를 응답한다.")
     void orderFail_emptyCart() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "test_password!");
+                                                           "test_password!");
         String accessToken = login(loginRequest)
                 .as(LoginResponse.class)
                 .getAccessToken();
@@ -101,7 +101,7 @@ class OrderIntegrationTest extends IntegrationTest {
     void readOrderDetail() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "test_password!");
+                                                           "test_password!");
         String accessToken = login(loginRequest)
                 .as(LoginResponse.class)
                 .getAccessToken();
@@ -139,11 +139,11 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문을 조회할 수 없다.")
+    @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_invalidOrderId() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "test_password!");
+                                                           "test_password!");
         String accessToken = login(loginRequest)
                 .as(LoginResponse.class)
                 .getAccessToken();
@@ -165,11 +165,11 @@ class OrderIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("다른 사용자의 주문을 조회할 수 없다.")
+    @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_orderOfOtherUser() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "test_password!");
+                                                           "test_password!");
         String accessToken = login(loginRequest)
                 .as(LoginResponse.class)
                 .getAccessToken();
@@ -180,7 +180,7 @@ class OrderIntegrationTest extends IntegrationTest {
         final Long orderId = extractOrderId(placeOrder(accessToken));
 
         final LoginRequest otherLoginRequest = new LoginRequest("other_test_email@woowafriends.com",
-                "test_password!");
+                                                                "test_password!");
         String otherAccessToken = login(otherLoginRequest)
                 .as(LoginResponse.class)
                 .getAccessToken();
@@ -205,7 +205,7 @@ class OrderIntegrationTest extends IntegrationTest {
     void readOrderHistory() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "test_password!");
+                                                           "test_password!");
         String accessToken = login(loginRequest)
                 .as(LoginResponse.class)
                 .getAccessToken();

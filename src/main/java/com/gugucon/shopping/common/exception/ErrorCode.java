@@ -8,8 +8,8 @@ public enum ErrorCode {
 
     UNKNOWN_ERROR(INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생헀습니다."),
     REQUIRED_FIELD_MISSING(BAD_REQUEST, "필수 항목이 누락되었습니다."),
-    EMAIL_NOT_REGISTERED(UNAUTHORIZED, "등록되지 않은 이메일입니다."),
-    PASSWORD_NOT_CORRECT(UNAUTHORIZED, "틀린 비밀번호 입니다."),
+    EMAIL_NOT_REGISTERED(BAD_REQUEST, "등록되지 않은 이메일입니다."),
+    PASSWORD_NOT_CORRECT(BAD_REQUEST, "틀린 비밀번호 입니다."),
     INVALID_EMAIL_PATTERN(BAD_REQUEST, "유효하지 않은 이메일 형식입니다."),
     INVALID_PASSWORD_PATTERN(BAD_REQUEST, "유효하지 않은 비밀번호 형식입니다."),
     NO_AUTHORIZATION_HEADER(UNAUTHORIZED, "인증 정보가 없습니다."),

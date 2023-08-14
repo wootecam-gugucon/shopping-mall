@@ -24,7 +24,7 @@ class LoginIntegrationTest extends IntegrationTest {
     void login() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "test_password!");
+                                                           "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -42,11 +42,11 @@ class LoginIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일로 로그인할 수 없다.")
+    @DisplayName("존재하지 않는 이메일이면 로그인을 요청했을 때 400 상태코드를 응답한다.")
     void loginFail_invalidEmail() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("unregistered_email@gmail.com",
-                "test_password!");
+                                                           "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -59,16 +59,16 @@ class LoginIntegrationTest extends IntegrationTest {
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMAIL_NOT_REGISTERED);
     }
 
     @Test
-    @DisplayName("틀린 비밀번호로 로그인할 수 없다.")
+    @DisplayName("틀린 비밀번호이면 로그인을 요청했을 때 400 상태코드를 응답한다.")
     void loginFail_incorrectPassword() {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                "invalid_password");
+                                                           "invalid_password");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -81,13 +81,13 @@ class LoginIntegrationTest extends IntegrationTest {
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.PASSWORD_NOT_CORRECT);
     }
 
     @ParameterizedTest
     @NullAndEmptySource
-    @DisplayName("이메일 없이 로그인할 수 없다.")
+    @DisplayName("이메일 정보가 없으면 로그인을 요청했을 때 400 상태코드를 응답한다.")
     void loginFail_withoutEmail(final String email) {
         /* given */
         final LoginRequest loginRequest = new LoginRequest(email, "test_password!");
@@ -109,7 +109,7 @@ class LoginIntegrationTest extends IntegrationTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @DisplayName("비밀번호 없이 로그인할 수 없다.")
+    @DisplayName("비밀번호 정보가 없으면 로그인을 요청했을 때 400 상태코드를 응답한다.")
     void loginFail_withoutPassword(final String password) {
         /* given */
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com", password);
