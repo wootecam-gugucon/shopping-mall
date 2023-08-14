@@ -17,19 +17,19 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     private final JwtProvider jwtProvider;
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String jwtToken = ((JwtAuthenticationToken) authentication).getJwtToken();
+    public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
+        final String jwtToken = ((JwtAuthenticationToken) authentication).getJwtToken();
         validateToken(jwtToken);
         String principal = jwtProvider.parseToken(jwtToken);
         return new JwtAuthenticationToken(principal, "", new ArrayList<>());
     }
 
     @Override
-    public boolean supports(Class<?> authentication) {
+    public boolean supports(final Class<?> authentication) {
         return JwtAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    private void validateToken(String jwtToken) {
+    private void validateToken(final String jwtToken) {
         if (!jwtProvider.validate(jwtToken)) {
             throw new BadCredentialsException(ErrorCode.INVALID_TOKEN.getMessage());
         }
