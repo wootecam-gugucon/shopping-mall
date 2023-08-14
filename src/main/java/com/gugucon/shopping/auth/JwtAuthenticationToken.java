@@ -9,7 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     private String jwtToken;
+
     private Object principal;
+
     private Object credentials;
 
     public JwtAuthenticationToken(final String jwtToken) {
