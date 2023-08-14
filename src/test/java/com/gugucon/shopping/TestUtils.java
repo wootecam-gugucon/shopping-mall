@@ -5,6 +5,7 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.response.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -38,14 +39,16 @@ public class TestUtils {
                 .build();
     }
 
-    public static ExtractableResponse<Response> login(final LoginRequest loginRequest) {
+    public static String login(final LoginRequest loginRequest) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(loginRequest)
                 .when().post("/api/v1/login/token")
                 .then().log().all()
-                .extract();
+                .extract()
+                .as(LoginResponse.class)
+                .getAccessToken();
     }
 
     public static ExtractableResponse<Response> insertCartItem(String accessToken,
@@ -60,31 +63,25 @@ public class TestUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> readCartItems(String accessToken) {
+    public static List<CartItemResponse> readCartItems(String accessToken) {
         return RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .when().get("/api/v1/cart/items")
                 .then().log().all()
-                .extract();
+                .extract()
+                .jsonPath()
+                .getList(".", CartItemResponse.class);
     }
 
-    public static ExtractableResponse<Response> placeOrder(String accessToken) {
-        return RestAssured
+    public static Long placeOrder(String accessToken) {
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .when()
                 .post("/api/v1/order")
                 .then()
                 .extract();
-    }
-
-    public static Long extractOrderId(final ExtractableResponse<Response> response) {
         return Long.parseLong(response.header("Location").split("/")[2]);
-    }
-
-    public static List<CartItemResponse> extractCartItemResponses(
-            final ExtractableResponse<Response> response) {
-        return response.jsonPath().getList(".", CartItemResponse.class);
     }
 }

@@ -21,9 +21,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Void> order(@MemberId final Long memberId) {
         final OrderResponse orderResponse = orderService.order(memberId);
-        return ResponseEntity.created(
-                        URI.create("/order/" + orderResponse.getOrderId()))
-                .build();
+        return ResponseEntity.created(URI.create("/order/" + orderResponse.getOrderId())).build();
     }
 
     @GetMapping("/{orderId}")

@@ -6,7 +6,6 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.gugucon.shopping.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +35,18 @@ class OrderIntegrationTest extends IntegrationTest {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    private static List<String> toProductNames(final OrderDetailResponse orderDetailResponse) {
+        return orderDetailResponse.getOrderItems().stream()
+                .map(OrderItemResponse::getProductName)
+                .toList();
+    }
+
+    private static List<Long> toOrderIds(final List<OrderHistoryResponse> orderHistoryResponse) {
+        return orderHistoryResponse.stream()
+                .map(OrderHistoryResponse::getOrderId)
+                .toList();
+    }
+
     @AfterEach
     void tearDown() {
         cartItemRepository.deleteAll();
@@ -48,14 +58,8 @@ class OrderIntegrationTest extends IntegrationTest {
     @DisplayName("주문한다.")
     void order() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "test_password!");
-        String accessToken = login(loginRequest)
-                .as(LoginResponse.class)
-                .getAccessToken();
-
-        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
-        insertCartItem(accessToken, cartItemInsertRequest);
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -75,11 +79,7 @@ class OrderIntegrationTest extends IntegrationTest {
     @DisplayName("장바구니가 비어 있으면 주문을 요청했을 때 400 상태코드를 응답한다.")
     void orderFail_emptyCart() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "test_password!");
-        String accessToken = login(loginRequest)
-                .as(LoginResponse.class)
-                .getAccessToken();
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -100,25 +100,12 @@ class OrderIntegrationTest extends IntegrationTest {
     @DisplayName("주문 상세 정보를 조회한다.")
     void readOrderDetail() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "test_password!");
-        String accessToken = login(loginRequest)
-                .as(LoginResponse.class)
-                .getAccessToken();
-
-        final CartItemInsertRequest cartItemInsertRequest1 = new CartItemInsertRequest(1L);
-        insertCartItem(accessToken, cartItemInsertRequest1);
-
-        final CartItemInsertRequest cartItemInsertRequest2 = new CartItemInsertRequest(2L);
-        insertCartItem(accessToken, cartItemInsertRequest2);
-
-        final List<CartItemResponse> cartItemResponses = extractCartItemResponses(
-                readCartItems(accessToken));
-        final List<String> cartItemNames = cartItemResponses.stream()
-                .map(CartItemResponse::getName)
-                .collect(Collectors.toUnmodifiableList());
-
-        final Long orderId = extractOrderId(placeOrder(accessToken));
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        insertCartItem(accessToken, new CartItemInsertRequest(2L));
+        final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
+        final List<String> cartItemNames = toProductNames(cartItemResponses);
+        final Long orderId = placeOrder(accessToken);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -131,10 +118,7 @@ class OrderIntegrationTest extends IntegrationTest {
 
         /* then */
         final OrderDetailResponse orderDetailResponse = response.as(OrderDetailResponse.class);
-        final List<String> orderItemNames = orderDetailResponse.getOrderItems().stream()
-                .map(OrderItemResponse::getProductName)
-                .collect(Collectors.toUnmodifiableList());
-        assertThat(cartItemNames).containsExactlyInAnyOrderElementsOf(orderItemNames);
+        assertThat(toProductNames(orderDetailResponse)).containsExactlyInAnyOrderElementsOf(cartItemNames);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -142,11 +126,7 @@ class OrderIntegrationTest extends IntegrationTest {
     @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_invalidOrderId() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "test_password!");
-        String accessToken = login(loginRequest)
-                .as(LoginResponse.class)
-                .getAccessToken();
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
         final Long invalidOrderId = Long.MAX_VALUE;
 
         /* when */
@@ -168,22 +148,10 @@ class OrderIntegrationTest extends IntegrationTest {
     @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_orderOfOtherUser() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "test_password!");
-        String accessToken = login(loginRequest)
-                .as(LoginResponse.class)
-                .getAccessToken();
-
-        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
-        insertCartItem(accessToken, cartItemInsertRequest);
-
-        final Long orderId = extractOrderId(placeOrder(accessToken));
-
-        final LoginRequest otherLoginRequest = new LoginRequest("other_test_email@woowafriends.com",
-                                                                "test_password!");
-        String otherAccessToken = login(otherLoginRequest)
-                .as(LoginResponse.class)
-                .getAccessToken();
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long orderId = placeOrder(accessToken);
+        String otherAccessToken = login(new LoginRequest("other_test_email@woowafriends.com", "test_password!"));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -204,18 +172,11 @@ class OrderIntegrationTest extends IntegrationTest {
     @DisplayName("주문 목록을 조회한다.")
     void readOrderHistory() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "test_password!");
-        String accessToken = login(loginRequest)
-                .as(LoginResponse.class)
-                .getAccessToken();
-
-        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
-        insertCartItem(accessToken, cartItemInsertRequest);
-        final Long firstOrderId = extractOrderId(placeOrder(accessToken));
-
-        insertCartItem(accessToken, cartItemInsertRequest);
-        final Long secondOrderId = extractOrderId(placeOrder(accessToken));
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long firstOrderId = placeOrder(accessToken);
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long secondOrderId = placeOrder(accessToken);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -229,10 +190,14 @@ class OrderIntegrationTest extends IntegrationTest {
         /* then */
         final List<OrderHistoryResponse> orderHistoryResponse = response.jsonPath()
                 .getList(".", OrderHistoryResponse.class);
-        final List<Long> orderIds = orderHistoryResponse.stream()
-                .map(OrderHistoryResponse::getOrderId)
-                .collect(Collectors.toUnmodifiableList());
+        final List<Long> orderIds = toOrderIds(orderHistoryResponse);
         assertThat(orderIds).containsExactly(secondOrderId, firstOrderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private List<String> toProductNames(final List<CartItemResponse> cartItemResponses) {
+        return cartItemResponses.stream()
+                .map(CartItemResponse::getName)
+                .toList();
     }
 }
