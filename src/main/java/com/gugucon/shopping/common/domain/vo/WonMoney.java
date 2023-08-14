@@ -1,6 +1,7 @@
 package com.gugucon.shopping.common.domain.vo;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,15 +13,16 @@ import lombok.NoArgsConstructor;
 @Getter
 public class WonMoney {
 
-    public static final WonMoney ZERO = new WonMoney(0);
+    public static final WonMoney ZERO = new WonMoney(0L);
 
-    private long value;
+    @NotNull
+    private Long value;
 
-    private WonMoney(final long value) {
+    private WonMoney(final Long value) {
         this.value = value;
     }
 
-    public static WonMoney from(final long value) {
+    public static WonMoney from(final Long value) {
         return new WonMoney(value);
     }
 

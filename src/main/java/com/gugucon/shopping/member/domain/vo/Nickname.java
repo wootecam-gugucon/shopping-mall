@@ -2,6 +2,7 @@ package com.gugucon.shopping.member.domain.vo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Embeddable
@@ -11,7 +12,8 @@ import lombok.*;
 @Getter
 public class Nickname {
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", nullable = false)
+    @NotNull
     private String value;
 
     public static Nickname from(String value) {

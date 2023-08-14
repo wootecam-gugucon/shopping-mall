@@ -39,7 +39,7 @@ class OrderTest {
         final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
 
         /* when & then */
-        assertThat(order.getTotalPrice()).isEqualTo(WonMoney.from(130000));
+        assertThat(order.getTotalPrice()).isEqualTo(WonMoney.from(130000L));
     }
 
     @Test
@@ -64,7 +64,7 @@ class OrderTest {
         assertThatNoException()
                 .isThrownBy(() -> Order.validateTotalPrice(List.of(validCartItem)));
         final ShoppingException exception = assertThrows(ShoppingException.class,
-                () -> Order.validateTotalPrice(List.of(invalidCartItem)));
+                                                         () -> Order.validateTotalPrice(List.of(invalidCartItem)));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
     }
 
@@ -77,7 +77,8 @@ class OrderTest {
 
         /* when & then */
         assertThatNoException().isThrownBy(() -> order.validateUserHasId(memberId));
-        ShoppingException exception = assertThrows(ShoppingException.class, () -> order.validateUserHasId(Long.MAX_VALUE));
+        ShoppingException exception = assertThrows(ShoppingException.class,
+                                                   () -> order.validateUserHasId(Long.MAX_VALUE));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
     }
 }

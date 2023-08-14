@@ -6,6 +6,8 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -22,18 +24,27 @@ import java.util.Objects;
 public class Order extends BaseTimeEntity {
 
     private static final long MAX_TOTAL_PRICE = 100_000_000_000L;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
     private final List<OrderItem> orderItems = new ArrayList<>();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "member_id")
+    @NotNull
     private Long memberId;
+
     @Enumerated(EnumType.STRING)
+    @NotNull
     private OrderStatus status;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "total_price"))
+    @Valid
+    @NotNull
     private WonMoney totalPrice;
 
     public static Order from(final Long memberId, final List<CartItem> cartItems) {

@@ -5,6 +5,8 @@ import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,14 +25,18 @@ public class CartItem extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "member_id")
+    @NotNull
     private Long memberId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
+    @NotNull
     private Product product;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "quantity"))
+    @Valid
+    @NotNull
     private Quantity quantity;
 
     @Builder

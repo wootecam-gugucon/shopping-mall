@@ -5,6 +5,7 @@ import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,12 +21,15 @@ public class Member extends BaseTimeEntity {
     private Long id;
 
     @Embedded
+    @Valid
     private Email email;
 
     @Embedded
+    @Valid
     private Password password;
 
     @Embedded
+    @Valid
     private Nickname nickname;
 
     @Builder
