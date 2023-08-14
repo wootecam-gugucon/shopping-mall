@@ -15,6 +15,6 @@ public final class TossValidationRequest {
     public static TossValidationRequest of(final PaySuccessParameter paySuccessParameter) {
         return new TossValidationRequest(paySuccessParameter.getPaymentKey(),
                                          paySuccessParameter.getOrderId(),
-                                         paySuccessParameter.getPrice());
+                                         paySuccessParameter.getAmount());
     }
 }

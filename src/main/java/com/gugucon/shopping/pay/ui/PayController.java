@@ -8,6 +8,7 @@ import com.gugucon.shopping.pay.dto.PaySuccessParameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,23 +34,13 @@ public final class PayController {
     }
 
     @GetMapping("/pay/success")
-    public String getSuccessPage(@RequestParam("paymentKey") final String paymentKey,
-                                 @RequestParam("orderId") final String orderId,
-                                 @RequestParam("amount") final Long price,
-                                 @RequestParam("paymentType") final String paymentType) {
-        final PaySuccessParameter paySuccessParameter = new PaySuccessParameter(paymentKey,
-                                                                                orderId,
-                                                                                price,
-                                                                                paymentType);
+    public String getSuccessPage(@ModelAttribute final PaySuccessParameter paySuccessParameter) {
         payService.validatePay(paySuccessParameter);
         return "pay-success";
     }
 
     @GetMapping("/pay/fail")
-    public String getFailPage(@RequestParam("code") final String errorCode,
-                              @RequestParam("message") final String message,
-                              @RequestParam("orderId") final String orderId) {
-        final PayFailParameter payFailParameter = new PayFailParameter(errorCode, message, orderId);
+    public String getFailPage(@ModelAttribute final PayFailParameter payFailParameter) {
         return "pay-fail";
     }
 

@@ -46,7 +46,7 @@ public class PayService {
         Long orderId = orderIdTranslator.decode(paySuccessParameter.getOrderId());
         final Pay pay = payRepository.findByOrderId(orderId)
                                .orElseThrow(RuntimeException::new);
-        pay.validateMoney(paySuccessParameter.getPrice());
+        pay.validateMoney(paySuccessParameter.getAmount());
         tossPayValidator.validatePayment(paySuccessParameter);
     }
 }

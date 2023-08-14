@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public final class PayFailParameter {
 
-    private final String errorCode;
+    private final String code;
     private final String message;
     private final String orderId;
 }
