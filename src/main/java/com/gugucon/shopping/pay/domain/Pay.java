@@ -29,8 +29,8 @@ public final class Pay {
 
     private Long price;
 
-    public Pay(final Long orderId, final String orderName, final Long price) {
-        this(null, orderId, Base64.getEncoder().encodeToString((orderId + orderName).getBytes()), orderName, price);
+    public Pay(final Long orderId, final String encodedOrderId, final String orderName, final Long price) {
+        this(null, orderId, encodedOrderId, orderName, price);
     }
 
     public PayResponse toPayResponse() {
