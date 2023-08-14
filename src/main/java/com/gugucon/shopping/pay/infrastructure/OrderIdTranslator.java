@@ -2,6 +2,6 @@ package com.gugucon.shopping.pay.infrastructure;
 
 public interface OrderIdTranslator {
 
-    public String encode(Long orderId, String orderName);
-    public Long decode(String encodedOrderId);
+    String encode(final Long orderId, final String orderName);
+    Long decode(final String encodedOrderId);
 }
