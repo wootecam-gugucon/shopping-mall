@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public final class PaySuccessParameter {
+public final class PayValidationRequest {
 
     private final String paymentKey;
     private final String orderId;

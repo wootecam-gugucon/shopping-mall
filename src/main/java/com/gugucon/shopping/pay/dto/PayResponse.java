@@ -8,7 +8,7 @@ public final class PayResponse {
 
     private final String encodedOrderId;
     private final String orderName;
-    private final String successUrl = "http://localhost:8080/pay/success";
+    private final String successUrl = "http://localhost:8080/pay/loading";
     private final String failUrl = "http://localhost:8080/pay/fail";
     // TODO: 회원 정보 가져오기?
     private final String customerEmail = "asdf@asdf.asdf";

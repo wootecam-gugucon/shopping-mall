@@ -3,7 +3,7 @@ package com.gugucon.shopping.pay.application;
 import com.gugucon.shopping.pay.domain.Pay;
 import com.gugucon.shopping.pay.dto.PayRequest;
 import com.gugucon.shopping.pay.dto.PayResponse;
-import com.gugucon.shopping.pay.dto.PaySuccessParameter;
+import com.gugucon.shopping.pay.dto.PayValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.OrderIdTranslator;
 import com.gugucon.shopping.pay.infrastructure.TossPayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
@@ -42,11 +42,11 @@ public class PayService {
         return PayResponse.of(payRepository.save(pay));
     }
 
-    public void validatePay(final PaySuccessParameter paySuccessParameter) {
-        Long orderId = orderIdTranslator.decode(paySuccessParameter.getOrderId());
+    public void validatePay(final PayValidationRequest payValidationRequest) {
+        Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
         final Pay pay = payRepository.findByOrderId(orderId)
                                .orElseThrow(RuntimeException::new);
-        pay.validateMoney(paySuccessParameter.getAmount());
-        tossPayValidator.validatePayment(paySuccessParameter);
+        pay.validateMoney(payValidationRequest.getAmount());
+        tossPayValidator.validatePayment(payValidationRequest);
     }
 }

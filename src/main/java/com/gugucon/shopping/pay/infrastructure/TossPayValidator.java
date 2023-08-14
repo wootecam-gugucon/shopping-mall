@@ -1,6 +1,6 @@
 package com.gugucon.shopping.pay.infrastructure;
 
-import com.gugucon.shopping.pay.dto.PaySuccessParameter;
+import com.gugucon.shopping.pay.dto.PayValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationResponse;
 import java.util.Base64;
@@ -30,9 +30,9 @@ public final class TossPayValidator {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
     }
 
-    public void validatePayment(final PaySuccessParameter paySuccessParameter) {
+    public void validatePayment(final PayValidationRequest payValidationRequest) {
         httpHeaders.setBasicAuth(Base64.getEncoder().encodeToString((secretKey + ":").getBytes()));
-        final TossValidationRequest tossValidationRequest = TossValidationRequest.of(paySuccessParameter);
+        final TossValidationRequest tossValidationRequest = TossValidationRequest.of(payValidationRequest);
         final HttpEntity<TossValidationRequest> request = new HttpEntity<>(tossValidationRequest, httpHeaders);
         final ResponseEntity<TossValidationResponse> response = restTemplate.postForEntity(VALIDATE_URL,
                                                                                      request,
