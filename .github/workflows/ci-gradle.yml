@@ -20,6 +20,7 @@ permissions:
   checks: write
 
 jobs:
+  environment: shopping-mall-secrets
   build:
 
     runs-on: ubuntu-latest
@@ -41,9 +42,11 @@ jobs:
       run: | 
         touch ./src/main/resources/application.properties
         echo "$SECRETS_CONTEXT"
-        
+
+      # 랜덤 파일 생성
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-        to_envs() { jq -r "to_entries[] | \"\(.key)<<$EOF\n\(.value)\n$EOF\n\""; }
+        echo "${EOF}"
+        to_envs() { jq -r "to_entries[] | \"\(.key)<<$EOF\n\(.value)\n$EOF\n\""; }  
         
         echo "$SECRETS_CONTEXT" | to_envs
         echo "$SECRETS_CONTEXT" | to_envs >> ./src/main/resources/application.properties
