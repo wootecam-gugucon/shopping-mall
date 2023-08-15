@@ -1,4 +1,4 @@
-package com.gugucon.shopping.member.utils;
+package com.gugucon.shopping.common.utils;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

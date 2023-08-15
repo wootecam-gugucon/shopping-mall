@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.member.utils.JwtProvider;
+import com.gugucon.shopping.common.utils.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

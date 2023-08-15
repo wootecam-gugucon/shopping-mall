@@ -1,7 +1,7 @@
 package com.gugucon.shopping.auth;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.member.utils.JwtProvider;
+import com.gugucon.shopping.common.utils.JwtProvider;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;

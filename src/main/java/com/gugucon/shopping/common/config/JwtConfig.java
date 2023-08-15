@@ -1,6 +1,6 @@
-package com.gugucon.shopping.member.config;
+package com.gugucon.shopping.common.config;
 
-import com.gugucon.shopping.member.utils.JwtProvider;
+import com.gugucon.shopping.common.utils.JwtProvider;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
