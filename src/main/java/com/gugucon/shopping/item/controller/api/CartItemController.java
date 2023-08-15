@@ -5,11 +5,11 @@ import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.service.CartService;
 import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +29,7 @@ public class CartItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public void insertCartItem(@RequestBody @Validated final CartItemInsertRequest cartItemInsertRequest,
+    public void insertCartItem(@RequestBody @Valid final CartItemInsertRequest cartItemInsertRequest,
                                @AuthenticationPrincipal final Long memberId) {
         cartService.insertCartItem(cartItemInsertRequest, memberId);
     }
@@ -43,7 +43,7 @@ public class CartItemController {
     @PutMapping("/{cartItemId}/quantity")
     @ResponseStatus(HttpStatus.OK)
     public void updateCartItemQuantity(@PathVariable final Long cartItemId,
-                                       @RequestBody @Validated final CartItemUpdateRequest cartItemUpdateRequest,
+                                       @RequestBody @Valid final CartItemUpdateRequest cartItemUpdateRequest,
                                        @MemberId final Long memberId) {
         cartService.updateCartItemQuantity(cartItemId, cartItemUpdateRequest, memberId);
     }
