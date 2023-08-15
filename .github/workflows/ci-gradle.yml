@@ -34,7 +34,8 @@ jobs:
         distribution: 'temurin'
         
     - name: gradlew에 실행 권한 부여
-      run: chmod +x gradlew
+      run: chmod +x ./gradlew
+
     - name: application.properties 파일 생성
       env:
         SECRETS_CONTEXT: ${{ toJson(secrets) }}
