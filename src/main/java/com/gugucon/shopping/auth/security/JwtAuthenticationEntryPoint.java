@@ -1,4 +1,4 @@
-package com.gugucon.shopping.auth;
+package com.gugucon.shopping.auth.security;
 
 import static com.gugucon.shopping.common.exception.ErrorCode.LOGIN_REQUESTED;
 

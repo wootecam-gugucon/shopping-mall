@@ -1,5 +1,6 @@
-package com.gugucon.shopping.auth;
+package com.gugucon.shopping.auth.security;
 
+import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
 import java.util.ArrayList;

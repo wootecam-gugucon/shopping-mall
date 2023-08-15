@@ -1,4 +1,4 @@
-package com.gugucon.shopping.auth;
+package com.gugucon.shopping.auth.domain.vo;
 
 import java.util.Collection;
 import lombok.Getter;

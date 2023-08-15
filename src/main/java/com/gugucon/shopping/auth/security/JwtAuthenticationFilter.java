@@ -1,5 +1,6 @@
-package com.gugucon.shopping.auth;
+package com.gugucon.shopping.auth.security;
 
+import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

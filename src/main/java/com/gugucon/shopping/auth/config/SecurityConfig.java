@@ -1,6 +1,9 @@
-package com.gugucon.shopping.auth;
+package com.gugucon.shopping.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gugucon.shopping.auth.security.JwtAuthenticationEntryPoint;
+import com.gugucon.shopping.auth.security.JwtAuthenticationFilter;
+import com.gugucon.shopping.auth.security.JwtAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
