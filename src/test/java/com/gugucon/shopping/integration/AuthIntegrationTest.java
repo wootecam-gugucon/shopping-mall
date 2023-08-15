@@ -23,7 +23,7 @@ class AuthIntegrationTest extends IntegrationTest {
     void authenticate() {
         // given
         final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-            "test_password!");
+                                                           "test_password!");
         String accessToken = TestUtils.login(loginRequest);
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
