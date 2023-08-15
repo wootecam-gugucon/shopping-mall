@@ -1,22 +1,22 @@
 package com.gugucon.shopping.pay.dto;
 
 import com.gugucon.shopping.pay.domain.Pay;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public final class PayResponse {
 
-    private final String encodedOrderId;
-    private final String orderName;
-    private static final String successUrl = "http://localhost:8080/pay/loading";
-    private static final String failUrl = "http://localhost:8080/pay/fail";
     private static final String customerEmail = "asdf@asdf.asdf";
     private static final String customerName = "김동주";
 
-    public static PayResponse of(final Pay pay) {
-        return new PayResponse(pay.getEncodedOrderId(), pay.getOrderName());
+    private final String encodedOrderId;
+    private final String orderName;
+    private final String successUrl;
+    private final String failUrl;
+
+    public static PayResponse from(final Pay pay, final String successUrl, final String failUrl) {
+        return new PayResponse(pay.getEncodedOrderId(), pay.getOrderName(), successUrl, failUrl);
     }
 }

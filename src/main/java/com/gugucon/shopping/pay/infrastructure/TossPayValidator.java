@@ -19,22 +19,19 @@ public final class TossPayValidator implements PayValidator {
     private static final String BASIC_AUTH_DELIMITER = ":";
 
     private final RestTemplate restTemplate;
-    private final HttpHeaders httpHeaders;
     private final Encoder encoder;
+    private final HttpHeaders httpHeaders;
 
-    @Value("${pay.toss.secret-key}")
-    private String secretKey;
-
-    public TossPayValidator() {
+    public TossPayValidator(final String secretKey) {
         this.restTemplate = new RestTemplate();
+        this.encoder = Base64.getEncoder();
         this.httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        this.encoder = Base64.getEncoder();
+        httpHeaders.setBasicAuth(encoder.encodeToString((secretKey + BASIC_AUTH_DELIMITER).getBytes()));
     }
 
     @Override
     public void validatePayment(final PayValidationRequest payValidationRequest) {
-        httpHeaders.setBasicAuth(encoder.encodeToString((secretKey + BASIC_AUTH_DELIMITER).getBytes()));
         final TossValidationRequest tossValidationRequest = TossValidationRequest.of(payValidationRequest);
         final HttpEntity<TossValidationRequest> request = new HttpEntity<>(tossValidationRequest, httpHeaders);
         final ResponseEntity<TossValidationResponse> response = restTemplate.postForEntity(VALIDATE_URL,
