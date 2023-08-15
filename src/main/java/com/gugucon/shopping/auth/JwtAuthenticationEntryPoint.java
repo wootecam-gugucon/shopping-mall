@@ -18,7 +18,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(final HttpServletRequest request, final HttpServletResponse response,
+    public void commence(final HttpServletRequest request,
+                         final HttpServletResponse response,
                          final AuthenticationException authException) throws IOException {
 
         final ErrorResponse errorResponse = ErrorResponse.from(LOGIN_REQUESTED);
