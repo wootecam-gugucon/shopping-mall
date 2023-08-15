@@ -36,7 +36,6 @@ jobs:
       run: chmod +x gradlew
 
     - name: application.properties 파일 생성
-      uses: sergeysova/jq-action@v2
       env:
         SECRETS_CONTEXT: ${{ toJson(secrets) }}
       run: | 
