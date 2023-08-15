@@ -35,10 +35,19 @@ jobs:
     - name: gradlew에 실행 권한 부여
       run: chmod +x gradlew
 
-    - name: application.properties 환경변수 설정
+    - name: application.properties 파일 생성
+      uses: sergeysova/jq-action@v2
+      env:
+        SECRETS_CONTEXT: ${{ toJson(secrets) }}
       run: | 
-        echo "${{JWT_SECRET_KEY}}" >> ./src/main/resources/application.properties
-        echo "${{JWT_EXPIRATION}}" >> ./src/main/resources/application.properties
+        touch ./src/main/resources/application.properties
+        echo "$SECRETS_CONTEXT"
+        
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        to_envs() { jq -r "to_entries[] | \"\(.key)<<$EOF\n\(.value)\n$EOF\n\""; }
+        
+        echo "$SECRETS_CONTEXT" | to_envs
+        echo "$SECRETS_CONTEXT" | to_envs >> ./src/main/resources/application.properties
 
     - name: 프로젝트 빌드 및 테스트
       run: ./gradlew clean build
