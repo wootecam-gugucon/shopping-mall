@@ -3,18 +3,18 @@ package com.gugucon.shopping.member.utils;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Component
 public class JwtProvider {
 
-    @Value("${jwt.secret-key}")
-    private String secretKey;
-    @Value("${jwt.expiration}")
-    private Long expirationMilliSeconds;
+    private final String secretKey;
+    private final Long expirationMilliSeconds;
+
+    public JwtProvider(final String secretKey, final Long expirationMilliSeconds) {
+        this.secretKey = secretKey;
+        this.expirationMilliSeconds = expirationMilliSeconds;
+    }
 
     public String generateToken(final String subject) {
         Date now = new Date(System.currentTimeMillis());
