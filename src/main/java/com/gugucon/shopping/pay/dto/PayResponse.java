@@ -11,12 +11,15 @@ public final class PayResponse {
     private static final String customerEmail = "asdf@asdf.asdf";
     private static final String customerName = "김동주";
 
-    private final String encodedOrderId;
     private final String orderName;
+    private final String encodedOrderId;
     private final String successUrl;
     private final String failUrl;
 
-    public static PayResponse from(final Pay pay, final String successUrl, final String failUrl) {
-        return new PayResponse(pay.getEncodedOrderId(), pay.getOrderName(), successUrl, failUrl);
+    public static PayResponse from(final Pay pay,
+                                   final String encodedOrderId,
+                                   final String successUrl,
+                                   final String failUrl) {
+        return new PayResponse(pay.getOrderName(), encodedOrderId, successUrl, failUrl);
     }
 }

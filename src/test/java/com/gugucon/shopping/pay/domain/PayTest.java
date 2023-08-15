@@ -15,7 +15,6 @@ class PayTest {
     void create() {
         assertThatNoException().isThrownBy(() -> Pay.builder()
                                      .orderId(1L)
-                                     .encodedOrderId("인코딩")
                                      .orderName("주문 이름")
                                      .price(1000L)
                                      .build());
@@ -27,7 +26,6 @@ class PayTest {
         // given
         Pay pay = Pay.builder()
                      .orderId(1L)
-                     .encodedOrderId("인코딩")
                      .orderName("주문 이름")
                      .price(1000L)
                      .build();
@@ -42,7 +40,6 @@ class PayTest {
         // given
         Pay pay = Pay.builder()
                      .orderId(1L)
-                     .encodedOrderId("인코딩")
                      .orderName("주문 이름")
                      .price(1000L)
                      .build();

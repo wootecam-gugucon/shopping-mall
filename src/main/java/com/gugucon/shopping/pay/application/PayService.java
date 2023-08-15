@@ -42,11 +42,10 @@ public class PayService {
         final String encodedOrderId = orderIdTranslator.encode(orderId, orderName);
         final Pay pay = Pay.builder()
                            .orderId(orderId)
-                           .encodedOrderId(encodedOrderId)
                            .orderName(orderName)
                            .price(price)
                            .build();
-        return PayResponse.from(payRepository.save(pay), successUrl, failUrl);
+        return PayResponse.from(payRepository.save(pay), encodedOrderId, successUrl, failUrl);
     }
 
     public void validatePay(final PayValidationRequest payValidationRequest) {

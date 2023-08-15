@@ -23,8 +23,6 @@ public final class Pay {
 
     private Long orderId;
 
-    private String encodedOrderId;
-
     private String orderName;
 
     private Long price;
