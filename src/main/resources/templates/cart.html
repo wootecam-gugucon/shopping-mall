@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+<div class="root">
+  <nav class="nav flex justify-end">
+    <div class="flex-center gap-15">
+      <a href="/" class="nav-button">상품</a>
+      <a href="/cart" class="nav-button">장바구니</a>
+      <a href="/order-history" class="nav-button">주문목록</a>
+      <a href="/login" class="nav-button">로그인</a>
+    </div>
+  </nav>
+
+  <section class="cart-section">
+    <div class="cart-list">
+    </div>
+    <div class="flex justify-between items-center mt-30">
+      <button class="primary-button flex-center" onclick="requestOrder()">주문하기</button>
+    </div>
+  </section>
+</div>
+<script th:src="@{/js/cart.js}"></script>
+<script th:src="@{/js/order.js}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const credentials = sessionStorage.getItem('accessToken');
+    if (!credentials) {
+      alert('사용자 정보가 없습니다.');
+      window.location.href = '/login';
+      return;
+    }
+
+    // TODO: [4단계] 장바구니 상품 목록 조회 스펙에 맞게 변경
+    fetch('/api/v1/cart/items', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${credentials}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response.json();
+    }).then((data) => {
+      let element = '<hr class="divide-line-gray mt-10" />';
+      data.forEach(cartItem => {
+        element += `
+                    <div class="cart-container">
+                      <div class="flex gap-15 mt-10">
+                        <img class="w-144 h-144 cover-image" src="assets/${cartItem.imageFileName}"/>
+                        <span class="cart-name">${cartItem.name}</span>
+                      </div>
+                      <div class="flex-col-center justify-around gap-15">
+                        <button class="cart-trash-svg" onclick="removeCartItem(${cartItem.cartItemId})">
+                            <img src="./assets/svgs/trash.svg" alt="삭제" />
+                        </button>
+                        <div class="number-input-container">
+                          <input type="number" class="number-input" value="${cartItem.quantity}" />
+                          <div>
+                            <button class="number-input-button" onclick="updateCartItemQuantity(${cartItem.cartItemId}, ${cartItem.quantity} + 1)">▲</button>
+                            <button class="number-input-button" onclick="updateCartItemQuantity(${cartItem.cartItemId}, ${cartItem.quantity} - 1)">▼</button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <hr class="divide-line-thin mt-10"/>
+                    `;
+      });
+
+      document.querySelector('.cart-list').innerHTML = element;
+    }).catch((error) => {
+      console.error(error);
+    });
+
+  });
+</script>
+</body>
+</html>

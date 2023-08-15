@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+<div class="root">
+  <nav class="nav flex justify-end">
+    <div class="flex-center gap-15">
+      <a href="/" class="nav-button">상품</a>
+      <a href="/cart" class="nav-button">장바구니</a>
+      <a href="/order-history" class="nav-button">주문목록</a>
+      <a href="/login" class="nav-button">로그인</a>
+    </div>
+  </nav>
+
+  <section class="form-container">
+    <form id="login-form" class="mt-40">
+      <label for="email">Email</label>
+      <input class="text-input mb-10" type="text" id="email" name="email" required>
+
+      <label for="password">Password</label>
+      <input class="text-input mb-10" type="password" id="password" name="password" required>
+
+      <button type="submit" class="primary-button-small form-submit-button">Login</button>
+    </form>
+  </section>
+</div>
+<script th:src="@{/js/login.js}"></script>
+</body>
+</html>

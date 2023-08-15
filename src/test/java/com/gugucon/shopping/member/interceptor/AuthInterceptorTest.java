@@ -1,0 +1,87 @@
+package com.gugucon.shopping.member.interceptor;
+
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.member.utils.JwtProvider;
+import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("AuthInterceptor 단위 테스트")
+class AuthInterceptorTest {
+
+    @Mock
+    private JwtProvider jwtProvider;
+    @InjectMocks
+    private AuthInterceptor authInterceptor;
+
+    @Test
+    @DisplayName("Authorization 헤더에서 토큰 정보를 파싱해서 Request 객체에 넣는다.")
+    void preHandle() {
+        /* given */
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("Bearer valid_token");
+        when(jwtProvider.validate("valid_token")).thenReturn(true);
+        when(jwtProvider.parseToken("valid_token")).thenReturn("1");
+        final ArgumentCaptor<String> headerCaptor = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<Long> memberIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        /* when & then */
+        assertThatNoException()
+                .isThrownBy(() -> authInterceptor.preHandle(request, null, null));
+        verify(request).setAttribute(headerCaptor.capture(), memberIdCaptor.capture());
+        assertThat(headerCaptor.getValue()).isEqualTo("memberId");
+        assertThat(memberIdCaptor.getValue()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Authorization 헤더 정보가 없으면 예외가 발생한다.")
+    void noAuthorizationHeader() {
+        /* given */
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn(null);
+
+        /* when & then */
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                () -> authInterceptor.preHandle(request, null, null));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NO_AUTHORIZATION_HEADER);
+    }
+
+    @Test
+    @DisplayName("지원하는 토큰 타입이 아니면 예외가 발생한다.")
+    void invalidTokenType() {
+        /* given */
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("Pearer ");
+
+        /* when & then */
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                () -> authInterceptor.preHandle(request, null, null));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_TOKEN_TYPE);
+    }
+
+    @Test
+    @DisplayName("유효한 토큰이 아니면 예외가 발생한다.")
+    void invalidToken() {
+        /* given */
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("Bearer invalid_token");
+        when(jwtProvider.validate("invalid_token")).thenReturn(false);
+
+        /* when & then */
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                () -> authInterceptor.preHandle(request, null, null));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_TOKEN);
+    }
+}

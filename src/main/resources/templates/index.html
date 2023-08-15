@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+<div class="root">
+  <nav class="nav flex justify-end">
+    <div class="flex items-center gap-15">
+      <a href="/" class="nav-button">상품</a>
+      <a href="/cart" class="nav-button">장바구니</a>
+      <a href="/order-history" class="nav-button">주문목록</a>
+      <a href="/login" class="nav-button">로그인</a>
+    </div>
+  </nav>
+
+  <section class="product-container">
+    <div th:each="product : ${products}">
+      <img class="w-280 h-280 cover-image" th:src="|assets/${product.imageFileName}|"/>
+      <div class="flex justify-between w-280 p-5">
+        <div class="product-info">
+          <span class="product-info__name" th:text="${product.name}"></span>
+          <span class="product-info__price" th:text="${product.price}"></span>
+        </div>
+        <button type="submit" class="product-btn" th:onclick="addCartItem([[${product.id}]])">
+          <img src="assets/svgs/cart.svg" alt="장바구니"/>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+<script th:src="@{/js/cart.js}"></script>
+</html>
