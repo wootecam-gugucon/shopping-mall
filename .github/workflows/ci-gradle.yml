@@ -35,6 +35,11 @@ jobs:
     - name: gradlew에 실행 권한 부여
       run: chmod +x gradlew
 
+    - name: application.properties 환경변수 설정
+      run: | 
+        echo "${{JWT_SECRET_KEY}}" >> ./src/main/resources/application.properties
+        echo "${{JWT_EXPIRATION}}" >> ./src/main/resources/application.properties
+
     - name: 프로젝트 빌드 및 테스트
       run: ./gradlew clean build
 
