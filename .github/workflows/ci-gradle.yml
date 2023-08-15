@@ -20,10 +20,10 @@ permissions:
   checks: write
 
 jobs:
-  environment: shopping-mall-secrets
   build:
 
     runs-on: ubuntu-latest
+    environment: shopping-mall-secrets
 
     steps:
     - uses: actions/checkout@v3
