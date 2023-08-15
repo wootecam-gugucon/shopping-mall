@@ -4,7 +4,6 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.service.CartService;
-import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class CartItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CartItemResponse> getCartItems(@MemberId final Long memberId) {
+    public List<CartItemResponse> getCartItems(@AuthenticationPrincipal final Long memberId) {
         return cartService.readCartItems(memberId);
     }
 
@@ -44,13 +43,13 @@ public class CartItemController {
     @ResponseStatus(HttpStatus.OK)
     public void updateCartItemQuantity(@PathVariable final Long cartItemId,
                                        @RequestBody @Valid final CartItemUpdateRequest cartItemUpdateRequest,
-                                       @MemberId final Long memberId) {
+                                       @AuthenticationPrincipal final Long memberId) {
         cartService.updateCartItemQuantity(cartItemId, cartItemUpdateRequest, memberId);
     }
 
     @DeleteMapping("/{cartItemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeCartItem(@PathVariable final Long cartItemId, @MemberId final Long memberId) {
+    public void removeCartItem(@PathVariable final Long cartItemId, @AuthenticationPrincipal final Long memberId) {
         cartService.removeCartItem(cartItemId, memberId);
     }
 }

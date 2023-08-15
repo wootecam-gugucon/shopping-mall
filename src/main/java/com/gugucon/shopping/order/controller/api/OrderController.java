@@ -1,6 +1,5 @@
 package com.gugucon.shopping.order.controller.api;
 
-import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderResponse;
 import com.gugucon.shopping.order.service.OrderService;
@@ -31,7 +30,8 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
-    public OrderDetailResponse getOrderDetail(@PathVariable final Long orderId, @MemberId final Long memberId) {
+    public OrderDetailResponse getOrderDetail(@PathVariable final Long orderId,
+                                              @AuthenticationPrincipal final Long memberId) {
         return orderService.getOrderDetail(orderId, memberId);
     }
 }
