@@ -43,7 +43,7 @@ jobs:
         touch ./src/main/resources/application.properties
         echo "$SECRETS_CONTEXT"
   
-        to_envs() { jq -r "to_entries[] | \"\(.key)=\(.value)\n\""; }  
+        to_envs() { jq -r "to_entries[] | \"\(.key|ascii_downcase|split("_")|join("."))=\(.value)\n\""; }  
         
         echo "$SECRETS_CONTEXT" | to_envs
         echo "$SECRETS_CONTEXT" | to_envs >> ./src/main/resources/application.properties
