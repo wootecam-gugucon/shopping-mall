@@ -5,7 +5,6 @@ import com.gugucon.shopping.pay.infrastructure.dto.TossValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationResponse;
 import java.util.Base64;
 import java.util.Base64.Encoder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,14 +18,17 @@ public final class TossPayValidator implements PayValidator {
     private static final String BASIC_AUTH_DELIMITER = ":";
 
     private final RestTemplate restTemplate;
-    private final Encoder encoder;
     private final HttpHeaders httpHeaders;
 
     public TossPayValidator(final String secretKey) {
         this.restTemplate = new RestTemplate();
-        this.encoder = Base64.getEncoder();
         this.httpHeaders = new HttpHeaders();
+        setHeaderForConnect(secretKey);
+    }
+
+    private void setHeaderForConnect(final String secretKey) {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        Encoder encoder = Base64.getEncoder();
         httpHeaders.setBasicAuth(encoder.encodeToString((secretKey + BASIC_AUTH_DELIMITER).getBytes()));
     }
 
