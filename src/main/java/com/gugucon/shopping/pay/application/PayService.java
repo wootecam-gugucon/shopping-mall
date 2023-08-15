@@ -7,28 +7,21 @@ import com.gugucon.shopping.pay.dto.PayValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.OrderIdTranslator;
 import com.gugucon.shopping.pay.infrastructure.PayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class PayService {
 
     private final PayRepository payRepository;
     private final PayValidator payValidator;
     private final OrderIdTranslator orderIdTranslator;
 
-    public PayService(final PayRepository payRepository,
-                      final PayValidator payValidator,
-                      final OrderIdTranslator orderIdTranslator) {
-        this.payRepository = payRepository;
-        this.payValidator = payValidator;
-        this.orderIdTranslator = orderIdTranslator;
-    }
-
     @Transactional
     public PayResponse createPay(final PayRequest payRequest) {
-        // TODO: 결제 금액이 실제 주문 금액과 같은지 확인
         final Long orderId = payRequest.getOrderId();
         final String orderName = payRequest.getOrderName();
         final Long price = payRequest.getPrice();
