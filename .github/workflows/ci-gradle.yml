@@ -9,7 +9,7 @@ name: Gradle로 CI 구축
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "17-application-properties-암호화" ]
   pull_request:
     branches: [ "main", "develop" ]
 
@@ -65,12 +65,12 @@ jobs:
         report_paths: '**/build/test-results/test/TEST-*.xml'
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: 빌드 실패 시 Slack으로 알림
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        author_name: 빌드 실패 알림
-        fields: repo, message, commit, author, action, eventName, ref, workflow, job, took
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      if: failure()
+  #  - name: 빌드 실패 시 Slack으로 알림
+  #    uses: 8398a7/action-slack@v3
+  #    with:
+  #      status: ${{ job.status }}
+  #      author_name: 빌드 실패 알림
+  #      fields: repo, message, commit, author, action, eventName, ref, workflow, job, took
+  #    env:
+  #      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #    if: failure()
