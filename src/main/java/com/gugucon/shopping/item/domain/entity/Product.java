@@ -2,6 +2,8 @@ package com.gugucon.shopping.item.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.vo.Stock;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -51,5 +53,11 @@ public class Product extends BaseTimeEntity {
         this.stock = Stock.from(stock);
         this.description = description;
         this.price = WonMoney.from(price);
+    }
+
+    public void validateStock() {
+        if (stock.isSoldOut()) {
+            throw new ShoppingException(ErrorCode.SOLD_OUT);
+        }
     }
 }

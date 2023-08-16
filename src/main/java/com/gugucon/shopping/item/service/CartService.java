@@ -30,7 +30,7 @@ public class CartService {
         final Long productId = cartItemInsertRequest.getProductId();
         final Product product = findProductBy(productId);
         validateProductNotInCart(memberId, productId);
-        validateStock(product.getStock());
+        product.validateStock();
 
         final CartItem cartItem = CartItem.builder()
                 .memberId(memberId)
@@ -38,12 +38,6 @@ public class CartService {
                 .quantity(1)
                 .build();
         cartItemRepository.save(cartItem);
-    }
-
-    private void validateStock(final Stock stock) {
-        if (stock.isSoldOut()) {
-            throw new ShoppingException(ErrorCode.SOLD_OUT);
-        }
     }
 
     public List<CartItemResponse> readCartItems(final Long memberId) {
