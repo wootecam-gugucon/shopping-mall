@@ -1,8 +1,11 @@
 package com.gugucon.shopping.pay.integration;
 
+import static com.gugucon.shopping.TestUtils.insertCartItem;
 import static com.gugucon.shopping.TestUtils.login;
+import static com.gugucon.shopping.TestUtils.placeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.pay.dto.PayRequest;
 import com.gugucon.shopping.pay.dto.PayResponse;
@@ -30,6 +33,9 @@ class PayIntegrationTest extends IntegrationTest {
         final PayRequest payRequest = new PayRequest(1L, 1000L, orderName);
         final String accessToken = login(new LoginRequest("test_email@woowafriends.com",
                                                           "test_password!"));
+
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        placeOrder(accessToken);
 
         // when
         ExtractableResponse<Response> response = RestAssured
