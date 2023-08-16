@@ -1,8 +1,11 @@
 package com.gugucon.shopping.pay.integration;
 
+import static com.gugucon.shopping.TestUtils.insertCartItem;
 import static com.gugucon.shopping.TestUtils.login;
+import static com.gugucon.shopping.TestUtils.placeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.pay.dto.PayRequest;
 import com.gugucon.shopping.pay.dto.PayResponse;
@@ -25,11 +28,13 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("결제 데이터 검증을 요청한다.")
     void createPayment() {
         // given
-        final Long orderId = 1L;
+        final LoginRequest request = new LoginRequest("test_email@woowafriends.com", "test_password!");
+        final String accessToken = login(request);
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+
+        final Long orderId = placeOrder(accessToken);
         final String orderName = "대충 주문 이름";
-        final PayRequest payRequest = new PayRequest(1L, 1000L, orderName);
-        final String accessToken = login(new LoginRequest("test_email@woowafriends.com",
-                                                          "test_password!"));
+        final PayRequest payRequest = new PayRequest(orderId, 1000L, orderName);
 
         // when
         ExtractableResponse<Response> response = RestAssured

@@ -8,6 +8,7 @@ import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
 import com.gugucon.shopping.auth.security.JwtAuthenticationProvider;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
+import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -59,10 +60,15 @@ class JwtAuthenticationProviderTest {
         // given
         final String jwtToken = "validJwtToken";
         final String principal = "12";
+        final Member member = new Member(Long.valueOf(principal),
+                                         "email@test.com",
+                                         "password",
+                                         "nickname");
         final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwtToken);
 
         when(jwtProvider.validate(jwtToken)).thenReturn(true);
         when(jwtProvider.parseToken(jwtToken)).thenReturn(principal);
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // when
         Authentication result = jwtAuthenticationProvider.authenticate(authenticationToken);
