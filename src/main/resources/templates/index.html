@@ -26,8 +26,8 @@
           <span class="product-info__name" th:text="${product.name}"></span>
           <span class="product-info__price" th:text="${product.price}"></span>
         </div>
-        <button type="submit" class="product-btn" th:onclick="addCartItem([[${product.id}]])">
-          <img src="assets/svgs/cart.svg" alt="장바구니"/>
+        <button type="submit" class="product-btn" th:disabled="${product.stock <= 0}" th:onclick="addCartItem([[${product.id}]])">
+          <img src="/assets/svgs/cart.svg" alt="장바구니"/>
         </button>
       </div>
     </div>
