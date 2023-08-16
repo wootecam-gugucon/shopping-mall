@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 public final class Pay extends BaseTimeEntity {
 
     @Id
@@ -35,5 +34,16 @@ public final class Pay extends BaseTimeEntity {
         if (!this.price.equals(price)) {
             throw new RuntimeException();
         }
+    }
+
+    @Builder
+    private Pay(final Long id,
+                final Long orderId,
+                final String orderName,
+                final Long price) {
+        this.id = id;
+        this.orderId = orderId;
+        this.orderName = orderName;
+        this.price = WonMoney.from(price);
     }
 }

@@ -44,7 +44,7 @@ public class PayService {
         final Pay pay = Pay.builder()
                            .orderId(orderId)
                            .orderName(orderName)
-                           .price(WonMoney.from(price))
+                           .price(price)
                            .build();
         return PayResponse.from(payRepository.save(pay), encodedOrderId, successUrl, failUrl);
     }
