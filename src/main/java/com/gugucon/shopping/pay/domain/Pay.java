@@ -2,6 +2,8 @@ package com.gugucon.shopping.pay.domain;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +30,7 @@ public final class Pay extends BaseTimeEntity {
 
     private String orderName;
 
+    @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
 
     public void validateMoney(final WonMoney price) {
