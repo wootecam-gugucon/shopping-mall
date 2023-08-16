@@ -4,6 +4,8 @@ insert into product(id, name, image_file_name, stock, description, price)
 values (2, '피자', 'pizza.png', 100, 'test_description', 25000);
 insert into product(id, name, image_file_name, stock, description, price)
 values (3, '사케', 'sake.png', 100, 'test_description', 30000);
+insert into product(id, name, image_file_name, stock, description, price)
+values (4, '품절된 치킨', 'fried_chicken.png', 0, 'test_description', 20000);
 
 insert into member(id, email, password, nickname)
 values (1, 'test_email@woowafriends.com', 'test_password!', 'tester1');

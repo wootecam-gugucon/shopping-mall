@@ -125,6 +125,31 @@ class CartIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("품절된 상품이면 장바구니 상품 추가를 요청했을 때 400 상태코드를 응답한다.")
+    void insertCartItemFail_soldOutProduct() {
+        /* given */
+        final String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+
+        final Long soldOutProductId = 4L;
+        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(soldOutProductId);
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(cartItemInsertRequest)
+                .when().post("/api/v1/cart/items")
+                .then().log().all()
+                .extract();
+
+        /* then */
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.SOLD_OUT);
+    }
+
+    @Test
     @DisplayName("장바구니 상품 목록을 조회한다")
     void readCartItems_() {
         /* given */
