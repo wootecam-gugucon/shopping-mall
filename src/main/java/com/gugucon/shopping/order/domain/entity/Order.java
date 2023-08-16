@@ -71,9 +71,6 @@ public class Order extends BaseTimeEntity {
     //TODO : refactor
     public String getOrderName() {
         final int size = orderItems.size();
-        if (size == 0) {
-            throw new RuntimeException();
-        }
         if (size == 1) {
             return orderItems.get(0).getProductName();
         }
@@ -85,10 +82,20 @@ public class Order extends BaseTimeEntity {
         totalPrice = totalPrice.add(orderItem.getTotalPrice());
     }
 
-    public void validateUserHasId(Long memberId) {
+    public void validateMemberHasId(Long memberId) {
         if (!Objects.equals(this.memberId, memberId)) {
             throw new ShoppingException(ErrorCode.INVALID_ORDER);
         }
+    }
+
+    public void validateNotPayed() {
+        if (status != OrderStatus.ORDERED) {
+            throw new ShoppingException(ErrorCode.PAYED_ORDER);
+        }
+    }
+
+    public void pay() {
+        this.status = OrderStatus.PAYED;
     }
 
     public enum OrderStatus {ORDERED, PAYED, DELIVERED}

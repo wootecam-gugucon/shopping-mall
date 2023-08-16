@@ -12,6 +12,11 @@ public class OrderPageController {
         return "order-detail";
     }
 
+    @GetMapping("/order-history/{orderId}")
+    public String getOrderHistoryDetailPage(@PathVariable final Long orderId) {
+        return "order-history-detail";
+    }
+
     @GetMapping("/order-history")
     public String getOrderHistoryPage() {
         return "order-history";

@@ -5,7 +5,7 @@
     <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <link rel="stylesheet" th:href="@{/css/index.css}">
-    <title>Shopping</title>
+    <title>결제 내역</title>
 </head>
 <body>
 <div class="root">
@@ -50,14 +50,15 @@
 <script th:src="@{/js/pay.js}"></script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
+
+        const orderId = [[${orderId}]];
+
         const credentials = localStorage.getItem('accessToken');
         if (!credentials) {
             alert('사용자 정보가 없습니다.');
             window.location.href = '/login';
             return;
         }
-
-        const orderId = [[${orderId}]];
 
         fetch(`/api/v1/order/${orderId}`, {
             method: 'GET',
@@ -92,8 +93,6 @@
                 '.order-right-section .order-total-price').innerText = `${data.totalPrice} 원`;
             document.querySelector(
                 '.order-right-section .pay-total-price').innerText = `${data.totalPrice} 원`;
-            document.querySelector('.pay-button').innerHTML =
-                `<button class="primary-button flex-center pay-button" onclick="payPopUp(${data.orderId})">결제하기</button>`
         }).catch((error) => {
             console.error(error);
         });

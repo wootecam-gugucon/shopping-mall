@@ -15,9 +15,16 @@
         const paymentType = urlParams.get('paymentType');
         let status;
 
-        fetch('/api/pay/validate', {
+        const credentials = localStorage.getItem('accessToken');
+        if (!credentials) {
+            alert('사용자 정보가 없습니다.');
+            window.location.href = '/login';
+        }
+
+        fetch('/api/v1/pay/validate', {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${credentials}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -32,11 +39,10 @@
         }).then((data) => {
             if (status === 200) {
                 top.opener.location.href = `/pay/success?orderId=${data.orderId}`;
+                self.close();
             } else {
-                alert("결제가 승인되지 않았습니다");
-                top.opener.location.href = '/pay/fail';
+                window.location.href = '/pay/fail-popup';
             }
-            self.close();
         }).catch((error) => {
             console.error(error);
         });

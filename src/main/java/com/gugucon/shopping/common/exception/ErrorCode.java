@@ -23,7 +23,11 @@ public enum ErrorCode {
     INVALID_ORDER(BAD_REQUEST, "존재하지 않는 주문입니다."),
     FAILED_TO_FETCH_EXCHANGE_RATE(BAD_REQUEST, "환율 정보를 가져올 수 없습니다."),
     EMPTY_CART(BAD_REQUEST, "장바구니가 비어 있습니다."),
-    INVALID_EXCHANGE_RATE(INTERNAL_SERVER_ERROR, "환율은 양수여야 합니다.");
+    INVALID_EXCHANGE_RATE(INTERNAL_SERVER_ERROR, "환율은 양수여야 합니다."),
+    PAYED_ORDER(BAD_REQUEST, "이미 결제 완료된 주문입니다."),
+    INVALID_PAY(BAD_REQUEST, "존재하지 않는 결제 정보입니다."),
+    PAY_FAILED(INTERNAL_SERVER_ERROR, "결제에 실패했습니다.."),
+    STOCK_NOT_ENOUGH(BAD_REQUEST, "상품의 재고가 부족합니다.");
 
     private final HttpStatus status;
     private final String message;

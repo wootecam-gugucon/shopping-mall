@@ -76,9 +76,9 @@ class OrderTest {
         final Order order = Order.from(memberId, Collections.emptyList());
 
         /* when & then */
-        assertThatNoException().isThrownBy(() -> order.validateUserHasId(memberId));
+        assertThatNoException().isThrownBy(() -> order.validateMemberHasId(memberId));
         ShoppingException exception = assertThrows(ShoppingException.class,
-                                                   () -> order.validateUserHasId(Long.MAX_VALUE));
+                                                   () -> order.validateMemberHasId(Long.MAX_VALUE));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
     }
 }

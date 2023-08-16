@@ -49,4 +49,12 @@ public class Quantity {
     public Integer getValue() {
         return value;
     }
+
+    public boolean isLessThan(final Quantity stock) {
+        return this.value < stock.value;
+    }
+
+    public Quantity decreaseBy(final Quantity other) {
+        return Quantity.from(this.value - other.value);
+    }
 }
