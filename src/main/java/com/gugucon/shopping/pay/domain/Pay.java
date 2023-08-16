@@ -1,14 +1,10 @@
 package com.gugucon.shopping.pay.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -23,13 +19,13 @@ public final class Pay {
 
     private Long orderId;
 
-    private String orderName;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "price"))
+    private WonMoney price;
 
-    private Long price;
-
-    public void validateMoney(final Long price) {
+    public void validateMoney(final WonMoney price) {
         if (!this.price.equals(price)) {
-            throw new RuntimeException();
+            throw new ShoppingException(ErrorCode.PAY_FAILED);
         }
     }
 }

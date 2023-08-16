@@ -40,13 +40,15 @@ public class OrderService {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
 
-        order.validateUserHasId(memberId);
+        order.validateMemberHasId(memberId);
         return OrderDetailResponse.from(order);
     }
 
     public List<OrderHistoryResponse> getOrderHistory(final Long memberId) {
-        final List<Order> orders = orderRepository.findAllByMemberIdWithOrderItems(memberId,
-                                                                                   Sort.by(Direction.DESC, "id"));
+        final List<Order> orders = orderRepository.findAllByMemberIdAndStatusWithOrderItems(memberId,
+                                                                                            Order.OrderStatus.PAYED,
+                                                                                            Sort.by(Direction.DESC,
+                                                                                                    "id"));
         return orders.stream()
                 .map(OrderHistoryResponse::from)
                 .toList();

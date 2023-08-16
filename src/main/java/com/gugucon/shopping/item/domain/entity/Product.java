@@ -1,7 +1,10 @@
 package com.gugucon.shopping.item.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +27,8 @@ public class Product extends BaseTimeEntity {
     private String imageFileName;
 
     @NotNull
-    private Integer stock;
+    @AttributeOverride(name = "value", column = @Column(name = "stock"))
+    private Quantity stock;
 
     @Lob
     @NotNull
@@ -46,8 +50,18 @@ public class Product extends BaseTimeEntity {
         this.id = id;
         this.name = name;
         this.imageFileName = imageFileName;
-        this.stock = stock;
+        this.stock = Quantity.from(stock);
         this.description = description;
         this.price = WonMoney.from(price);
+    }
+
+    public void validateStockIsNotLessThan(final Quantity other) {
+        if (stock.isLessThan(other)) {
+            throw new ShoppingException(ErrorCode.STOCK_NOT_ENOUGH);
+        }
+    }
+
+    public void decreaseStockBy(final Quantity other) {
+        stock = stock.decreaseBy(other);
     }
 }

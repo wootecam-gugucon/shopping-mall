@@ -1,11 +1,10 @@
 package com.gugucon.shopping.pay.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.catchException;
-
+import com.gugucon.shopping.common.domain.vo.WonMoney;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Pay 단위 테스트")
 class PayTest {
@@ -14,10 +13,9 @@ class PayTest {
     @DisplayName("결제 객체를 생성한다")
     void create() {
         assertThatNoException().isThrownBy(() -> Pay.builder()
-                                     .orderId(1L)
-                                     .orderName("주문 이름")
-                                     .price(1000L)
-                                     .build());
+                .orderId(1L)
+                .price(WonMoney.from(1000L))
+                .build());
     }
 
     @Test
@@ -25,13 +23,12 @@ class PayTest {
     void validateMoneySuccess_PriceSame() {
         // given
         Pay pay = Pay.builder()
-                     .orderId(1L)
-                     .orderName("주문 이름")
-                     .price(1000L)
-                     .build();
+                .orderId(1L)
+                .price(WonMoney.from(1000L))
+                .build();
 
         // when & then
-        assertThatNoException().isThrownBy(() -> pay.validateMoney(1000L));
+        assertThatNoException().isThrownBy(() -> pay.validateMoney(WonMoney.from(1000L)));
     }
 
     @Test
@@ -39,13 +36,12 @@ class PayTest {
     void validateMoneyFail_PriceDifferent() {
         // given
         Pay pay = Pay.builder()
-                     .orderId(1L)
-                     .orderName("주문 이름")
-                     .price(1000L)
-                     .build();
+                .orderId(1L)
+                .price(WonMoney.from(1000L))
+                .build();
 
         // when
-        Exception exception = catchException(() -> pay.validateMoney(500L));
+        Exception exception = catchException(() -> pay.validateMoney(WonMoney.from(500L)));
 
         // then
         assertThat(exception).isInstanceOf(RuntimeException.class);
