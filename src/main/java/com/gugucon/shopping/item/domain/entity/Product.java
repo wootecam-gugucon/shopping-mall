@@ -2,6 +2,7 @@ package com.gugucon.shopping.item.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.item.domain.vo.Stock;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -24,16 +25,17 @@ public class Product extends BaseTimeEntity {
     private String imageFileName;
 
     @NotNull
-    private Integer stock;
+    @AttributeOverride(name = "value", column = @Column(name = "stock"))
+    private Stock stock;
 
     @Lob
     @NotNull
     private String description;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "price"))
     @Valid
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
 
     @Builder
@@ -46,7 +48,7 @@ public class Product extends BaseTimeEntity {
         this.id = id;
         this.name = name;
         this.imageFileName = imageFileName;
-        this.stock = stock;
+        this.stock = Stock.from(stock);
         this.description = description;
         this.price = WonMoney.from(price);
     }
