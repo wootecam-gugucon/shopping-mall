@@ -37,7 +37,7 @@ public class OrderItem extends BaseTimeEntity {
     private Long productId;
 
     @NotNull
-    private String productName;
+    private String name;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))

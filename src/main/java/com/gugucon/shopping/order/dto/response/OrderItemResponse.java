@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @Getter
 public final class OrderItemResponse {
 
-    private String productName;
+    private String name;
     private long price;
     private String imageFileName;
     private int quantity;
 
     public static OrderItemResponse from(final OrderItem orderItem) {
-        return new OrderItemResponse(orderItem.getProductName(), orderItem.getPrice().getValue(),
-            orderItem.getImageFileName(), orderItem.getQuantity().getValue());
+        return new OrderItemResponse(orderItem.getName(), orderItem.getPrice().getValue(),
+                                     orderItem.getImageFileName(), orderItem.getQuantity().getValue());
     }
 }
