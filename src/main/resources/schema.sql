@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS products
     `price`            bigint                NOT NULL,
     `image_file_name`  varchar(255)          NOT NULL unique,
     `stock`            int                   NOT NULL,
-    `description`      longtext              NOT NULL,
+    `description`      clob              NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL
 );
