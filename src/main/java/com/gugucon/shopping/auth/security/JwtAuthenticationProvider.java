@@ -3,12 +3,14 @@ package com.gugucon.shopping.auth.security;
 import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
+import com.gugucon.shopping.member.repository.MemberRepository;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,12 +18,14 @@ import org.springframework.stereotype.Component;
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         final String jwtToken = ((JwtAuthenticationToken) authentication).getJwtToken();
         validateToken(jwtToken);
         final Long principal = Long.valueOf(jwtProvider.parseToken(jwtToken));
+        validatePrincipal(principal);
         return new JwtAuthenticationToken(principal, "", new ArrayList<>());
     }
 
@@ -34,5 +38,10 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         if (!jwtProvider.validate(jwtToken)) {
             throw new BadCredentialsException(ErrorCode.INVALID_TOKEN.getMessage());
         }
+    }
+
+    private void validatePrincipal(final Long principal) {
+        memberRepository.findById(principal)
+            .orElseThrow(() -> new UsernameNotFoundException(ErrorCode.EMAIL_NOT_REGISTERED.getMessage()));
     }
 }

@@ -8,6 +8,8 @@ import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
 import com.gugucon.shopping.auth.security.JwtAuthenticationProvider;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
+import com.gugucon.shopping.member.repository.MemberRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @DisplayName("JwtAuthenticationProvider 단위 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +30,8 @@ class JwtAuthenticationProviderTest {
 
     @Mock
     private JwtProvider jwtProvider;
+    @Mock
+    private MemberRepository memberRepository;
 
     @Test
     @DisplayName("JwtAuthenticationToken 클래스를 지원한다")
@@ -81,5 +86,23 @@ class JwtAuthenticationProviderTest {
         assertThatThrownBy(() -> jwtAuthenticationProvider.authenticate(authenticationToken))
             .hasMessage(ErrorCode.INVALID_TOKEN.getMessage())
             .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 id 로 인증 요청을 보내면 예외가 발생한다")
+    void authenticationFail_invalidMemberId() {
+        // given
+        final Long invalidMemberId = 1L;
+        final String invalidMemberToken = "invalid";
+        final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(invalidMemberToken);
+
+        when(jwtProvider.validate(invalidMemberToken)).thenReturn(true);
+        when(jwtProvider.parseToken(invalidMemberToken)).thenReturn(String.valueOf(invalidMemberId));
+        when(memberRepository.findById(invalidMemberId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> jwtAuthenticationProvider.authenticate(authenticationToken))
+            .hasMessage(ErrorCode.EMAIL_NOT_REGISTERED.getMessage())
+            .isInstanceOf(UsernameNotFoundException.class);
     }
 }
