@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS order_items
     `image_file_name`  varchar(255)          NOT NULL,
     `quantity`         int                   NOT NULL DEFAULT 1,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL
+    `last_modified_at` datetime              NOT NULL,
+    foreign key(order_id) references orders(id)
 );
 
 CREATE TABLE IF NOT EXISTS products
@@ -62,5 +63,6 @@ CREATE TABLE IF NOT EXISTS pays
     `order_name`       varchar(255)          NOT NULL,
     `price`            bigint                NOT NULL,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL
+    `last_modified_at` datetime              NOT NULL,
+    foreign key(order_id) references orders(id)
 );
