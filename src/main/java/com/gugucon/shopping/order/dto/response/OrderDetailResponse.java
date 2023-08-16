@@ -1,12 +1,11 @@
 package com.gugucon.shopping.order.dto.response;
 
 import com.gugucon.shopping.order.domain.entity.Order;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,6 +22,6 @@ public final class OrderDetailResponse {
                 .toList();
 
         return new OrderDetailResponse(order.getId(), orderItemResponses,
-                order.getTotalPrice().getValue());
+                order.calculateTotalPrice().getValue());
     }
 }
