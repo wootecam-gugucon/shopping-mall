@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS members
 CREATE TABLE IF NOT EXISTS order_items
 (
     `id`               bigint auto_increment NOT NULL primary key,
-    `order_id`         bigint                ,
+    `order_id`         bigint,
     `product_id`       bigint                NOT NULL,
     `name`             varchar(255)          NOT NULL,
     `price`            bigint                NOT NULL,
@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS cart_items
     `quantity`         int                   NOT NULL DEFAULT 1,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL,
-    foreign key (product_id) references products (id)
+    foreign key (product_id) references products (id),
+    foreign key (member_id) references members (id)
 );
 
 CREATE TABLE IF NOT EXISTS orders
@@ -50,7 +51,8 @@ CREATE TABLE IF NOT EXISTS orders
     `member_id`        bigint                NOT NULL,
     `status`           varchar(255)          NOT NULL,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL
+    `last_modified_at` datetime              NOT NULL,
+    foreign key (member_id) references members (id)
 );
 
 CREATE TABLE IF NOT EXISTS pays
