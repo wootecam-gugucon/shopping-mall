@@ -29,8 +29,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .securityMatchers(security -> security
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/**"))
+            )
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/"), new AntPathRequestMatcher("/api/v1/login/token"))
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/login/token"))
                 .permitAll()
                 .anyRequest().authenticated()
             )
