@@ -2,9 +2,11 @@ package com.gugucon.shopping.integration;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
@@ -30,10 +32,15 @@ class OrderIntegrationTest extends IntegrationTest {
 
     @Autowired
     private CartItemRepository cartItemRepository;
+
     @Autowired
     private OrderRepository orderRepository;
+
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     private static List<String> toProductNames(final OrderDetailResponse orderDetailResponse) {
         return orderDetailResponse.getOrderItems().stream()
@@ -93,6 +100,32 @@ class OrderIntegrationTest extends IntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_CART);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("품절된 상품을 포함해 주문을 요청했을 때 400 상태코드를 응답한다.")
+    void orderFail_soldOutProduct() {
+        /* given */
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        cartItemRepository.save(CartItem.builder()
+                                        .product(productRepository.findById(4L).orElseThrow())
+                                        .memberId(1L)
+                                        .quantity(1)
+                                        .build());
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
+
+        /* then */
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.SOLD_OUT);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
