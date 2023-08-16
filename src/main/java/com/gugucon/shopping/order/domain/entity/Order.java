@@ -5,15 +5,27 @@ import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
-import jakarta.persistence.*;
-import jakarta.validation.Valid;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "orders")
@@ -41,14 +53,8 @@ public class Order extends BaseTimeEntity {
     @NotNull
     private OrderStatus status;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "total_price"))
-    @Valid
-    @NotNull
-    private WonMoney totalPrice;
-
     public static Order from(final Long memberId, final List<CartItem> cartItems) {
-        Order order = new Order(null, memberId, OrderStatus.ORDERED, WonMoney.ZERO);
+        Order order = new Order(null, memberId, OrderStatus.ORDERED);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -62,6 +68,12 @@ public class Order extends BaseTimeEntity {
         validateRangeOf(totalPrice);
     }
 
+    public WonMoney calculateTotalPrice() {
+        return orderItems.stream()
+            .map(OrderItem::getTotalPrice)
+            .reduce(WonMoney.ZERO, WonMoney::add);
+    }
+
     private static void validateRangeOf(final BigInteger totalPrice) {
         if (totalPrice.compareTo(BigInteger.valueOf(MAX_TOTAL_PRICE)) > 0) {
             throw new ShoppingException(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
@@ -70,7 +82,6 @@ public class Order extends BaseTimeEntity {
 
     private void addOrderItem(final OrderItem orderItem) {
         orderItems.add(orderItem);
-        totalPrice = totalPrice.add(orderItem.getTotalPrice());
     }
 
     public void validateUserHasId(Long memberId) {
