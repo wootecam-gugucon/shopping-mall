@@ -26,4 +26,8 @@ public final class Stock {
             throw new ShoppingException(ErrorCode.INVALID_STOCK);
         }
     }
+
+    public boolean isSoldOut() {
+        throw new UnsupportedOperationException();
+    }
 }
