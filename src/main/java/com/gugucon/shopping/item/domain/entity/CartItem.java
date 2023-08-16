@@ -66,6 +66,6 @@ public class CartItem extends BaseTimeEntity {
     }
 
     public void validateSoldOut() {
-        throw new UnsupportedOperationException();
+        product.validateStock();
     }
 }
