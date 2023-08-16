@@ -1,6 +1,7 @@
 package com.gugucon.shopping.pay.domain;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
+import com.gugucon.shopping.common.domain.vo.WonMoney;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,9 +27,9 @@ public final class Pay extends BaseTimeEntity {
 
     private String orderName;
 
-    private Long price;
+    private WonMoney price;
 
-    public void validateMoney(final Long price) {
+    public void validateMoney(final WonMoney price) {
         if (!this.price.equals(price)) {
             throw new RuntimeException();
         }
