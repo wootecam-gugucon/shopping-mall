@@ -2,12 +2,14 @@ package com.gugucon.shopping.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
 import com.gugucon.shopping.auth.security.JwtAuthenticationProvider;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
+import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -63,9 +65,14 @@ class JwtAuthenticationProviderTest {
 
         when(jwtProvider.validate(jwtToken)).thenReturn(true);
         when(jwtProvider.parseToken(jwtToken)).thenReturn(principal);
+        final Member member = Member.builder()
+                .id(Long.parseLong(principal))
+                .email("email@email.com").password("password")
+                .build();
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.ofNullable(member));
 
         // when
-        Authentication result = jwtAuthenticationProvider.authenticate(authenticationToken);
+        final Authentication result = jwtAuthenticationProvider.authenticate(authenticationToken);
 
         // then
         assertThat(result).isInstanceOf(JwtAuthenticationToken.class);
