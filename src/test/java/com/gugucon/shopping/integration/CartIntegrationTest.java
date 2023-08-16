@@ -355,7 +355,7 @@ class CartIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("장바구니 상품을 삭제한다")
+    @DisplayName("장바구니 상품을 삭제한다.")
     void removeCartItem() {
         /* given */
         final String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
@@ -374,6 +374,26 @@ class CartIntegrationTest extends IntegrationTest {
         /* then */
         final List<CartItemResponse> updatedCartItemResponses = readCartItems(accessToken);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(updatedCartItemResponses).isEmpty();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 장바구니 상품을 삭제할 때 400 상태코드를 응답한다.")
+    void removeCartItem2() {
+        /* given */
+        final String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when().delete("/api/v1/cart/items/{cartItemId}", 1000)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        final List<CartItemResponse> updatedCartItemResponses = readCartItems(accessToken);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(updatedCartItemResponses).isEmpty();
     }
 

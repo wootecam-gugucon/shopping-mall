@@ -61,8 +61,7 @@ class OrderTest {
                 .build();
 
         /* when & then */
-        assertThatNoException()
-                .isThrownBy(() -> Order.validateTotalPrice(List.of(validCartItem)));
+        assertThatNoException().isThrownBy(() -> Order.validateTotalPrice(List.of(validCartItem)));
         final ShoppingException exception = assertThrows(ShoppingException.class,
                                                          () -> Order.validateTotalPrice(List.of(invalidCartItem)));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
