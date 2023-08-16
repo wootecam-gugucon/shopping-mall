@@ -5,6 +5,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.item.domain.vo.Stock;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
@@ -29,6 +30,7 @@ public class CartService {
         final Long productId = cartItemInsertRequest.getProductId();
         final Product product = findProductBy(productId);
         validateProductNotInCart(memberId, productId);
+        validateStock(product.getStock());
 
         final CartItem cartItem = CartItem.builder()
                 .memberId(memberId)
@@ -36,6 +38,12 @@ public class CartService {
                 .quantity(1)
                 .build();
         cartItemRepository.save(cartItem);
+    }
+
+    private void validateStock(final Stock stock) {
+        if (stock.isSoldOut()) {
+            throw new ShoppingException(ErrorCode.SOLD_OUT);
+        }
     }
 
     public List<CartItemResponse> readCartItems(final Long memberId) {
