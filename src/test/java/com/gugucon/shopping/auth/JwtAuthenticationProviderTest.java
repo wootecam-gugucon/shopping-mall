@@ -2,7 +2,6 @@ package com.gugucon.shopping.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
@@ -61,18 +60,18 @@ class JwtAuthenticationProviderTest {
         // given
         final String jwtToken = "validJwtToken";
         final String principal = "12";
+        final Member member = new Member(Long.valueOf(principal),
+                                         "email@test.com",
+                                         "password",
+                                         "nickname");
         final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwtToken);
 
         when(jwtProvider.validate(jwtToken)).thenReturn(true);
         when(jwtProvider.parseToken(jwtToken)).thenReturn(principal);
-        final Member member = Member.builder()
-                .id(Long.parseLong(principal))
-                .email("email@email.com").password("password")
-                .build();
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.ofNullable(member));
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // when
-        final Authentication result = jwtAuthenticationProvider.authenticate(authenticationToken);
+        Authentication result = jwtAuthenticationProvider.authenticate(authenticationToken);
 
         // then
         assertThat(result).isInstanceOf(JwtAuthenticationToken.class);

@@ -1,5 +1,6 @@
 package com.gugucon.shopping.pay.application;
 
+import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.pay.domain.Pay;
 import com.gugucon.shopping.pay.dto.PayRequest;
 import com.gugucon.shopping.pay.dto.PayResponse;
@@ -52,7 +53,7 @@ public class PayService {
         final Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
         final Pay pay = payRepository.findByOrderId(orderId)
                                      .orElseThrow(RuntimeException::new);
-        pay.validateMoney(payValidationRequest.getAmount());
+        pay.validateMoney(WonMoney.from(payValidationRequest.getAmount()));
         payValidator.validatePayment(payValidationRequest);
     }
 }

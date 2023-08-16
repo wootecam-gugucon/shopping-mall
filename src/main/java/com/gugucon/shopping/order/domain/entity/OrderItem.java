@@ -4,12 +4,24 @@ import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.item.domain.entity.CartItem;
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "order_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
@@ -25,7 +37,7 @@ public class OrderItem extends BaseTimeEntity {
     private Long productId;
 
     @NotNull
-    private String productName;
+    private String name;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))

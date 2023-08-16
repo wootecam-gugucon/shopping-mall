@@ -42,9 +42,9 @@ class OrderIntegrationTest extends IntegrationTest {
     @Autowired
     private ProductRepository productRepository;
 
-    private static List<String> toProductNames(final OrderDetailResponse orderDetailResponse) {
+    private static List<String> toNames(final OrderDetailResponse orderDetailResponse) {
         return orderDetailResponse.getOrderItems().stream()
-                .map(OrderItemResponse::getProductName)
+                .map(OrderItemResponse::getName)
                 .toList();
     }
 
@@ -137,7 +137,7 @@ class OrderIntegrationTest extends IntegrationTest {
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         insertCartItem(accessToken, new CartItemInsertRequest(2L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
-        final List<String> cartItemNames = toProductNames(cartItemResponses);
+        final List<String> cartItemNames = toNames(cartItemResponses);
         final Long orderId = placeOrder(accessToken);
 
         /* when */
@@ -151,7 +151,7 @@ class OrderIntegrationTest extends IntegrationTest {
 
         /* then */
         final OrderDetailResponse orderDetailResponse = response.as(OrderDetailResponse.class);
-        assertThat(toProductNames(orderDetailResponse)).containsExactlyInAnyOrderElementsOf(cartItemNames);
+        assertThat(toNames(orderDetailResponse)).containsExactlyInAnyOrderElementsOf(cartItemNames);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -255,7 +255,7 @@ class OrderIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    private List<String> toProductNames(final List<CartItemResponse> cartItemResponses) {
+    private List<String> toNames(final List<CartItemResponse> cartItemResponses) {
         return cartItemResponses.stream()
                 .map(CartItemResponse::getName)
                 .toList();
