@@ -13,6 +13,6 @@ public final class Stock {
     private int value;
 
     public static Stock from(final int value) {
-        throw new UnsupportedOperationException();
+        return new Stock(value);
     }
 }
