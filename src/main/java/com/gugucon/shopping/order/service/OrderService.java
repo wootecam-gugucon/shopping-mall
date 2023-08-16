@@ -30,10 +30,16 @@ public class OrderService {
         final List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
 
         validateNotEmpty(cartItems);
+        validateSoldOut(cartItems);
         Order.validateTotalPrice(cartItems);
+
         final Order order = Order.from(memberId, cartItems);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
+    }
+
+    private void validateSoldOut(final List<CartItem> cartItems) {
+        cartItems.forEach(CartItem::validateSoldOut);
     }
 
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long memberId) {
