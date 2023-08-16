@@ -28,6 +28,6 @@ public final class Stock {
     }
 
     public boolean isSoldOut() {
-        throw new UnsupportedOperationException();
+        return value == 0;
     }
 }
