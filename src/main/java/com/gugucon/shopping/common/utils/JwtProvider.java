@@ -1,9 +1,8 @@
-package com.gugucon.shopping.member.utils;
+package com.gugucon.shopping.common.utils;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import java.util.Date;
 
 public class JwtProvider {
@@ -11,9 +10,9 @@ public class JwtProvider {
     private final String secretKey;
     private final Long expirationMilliSeconds;
 
-    public JwtProvider(final String secretKey, final Long expirationMilliSeconds) {
+    public JwtProvider(final String secretKey, final Long expiration) {
         this.secretKey = secretKey;
-        this.expirationMilliSeconds = expirationMilliSeconds;
+        this.expirationMilliSeconds = expiration;
     }
 
     public String generateToken(final String subject) {
