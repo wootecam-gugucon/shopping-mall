@@ -8,6 +8,16 @@ CREATE TABLE IF NOT EXISTS members
     `last_modified_at` datetime              NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS orders
+(
+    `id`               bigint auto_increment NOT NULL primary key,
+    `member_id`        bigint                NOT NULL,
+    `status`           varchar(255)          NOT NULL,
+    `created_at`       datetime              NOT NULL,
+    `last_modified_at` datetime              NOT NULL,
+    foreign key (member_id) references members (id)
+);
+
 CREATE TABLE IF NOT EXISTS order_items
 (
     `id`               bigint auto_increment NOT NULL primary key,
@@ -19,7 +29,7 @@ CREATE TABLE IF NOT EXISTS order_items
     `quantity`         int                   NOT NULL DEFAULT 1,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL,
-    foreign key(order_id) references orders(id)
+    foreign key (order_id) references orders (id)
 );
 
 CREATE TABLE IF NOT EXISTS products
@@ -29,7 +39,7 @@ CREATE TABLE IF NOT EXISTS products
     `price`            bigint                NOT NULL,
     `image_file_name`  varchar(255)          NOT NULL unique,
     `stock`            int                   NOT NULL,
-    `description`      text                  NOT NULL,
+    `description`      longtext              NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL
 );
@@ -46,16 +56,6 @@ CREATE TABLE IF NOT EXISTS cart_items
     foreign key (member_id) references members (id)
 );
 
-CREATE TABLE IF NOT EXISTS orders
-(
-    `id`               bigint auto_increment NOT NULL primary key,
-    `member_id`        bigint                NOT NULL,
-    `status`           varchar(255)          NOT NULL,
-    `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL,
-    foreign key (member_id) references members (id)
-);
-
 CREATE TABLE IF NOT EXISTS pays
 (
     `id`               bigint auto_increment NOT NULL primary key,
@@ -64,5 +64,5 @@ CREATE TABLE IF NOT EXISTS pays
     `price`            bigint                NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL,
-    foreign key(order_id) references orders(id)
+    foreign key (order_id) references orders (id)
 );
