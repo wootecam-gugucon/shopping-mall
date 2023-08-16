@@ -64,4 +64,8 @@ public class CartItem extends BaseTimeEntity {
         return BigInteger.valueOf(product.getPrice().getValue())
                 .multiply(BigInteger.valueOf(quantity.getValue()));
     }
+
+    public void validateSoldOut() {
+        throw new UnsupportedOperationException();
+    }
 }

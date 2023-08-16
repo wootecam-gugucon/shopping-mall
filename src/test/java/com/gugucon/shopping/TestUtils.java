@@ -29,6 +29,18 @@ public class TestUtils {
                 .build();
     }
 
+    public static Product createSoldOutProduct(String name, long price) {
+        sequence++;
+        return Product.builder()
+                .id(sequence)
+                .name(name)
+                .imageFileName("image_file_name_" + sequence)
+                .stock(0)
+                .description("test_description")
+                .price(price)
+                .build();
+    }
+
     public static Member createMember() {
         sequence++;
         return Member.builder()
