@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 실패</title>
+</head>
+<body>
+<span>결제에 실패하였습니다.</span>
+
+</body>
+<script>
+    alert("결제가 승인되지 않았습니다");
+    top.opener.location.href = '/pay/fail';
+    self.close();
+</script>
+</html>

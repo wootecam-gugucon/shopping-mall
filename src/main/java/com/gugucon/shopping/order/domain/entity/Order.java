@@ -68,6 +68,18 @@ public class Order extends BaseTimeEntity {
         }
     }
 
+    //TODO : refactor
+    public String getOrderName() {
+        final int size = orderItems.size();
+        if (size == 0) {
+            throw new RuntimeException();
+        }
+        if (size == 1) {
+            return orderItems.get(0).getProductName();
+        }
+        return orderItems.get(0).getProductName() + " 외 " + (size - 1) + "건";
+    }
+
     private void addOrderItem(final OrderItem orderItem) {
         orderItems.add(orderItem);
         totalPrice = totalPrice.add(orderItem.getTotalPrice());

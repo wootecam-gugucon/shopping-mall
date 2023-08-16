@@ -1,7 +1,5 @@
 package com.gugucon.shopping.member.config;
 
-import java.util.List;
-
 import com.gugucon.shopping.member.argumentresolver.MemberIdArgumentResolver;
 import com.gugucon.shopping.member.interceptor.AuthInterceptor;
 import com.gugucon.shopping.member.utils.JwtProvider;
@@ -10,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,8 +20,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(new AuthInterceptor(jwtProvider))
-            .addPathPatterns("/api/**")
-            .excludePathPatterns("/api/v1/login/**");
+                .addPathPatterns("/api/**")
+                .excludePathPatterns("/api/v1/login/**", "/api/pay/**");
     }
 
     @Override
