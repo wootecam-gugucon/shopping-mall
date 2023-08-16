@@ -9,7 +9,7 @@ name: Gradle로 CI 구축
 
 on:
   push:
-    branches: [ "main", "develop", "17-application-properties-암호화" ]
+    branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
 
