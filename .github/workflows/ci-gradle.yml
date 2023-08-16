@@ -37,16 +37,9 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: application.properties 파일 생성
-      env:
-        SECRETS_CONTEXT: ${{ toJson(secrets) }}
       run: | 
         touch ./src/main/resources/application.properties
-        echo "$SECRETS_CONTEXT"
-  
-        to_envs() { jq -r 'to_entries[] | "\(.key | ascii_downcase | split("_") | join("."))=\(.value)"'; }  
-        
-        echo "$SECRETS_CONTEXT" | to_envs
-        echo "$SECRETS_CONTEXT" | to_envs >> ./src/main/resources/application.properties
+        echo ${{ secrets.APPLICATION_PROPERTIES }} >> ./src/main/resources/application.properties
 
     - name: 프로젝트 빌드 및 테스트
       run: ./gradlew clean build
@@ -64,12 +57,12 @@ jobs:
         report_paths: '**/build/test-results/test/TEST-*.xml'
         token: ${{ secrets.GITHUB_TOKEN }}
 
-  #  - name: 빌드 실패 시 Slack으로 알림
-  #    uses: 8398a7/action-slack@v3
-  #    with:
-  #      status: ${{ job.status }}
-  #      author_name: 빌드 실패 알림
-  #      fields: repo, message, commit, author, action, eventName, ref, workflow, job, took
-  #    env:
-  #      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #    if: failure()
+    - name: 빌드 실패 시 Slack으로 알림
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        author_name: 빌드 실패 알림
+        fields: repo, message, commit, author, action, eventName, ref, workflow, job, took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: failure()
