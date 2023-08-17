@@ -55,7 +55,7 @@ public class CartItem extends BaseTimeEntity {
         this.quantity = quantity;
     }
 
-    public void validateMemberHasId(final Long memberId) {
+    public void validateMember(final Long memberId) {
         if (!Objects.equals(this.memberId, memberId)) {
             throw new ShoppingException(ErrorCode.INVALID_CART_ITEM);
         }

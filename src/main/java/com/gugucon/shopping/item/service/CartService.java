@@ -71,7 +71,7 @@ public class CartService {
         final CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_CART_ITEM));
 
-        cartItem.validateUserHasId(memberId);
+        cartItem.validateMember(memberId);
         return cartItem;
     }
 
