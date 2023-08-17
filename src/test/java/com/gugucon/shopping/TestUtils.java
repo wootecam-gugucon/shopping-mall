@@ -5,6 +5,7 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -49,6 +50,15 @@ public class TestUtils {
                 .extract()
                 .as(LoginResponse.class)
                 .getAccessToken();
+    }
+
+    public static void signup(final SignupRequest signupRequest) {
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(signupRequest)
+                .when().post("/api/v1/signup")
+                .then().log().all();
     }
 
     public static ExtractableResponse<Response> insertCartItem(String accessToken,
