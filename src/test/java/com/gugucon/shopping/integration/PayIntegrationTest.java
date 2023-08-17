@@ -1,0 +1,301 @@
+package com.gugucon.shopping.integration;
+
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.order.repository.OrderItemRepository;
+import com.gugucon.shopping.order.repository.OrderRepository;
+import com.gugucon.shopping.pay.dto.*;
+import com.gugucon.shopping.pay.repository.PayRepository;
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
+
+import static com.gugucon.shopping.TestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+@DisplayName("결제 기능 통합 테스트")
+class PayIntegrationTest extends IntegrationTest {
+
+    @Value("${pay.callback.success-url}")
+    private String successUrl;
+    @Value("${pay.callback.fail-url}")
+    private String failUrl;
+    @Autowired
+    private RestTemplate restTemplate;
+    @Autowired
+    private PayRepository payRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @AfterEach
+    void tearDown() {
+        payRepository.deleteAll();
+        orderRepository.deleteAll();
+        orderItemRepository.deleteAll();
+        cartItemRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("주문에 대한 결제 정보를 생성한다.")
+    void createPayment_() {
+        // given
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long orderId = placeOrder(accessToken);
+        final PayCreateRequest payCreateRequest = new PayCreateRequest(orderId);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payCreateRequest)
+                .when()
+                .put("/api/v1/pay")
+                .then()
+                .extract();
+
+        // then
+        final PayCreateResponse payCreateResponse = response.as(PayCreateResponse.class);
+        assertThat(payCreateResponse.getPayId()).isNotNull();
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("결제 정보를 조회한다.")
+    void getPaymentInfo_() {
+        // given
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long orderId = placeOrder(accessToken);
+        final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/pay/{payId}", payId)
+                .then()
+                .extract();
+
+        // then
+        final PayInfoResponse payInfoResponse = response.as(PayInfoResponse.class);
+        assertThat(payInfoResponse.getEncodedOrderId()).isNotEmpty();
+        assertThat(payInfoResponse.getOrderName()).isEqualTo("치킨");
+        assertThat(payInfoResponse.getPrice()).isEqualTo(20000);
+        assertThat(payInfoResponse.getCustomerEmail()).isEqualTo("test_email@woowafriends.com");
+        assertThat(payInfoResponse.getCustomerName()).isEqualTo("tester1");
+        assertThat(payInfoResponse.getCustomerKey()).isNotEmpty();
+        assertThat(payInfoResponse.getSuccessUrl()).isEqualTo(successUrl);
+        assertThat(payInfoResponse.getFailUrl()).isEqualTo(failUrl);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("결제를 검증한다.")
+    void validatePayment_() {
+        // given
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long orderId = placeOrder(accessToken);
+        final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
+        final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
+        final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
+                                                                                   payInfoResponse.getEncodedOrderId(),
+                                                                                   payInfoResponse.getPrice(),
+                                                                                   "mockPaymentType");
+
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.once(), anything())
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payValidationRequest)
+                .when()
+                .post("/api/v1/pay/validate")
+                .then()
+                .extract();
+
+        // then
+        final PayValidationResponse payValidationResponse = response.as(PayValidationResponse.class);
+        assertThat(payValidationResponse.getOrderId()).isEqualTo(orderId);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("외부 API 검증 요청에 실패하면 결제 검증을 요청했을 때 500 상태코드를 반환한다.")
+    void validatePaymentFail_externalValidationFail() {
+        // given
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long orderId = placeOrder(accessToken);
+        final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
+        final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
+        final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
+                                                                                   payInfoResponse.getEncodedOrderId(),
+                                                                                   payInfoResponse.getPrice(),
+                                                                                   "mockPaymentType");
+
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.once(), anything())
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{ \"status\": \"ABORTED\" }", MediaType.APPLICATION_JSON));
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payValidationRequest)
+                .when()
+                .post("/api/v1/pay/validate")
+                .then()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.UNKNOWN_ERROR);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @Test
+    @DisplayName("재고가 부족하면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
+    void validatePaymentFail_stockNotEnough() {
+        // given
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(2L));
+        final Long orderId = placeOrder(accessToken);
+        final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
+        final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
+        final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
+                                                                                   payInfoResponse.getEncodedOrderId(),
+                                                                                   payInfoResponse.getPrice(),
+                                                                                   "mockPaymentType");
+
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.twice(), anything())
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+
+        buyProduct("other_test_email@woowafriends.com", "test_password!", 2L, 100);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payValidationRequest)
+                .when()
+                .post("/api/v1/pay/validate")
+                .then()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.STOCK_NOT_ENOUGH);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("이미 결제가 완료되었으면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
+    void validatePaymentFail_payedOrder() {
+        // given
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long orderId = placeOrder(accessToken);
+        final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
+        final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
+        final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
+                                                                                   payInfoResponse.getEncodedOrderId(),
+                                                                                   payInfoResponse.getPrice(),
+                                                                                   "mockPaymentType");
+
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.twice(), anything())
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+
+        validatePayment(accessToken, payValidationRequest);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payValidationRequest)
+                .when()
+                .post("/api/v1/pay/validate")
+                .then()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.PAYED_ORDER);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("다른 사람의 주문에 대해 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
+    void validatePaymentFail_orderOfOtherMember() {
+        // given
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        final Long orderId = placeOrder(accessToken);
+        final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
+        final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
+        final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
+                                                                                   payInfoResponse.getEncodedOrderId(),
+                                                                                   payInfoResponse.getPrice(),
+                                                                                   "mockPaymentType");
+
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.twice(), anything())
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+
+        String otherAccessToken = login(new LoginRequest("other_test_email@woowafriends.com", "test_password!"));
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(otherAccessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payValidationRequest)
+                .when()
+                .post("/api/v1/pay/validate")
+                .then()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+}

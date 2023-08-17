@@ -61,7 +61,7 @@ public class PayService {
     @Transactional
     public PayCreateResponse createPay(final PayCreateRequest payCreateRequest, final Long memberId) {
         final Long orderId = payCreateRequest.getOrderId();
-        final Order order = findUnpayedOrderBy(orderId, memberId);
+        final Order order = findUnPayedOrderBy(orderId, memberId);
         payRepository.findByOrderId(orderId)
                 .ifPresent(payRepository::delete);
 
@@ -71,7 +71,7 @@ public class PayService {
     public PayInfoResponse readPayInfo(final Long payId, final Long memberId) {
         final Pay pay = payRepository.findById(payId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PAY));
-        final Order order = findUnpayedOrderBy(pay.getOrderId(), memberId);
+        final Order order = findUnPayedOrderBy(pay.getOrderId(), memberId);
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
 
@@ -87,7 +87,7 @@ public class PayService {
     @Transactional
     public PayValidationResponse validatePay(final PayValidationRequest payValidationRequest, final Long memberId) {
         final Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
-        final Order order = findUnpayedOrderBy(orderId, memberId);
+        final Order order = findUnPayedOrderBy(orderId, memberId);
         final Pay pay = payRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PAY));
 
@@ -109,7 +109,7 @@ public class PayService {
         });
     }
 
-    private Order findUnpayedOrderBy(final Long orderId, final Long memberId) {
+    private Order findUnPayedOrderBy(final Long orderId, final Long memberId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         order.validateMemberHasId(memberId);

@@ -25,7 +25,7 @@ public final class PayController {
 
     @GetMapping("/api/v1/pay/{payId}")
     @ResponseStatus(HttpStatus.OK)
-    public PayInfoResponse getPayInfo(@PathVariable Long payId, @MemberId Long memberId) {
+    public PayInfoResponse getPaymentInfo(@PathVariable Long payId, @MemberId Long memberId) {
         return payService.readPayInfo(payId, memberId);
     }
 

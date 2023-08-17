@@ -168,33 +168,6 @@ class OrderIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    //@Test
-    @DisplayName("주문 목록을 조회한다.")
-    void readOrderHistory() {
-        /* given */
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final Long firstOrderId = placeOrder(accessToken);
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final Long secondOrderId = placeOrder(accessToken);
-
-        /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .get("/api/v1/order-history")
-                .then()
-                .extract();
-
-        /* then */
-        final List<OrderHistoryResponse> orderHistoryResponse = response.jsonPath()
-                .getList(".", OrderHistoryResponse.class);
-        final List<Long> orderIds = toOrderIds(orderHistoryResponse);
-        assertThat(orderIds).containsExactly(secondOrderId, firstOrderId);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
     private List<String> toProductNames(final List<CartItemResponse> cartItemResponses) {
         return cartItemResponses.stream()
                 .map(CartItemResponse::getName)
