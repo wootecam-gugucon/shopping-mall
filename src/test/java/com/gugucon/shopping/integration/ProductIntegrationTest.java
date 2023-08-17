@@ -3,11 +3,11 @@ package com.gugucon.shopping.integration;
 import static com.gugucon.shopping.TestUtils.login;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Comparator;
@@ -55,9 +55,9 @@ class ProductIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        final PagedResponse result = response.as(PagedResponse.class);
-        final List<ProductResponse> products = result.getData();
-        final int totalPage = result.getTotalPage();
+        final JsonPath result = response.body().jsonPath();
+        final List<ProductResponse> products = result.getList("data", ProductResponse.class);
+        final int totalPage = result.getInt("totalPage");
 
         assertThat(products).hasSize(3);
         assertThat(totalPage).isEqualTo(1);
@@ -78,11 +78,12 @@ class ProductIntegrationTest extends IntegrationTest {
             .extract();
 
         /* then */
+
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        final PagedResponse result = response.as(PagedResponse.class);
-        final List<ProductResponse> products = result.getData();
-        final int totalPage = result.getTotalPage();
+        final JsonPath result = response.body().jsonPath();
+        final List<ProductResponse> products = result.getList("data", ProductResponse.class);
+        final int totalPage = result.getInt("totalPage");
 
         assertThat(products).hasSize(1);
         assertThat(totalPage).isEqualTo(3);
