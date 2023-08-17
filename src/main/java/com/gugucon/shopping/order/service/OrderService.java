@@ -31,6 +31,7 @@ public class OrderService {
 
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
+
         final Order order = Order.from(memberId, cartItems);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));

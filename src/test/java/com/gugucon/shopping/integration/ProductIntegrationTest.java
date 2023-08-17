@@ -3,6 +3,7 @@ package com.gugucon.shopping.integration;
 import static com.gugucon.shopping.TestUtils.login;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import io.restassured.RestAssured;
@@ -16,8 +17,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+@IntegrationTest
 @DisplayName("상품 기능 통합 테스트")
-class ProductIntegrationTest extends IntegrationTest {
+class ProductIntegrationTest {
 
     @Test
     @DisplayName("페이징 조건이 기재되지 않으면 기본 설정에 따라 페이징하여 반환한다.")

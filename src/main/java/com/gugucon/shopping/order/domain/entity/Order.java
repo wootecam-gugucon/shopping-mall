@@ -5,27 +5,14 @@ import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "orders")
@@ -54,7 +41,7 @@ public class Order extends BaseTimeEntity {
     private OrderStatus status;
 
     public static Order from(final Long memberId, final List<CartItem> cartItems) {
-        Order order = new Order(null, memberId, OrderStatus.ORDERED);
+        final Order order = new Order(null, memberId, OrderStatus.ORDERED);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -90,5 +77,5 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    public enum OrderStatus {ORDERED, PAYED, DELIVERED}
+    public enum OrderStatus {ORDERED, PAYED}
 }

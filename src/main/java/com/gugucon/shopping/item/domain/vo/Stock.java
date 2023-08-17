@@ -1,0 +1,37 @@
+package com.gugucon.shopping.item.domain.vo;
+
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Embeddable
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Stock {
+
+    private Integer value;
+
+    public static Stock from(final int value) {
+        validate(value);
+        return new Stock(value);
+    }
+
+    private static void validate(final int value) {
+        if (value < 0) {
+            throw new ShoppingException(ErrorCode.INVALID_STOCK);
+        }
+    }
+
+    public boolean isZero() {
+        return value == 0;
+    }
+
+    public boolean isNotLessThan(final int quantity) {
+        return value >= quantity;
+    }
+}

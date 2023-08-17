@@ -1,10 +1,9 @@
 package com.gugucon.shopping.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
@@ -20,8 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+@IntegrationTest
 @DisplayName("회원 가입 기능 통합 테스트")
-class SignupIntegrationTest extends IntegrationTest {
+class SignupIntegrationTest {
 
     @Autowired
     private MemberRepository memberRepository;

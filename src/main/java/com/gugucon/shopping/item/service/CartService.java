@@ -29,6 +29,7 @@ public class CartService {
         final Long productId = cartItemInsertRequest.getProductId();
         final Product product = findProductBy(productId);
         validateProductNotInCart(memberId, productId);
+        product.validateSoldOut();
 
         final CartItem cartItem = CartItem.builder()
                 .memberId(memberId)
@@ -70,7 +71,7 @@ public class CartService {
         final CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_CART_ITEM));
 
-        cartItem.validateUserHasId(memberId);
+        cartItem.validateMember(memberId);
         return cartItem;
     }
 

@@ -3,6 +3,7 @@ package com.gugucon.shopping.integration;
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
@@ -21,8 +22,9 @@ import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@IntegrationTest
 @DisplayName("로그인 기능 통합 테스트")
-class LoginIntegrationTest extends IntegrationTest {
+class LoginIntegrationTest {
 
     @Autowired
     private MemberRepository memberRepository;

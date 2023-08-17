@@ -1,7 +1,9 @@
 package com.gugucon.shopping;
 
+import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Password;
@@ -12,10 +14,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-
-import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 public class TestUtils {
 
@@ -35,6 +37,30 @@ public class TestUtils {
                 .build();
     }
 
+    public static Product createProduct(int stock) {
+        sequence++;
+        return Product.builder()
+                .id(sequence)
+                .name("name")
+                .imageFileName("image_file_name_" + sequence)
+                .stock(stock)
+                .description("test_description")
+                .price(1000L)
+                .build();
+    }
+
+    public static Product createSoldOutProduct(String name, long price) {
+        sequence++;
+        return Product.builder()
+                .id(sequence)
+                .name(name)
+                .imageFileName("image_file_name_" + sequence)
+                .stock(0)
+                .description("test_description")
+                .price(price)
+                .build();
+    }
+
     public static Member createMember() {
         sequence++;
         return Member.builder()
@@ -42,6 +68,16 @@ public class TestUtils {
                 .email("test_email" + sequence + "@gmail.com")
                 .password(Password.of("test_password", passwordEncoder))
                 .nickname("test_nickname_" + sequence)
+                .build();
+    }
+
+    public static CartItem createCartItem() {
+        sequence++;
+        return CartItem.builder()
+                .id(sequence)
+                .memberId(1L)
+                .product(createProduct(100))
+                .quantity(1)
                 .build();
     }
 
@@ -74,6 +110,19 @@ public class TestUtils {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemInsertRequest)
                 .when().post("/api/v1/cart/items")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> updateCartItem(final String accessToken,
+                                                               final long cartItemId,
+                                                               final CartItemUpdateRequest cartItemUpdateRequest) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(cartItemUpdateRequest)
+                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
                 .then().log().all()
                 .extract();
     }

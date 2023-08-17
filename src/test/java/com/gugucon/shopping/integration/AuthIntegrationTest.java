@@ -1,10 +1,9 @@
 package com.gugucon.shopping.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
@@ -19,8 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+@IntegrationTest
 @DisplayName("jwt 토큰 인증 기능 통합 테스트")
-class AuthIntegrationTest extends IntegrationTest {
+class AuthIntegrationTest {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -65,6 +67,7 @@ class AuthIntegrationTest extends IntegrationTest {
             .given().log().all()
             .auth().oauth2(invalidToken)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .accept(MediaType.APPLICATION_JSON_VALUE)
             .body(cartItemInsertRequest)
             .when().post("/api/v1/cart/items")
             .then().log().all()
