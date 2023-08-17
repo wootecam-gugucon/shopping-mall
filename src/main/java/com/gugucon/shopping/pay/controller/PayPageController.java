@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.ui;
+package com.gugucon.shopping.pay.controller;
 
 import com.gugucon.shopping.pay.dto.PayFailParameter;
 import com.gugucon.shopping.pay.dto.PayValidationRequest;

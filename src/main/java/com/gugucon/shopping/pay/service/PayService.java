@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.application;
+package com.gugucon.shopping.pay.service;
 
 import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;

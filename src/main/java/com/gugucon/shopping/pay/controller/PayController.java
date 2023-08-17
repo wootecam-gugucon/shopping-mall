@@ -1,8 +1,8 @@
-package com.gugucon.shopping.pay.ui;
+package com.gugucon.shopping.pay.controller;
 
 import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
-import com.gugucon.shopping.pay.application.PayService;
 import com.gugucon.shopping.pay.dto.*;
+import com.gugucon.shopping.pay.service.PayService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
