@@ -81,4 +81,18 @@ class OrderTest {
                                                    () -> order.validateMemberHasId(Long.MAX_VALUE));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
     }
+
+    @Test
+    @DisplayName("결제된 주문이면 예외가 발생한다.")
+    void validateUnPayed() {
+        // given
+        final Long memberId = createMember().getId();
+        final Order order = Order.from(memberId, Collections.emptyList());
+        order.pay();
+
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                                                         () -> order.validateUnPayed());
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.PAYED_ORDER);
+    }
 }
