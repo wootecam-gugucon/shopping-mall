@@ -25,8 +25,8 @@ public class ProductService {
     }
 
     public PagedResponse<ProductResponse> readAllProducts(final Pageable pageable) {
-        Page<Product> products = productRepository.findAll(pageable);
-        List<ProductResponse> data = products.stream()
+        final Page<Product> products = productRepository.findAll(pageable);
+        final List<ProductResponse> data = products.stream()
             .map(ProductResponse::from)
             .toList();
         return new PagedResponse<>(data, products.isLast());
