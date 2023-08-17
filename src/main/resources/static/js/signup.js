@@ -11,7 +11,7 @@ form.addEventListener('submit', (event) => {
     signupRequest[key] = value;
   }
 
-  if (signupRequest["password2"] !== signupRequest["password"]) {
+  if (signupRequest["passwordCheck"] !== signupRequest["password"]) {
     alert("비밀번호가 일치하지 않습니다.");
     return false;
   }
@@ -26,6 +26,9 @@ form.addEventListener('submit', (event) => {
     if (response.status === 201) {
       alert("회원가입이 완료되었습니다. 로그인해 주세요.");
       window.location.href = '/login';
+    }
+    else {
+      response.json().then((data) => alert(data.message));
     }
   }).catch((error) => {
     alert(error);
