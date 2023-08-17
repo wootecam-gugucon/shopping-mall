@@ -26,7 +26,7 @@ class OrderItemTest {
 
     @Test
     @DisplayName("품절된 상품을 포함해 OrderItem을 생성하면 예외를 반환한다.")
-    void create_soldOutProduct() {
+    void createFail_soldOutProduct() {
         // given
         final CartItem cartItem = CartItem.builder()
                 .product(TestUtils.createSoldOutProduct("name", 1000))
@@ -41,7 +41,7 @@ class OrderItemTest {
 
     @Test
     @DisplayName("재고보다 많은 수량으로 OrderItem을 생성하면 예외를 반환한다.")
-    void create_tooManyQuantity() {
+    void createFail_tooManyQuantity() {
         // given
         final CartItem cartItem = CartItem.builder()
                 .product(TestUtils.createProduct(1))

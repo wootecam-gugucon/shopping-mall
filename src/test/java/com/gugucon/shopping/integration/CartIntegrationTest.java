@@ -472,7 +472,7 @@ class CartIntegrationTest {
 
     @Test
     @DisplayName("존재하지 않는 장바구니 상품을 삭제할 때 400 상태코드를 응답한다.")
-    void removeCartItem2() {
+    void removeCartItem_productNotExist() {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
