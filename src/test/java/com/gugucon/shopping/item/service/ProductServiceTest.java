@@ -47,13 +47,15 @@ class ProductServiceTest {
         PagedResponse<ProductResponse> productResponses = productService.readAllProducts(pageable);
 
         /* then */
-        final List<String> names = productResponses.getData()
+        final List<String> names = productResponses.getContents()
             .stream()
             .map(ProductResponse::getName)
             .collect(Collectors.toList());
 
         assertThat(names).containsExactly("치킨", "피자", "사케");
-        assertThat(productResponses.getData()).hasSize(3);
+        assertThat(productResponses.getContents()).hasSize(3);
+        assertThat(productResponses.getCurrentPage()).isZero();
+        assertThat(productResponses.getSize()).isEqualTo(3);
         assertThat(productResponses.getTotalPage()).isEqualTo(1);
     }
 }

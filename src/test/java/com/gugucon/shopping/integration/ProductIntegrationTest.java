@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 class ProductIntegrationTest {
 
     @Test
-    @DisplayName("페이징 조건이 기재되지 않으면 기본 설정에 따라 페이징하여 반환한다.")
+    @DisplayName("페이징 조건이 기재되지 않으면 기본 설정 (page=0, size=20) 에 따라 페이징하여 반환한다.")
     void readAllProducts_defaultPaging() {
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -33,10 +33,14 @@ class ProductIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final JsonPath result = response.body().jsonPath();
-        final List<ProductResponse> products = result.getList("data", ProductResponse.class);
+        final List<ProductResponse> products = result.getList("contents", ProductResponse.class);
         final int totalPage = result.getInt("totalPage");
+        final int currentPage = result.getInt("currentPage");
+        final int size = result.getInt("size");
 
         assertThat(products).hasSize(4);
+        assertThat(currentPage).isZero();
+        assertThat(size).isEqualTo(20);
         assertThat(totalPage).isEqualTo(1);
     }
 
@@ -51,15 +55,18 @@ class ProductIntegrationTest {
             .extract();
 
         /* then */
-
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final JsonPath result = response.body().jsonPath();
-        final List<ProductResponse> products = result.getList("data", ProductResponse.class);
+        final List<ProductResponse> products = result.getList("contents", ProductResponse.class);
         final int totalPage = result.getInt("totalPage");
+        final int currentPage = result.getInt("currentPage");
+        final int size = result.getInt("size");
 
         assertThat(products).hasSize(1);
         assertThat(totalPage).isEqualTo(4);
+        assertThat(currentPage).isZero();
+        assertThat(size).isEqualTo(1);
     }
 
     @Test
@@ -77,7 +84,7 @@ class ProductIntegrationTest {
 
         final List<ProductResponse> products = response.body()
             .jsonPath()
-            .getList("data", ProductResponse.class);
+            .getList("contents", ProductResponse.class);
         final List<ProductResponse> sortedProducts = products.stream()
             .sorted(Comparator.comparing(ProductResponse::getId).reversed())
             .toList();
