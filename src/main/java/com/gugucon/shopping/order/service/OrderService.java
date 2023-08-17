@@ -30,16 +30,11 @@ public class OrderService {
         final List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
 
         validateNotEmpty(cartItems);
-        validateCanBuy(cartItems);
         Order.validateTotalPrice(cartItems);
 
         final Order order = Order.from(memberId, cartItems);
         cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
-    }
-
-    private void validateCanBuy(final List<CartItem> cartItems) {
-        cartItems.forEach(CartItem::validateStock);
     }
 
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long memberId) {
