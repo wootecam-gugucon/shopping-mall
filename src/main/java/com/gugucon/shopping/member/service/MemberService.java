@@ -6,6 +6,7 @@ import com.gugucon.shopping.common.utils.JwtProvider;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,30 @@ public class MemberService {
     private void validatePassword(final LoginRequest loginRequest, final Member member) {
         if (!member.getPassword().hasValue(loginRequest.getPassword())) {
             throw new ShoppingException(ErrorCode.PASSWORD_NOT_CORRECT);
+        }
+    }
+
+    public void signup(final SignupRequest signupRequest) {
+        validateEmailNotExist(signupRequest.getEmail());
+        validatePasswordChecked(signupRequest.getPassword(), signupRequest.getPasswordCheck());
+
+        Member member = Member.builder()
+                              .email(signupRequest.getEmail())
+                              .password(signupRequest.getPassword())
+                              .nickname(signupRequest.getNickname())
+                              .build();
+        memberRepository.save(member);
+    }
+
+    private void validateEmailNotExist(final String email) {
+         if (memberRepository.findByEmail(Email.from(email)).isPresent()) {
+             throw new ShoppingException(ErrorCode.EMAIL_ALREADY_EXIST);
+         }
+    }
+
+    private void validatePasswordChecked(final String password, final String passwordCheck) {
+        if (!password.equals(passwordCheck)) {
+            throw new ShoppingException(ErrorCode.PASSWORD_CHECK_NOT_SAME);
         }
     }
 }
