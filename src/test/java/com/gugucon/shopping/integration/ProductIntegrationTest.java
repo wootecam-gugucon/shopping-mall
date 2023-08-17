@@ -3,6 +3,7 @@ package com.gugucon.shopping.integration;
 import static com.gugucon.shopping.TestUtils.login;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import io.restassured.RestAssured;
@@ -57,13 +58,11 @@ class ProductIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        final List<ProductResponse> result = response.body()
-            .jsonPath()
-            .getList(".data", ProductResponse.class);
-        final boolean isLastPage = response.body()
-            .jsonPath()
-            .getBoolean(".isLastPage");
-        assertThat(result).hasSize(pageRequest.getPageSize());
-        assertThat(isLastPage).isFalse();
+        final PagedResponse result = response.as(PagedResponse.class);
+        final List<ProductResponse> products = result.getData();
+        final boolean lastPage = result.isLastPage();
+
+        assertThat(products).hasSize(3);
+        assertThat(lastPage).isTrue();
     }
 }
