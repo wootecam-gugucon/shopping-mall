@@ -1,5 +1,6 @@
 package com.gugucon.shopping.pay.dto;
 
+import com.gugucon.shopping.pay.domain.Pay;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,7 +10,7 @@ public class PayCreateResponse {
 
     private final Long payId;
 
-    public static PayCreateResponse from(final Long payId) {
-        return new PayCreateResponse(payId);
+    public static PayCreateResponse from(final Pay pay) {
+        return new PayCreateResponse(pay.getId());
     }
 }

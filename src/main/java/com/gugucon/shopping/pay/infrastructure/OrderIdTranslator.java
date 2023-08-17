@@ -1,7 +1,10 @@
 package com.gugucon.shopping.pay.infrastructure;
 
+import com.gugucon.shopping.order.domain.entity.Order;
+
 public interface OrderIdTranslator {
 
-    String encode(final Long orderId, final String orderName);
+    String encode(final Order order);
+
     Long decode(final String encodedOrderId);
 }

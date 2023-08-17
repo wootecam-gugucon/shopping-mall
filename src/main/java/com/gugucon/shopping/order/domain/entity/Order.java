@@ -88,7 +88,7 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    public void validateNotPayed() {
+    public void validateUnPayed() {
         if (status != OrderStatus.ORDERED) {
             throw new ShoppingException(ErrorCode.PAYED_ORDER);
         }
@@ -98,5 +98,5 @@ public class Order extends BaseTimeEntity {
         this.status = OrderStatus.PAYED;
     }
 
-    public enum OrderStatus {ORDERED, PAYED, DELIVERED}
+    public enum OrderStatus {ORDERED, PAYED}
 }
