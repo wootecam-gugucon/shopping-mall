@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Stock {
 
-    private int value;
+    private Integer value;
 
     public static Stock from(final int value) {
         validate(value);
