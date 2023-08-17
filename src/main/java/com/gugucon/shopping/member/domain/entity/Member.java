@@ -47,7 +47,7 @@ public class Member extends BaseTimeEntity {
         this.nickname = Nickname.from(nickname);
     }
 
-    public boolean matchPassword(final String password, final PasswordEncoder passwordEncoder) {
-        return this.password.hasValue(password, passwordEncoder);
+    public boolean matchPassword(final String rawPassword, final PasswordEncoder passwordEncoder) {
+        return this.password.hasValue(rawPassword, passwordEncoder);
     }
 }

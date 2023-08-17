@@ -38,12 +38,12 @@ public class Password {
         }
     }
 
-    public static Password of(final String password, final PasswordEncoder passwordEncoder) {
-        validatePattern(password);
-        return new Password(passwordEncoder.encode(password));
+    public static Password of(final String rawPassword, final PasswordEncoder passwordEncoder) {
+        validatePattern(rawPassword);
+        return new Password(passwordEncoder.encode(rawPassword));
     }
 
-    public boolean hasValue(final String value, final PasswordEncoder passwordEncoder) {
-        return passwordEncoder.matches(value, this.value);
+    public boolean hasValue(final String rawValue, final PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(rawValue, this.value);
     }
 }
