@@ -20,7 +20,7 @@ class ProductTest {
         final Product product = TestUtils.createProduct("name", 1000L);
 
         // when & then
-        assertThatNoException().isThrownBy(product::validateStock);
+        assertThatNoException().isThrownBy(product::validateSoldOut);
     }
 
     @Test
@@ -30,7 +30,7 @@ class ProductTest {
         final Product product = TestUtils.createSoldOutProduct("name", 1000L);
 
         // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class, product::validateStock);
+        final ShoppingException exception = assertThrows(ShoppingException.class, product::validateSoldOut);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.SOLD_OUT);
     }
 }

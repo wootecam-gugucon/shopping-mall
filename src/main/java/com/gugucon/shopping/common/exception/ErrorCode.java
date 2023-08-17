@@ -24,7 +24,8 @@ public enum ErrorCode {
     INVALID_ORDER(BAD_REQUEST, "존재하지 않는 주문입니다."),
     EMPTY_CART(BAD_REQUEST, "장바구니가 비어 있습니다."),
     INVALID_STOCK(BAD_REQUEST, "재고의 값이 올바르지 않습니다."),
-    SOLD_OUT(BAD_REQUEST, "품절된 상품입니다.");
+    SOLD_OUT(BAD_REQUEST, "품절된 상품입니다."),
+    LACK_OF_STOCK(BAD_REQUEST, "재고가 부족합니다.");
 
     private final HttpStatus status;
     private final String message;

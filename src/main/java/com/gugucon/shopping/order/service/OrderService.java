@@ -30,7 +30,7 @@ public class OrderService {
         final List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
 
         validateNotEmpty(cartItems);
-        validateSoldOut(cartItems);
+        validateCanBuy(cartItems);
         Order.validateTotalPrice(cartItems);
 
         final Order order = Order.from(memberId, cartItems);
@@ -38,8 +38,8 @@ public class OrderService {
         return OrderResponse.from(orderRepository.save(order));
     }
 
-    private void validateSoldOut(final List<CartItem> cartItems) {
-        cartItems.forEach(CartItem::validateSoldOut);
+    private void validateCanBuy(final List<CartItem> cartItems) {
+        cartItems.forEach(CartItem::validateStock);
     }
 
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long memberId) {

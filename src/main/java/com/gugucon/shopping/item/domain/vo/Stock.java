@@ -30,4 +30,8 @@ public final class Stock {
     public boolean isSoldOut() {
         return value == 0;
     }
+
+    public boolean canBuy(final int quantity) {
+        return value >= quantity;
+    }
 }

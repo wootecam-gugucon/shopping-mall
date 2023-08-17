@@ -5,22 +5,10 @@ import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.vo.Stock;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "products")
@@ -68,9 +56,15 @@ public class Product extends BaseTimeEntity {
         this.price = WonMoney.from(price);
     }
 
-    public void validateStock() {
+    public void validateSoldOut() {
         if (stock.isSoldOut()) {
             throw new ShoppingException(ErrorCode.SOLD_OUT);
+        }
+    }
+
+    public void validateCanBuy(final int quantity) {
+        if (!stock.canBuy(quantity)) {
+            throw new ShoppingException(ErrorCode.LACK_OF_STOCK);
         }
     }
 }

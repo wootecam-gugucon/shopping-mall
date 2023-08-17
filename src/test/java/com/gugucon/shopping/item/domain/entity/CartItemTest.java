@@ -46,7 +46,7 @@ class CartItemTest {
                 .build();
 
         // when & then
-        assertThatNoException().isThrownBy(cartItem::validateSoldOut);
+        assertThatNoException().isThrownBy(cartItem::validateStock);
     }
 
     @Test
@@ -61,6 +61,6 @@ class CartItemTest {
                 .build();
 
         // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class, cartItem::validateSoldOut);
+        final ShoppingException exception = assertThrows(ShoppingException.class, cartItem::validateStock);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.SOLD_OUT);    }
 }
