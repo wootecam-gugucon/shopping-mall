@@ -43,13 +43,13 @@ public final class TossPayValidator implements PayValidator {
 
     private void validateSuccess(final ResponseEntity<TossValidationResponse> response) {
         if (response.getStatusCode() != HttpStatus.OK) {
-            throw new ShoppingException(ErrorCode.PAY_FAILED);
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
         if (response.getBody() == null) {
-            throw new ShoppingException(ErrorCode.PAY_FAILED);
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
         if (!response.getBody().getStatus().equals("DONE")) {
-            throw new ShoppingException(ErrorCode.PAY_FAILED);
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
     }
 }

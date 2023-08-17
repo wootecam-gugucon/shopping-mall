@@ -36,7 +36,7 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
         try {
             return Long.parseLong(decoded.split(DELIMITER)[0]);
         } catch (NumberFormatException e) {
-            throw new ShoppingException(ErrorCode.PAY_FAILED);
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
     }
 }
