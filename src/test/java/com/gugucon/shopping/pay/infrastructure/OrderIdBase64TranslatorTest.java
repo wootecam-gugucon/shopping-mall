@@ -1,5 +1,6 @@
 package com.gugucon.shopping.pay.infrastructure;
 
+import com.gugucon.shopping.order.domain.entity.Order;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,19 +12,31 @@ class OrderIdBase64TranslatorTest {
 
     private final OrderIdTranslator orderIdTranslator = new OrderIdBase64Translator();
 
-    //@Test
+    @Test
     @DisplayName("인코딩한 내용을 디코딩하면 같은 내용이 된다")
     void encodeAndDecodeSuccess_SameString() {
         // given
         Long orderId = 1L;
         String orderName = "주문 이름";
 
+        final Order order = new Order() {
+            @Override
+            public Long getId() {
+                return orderId;
+            }
+
+            @Override
+            public String getOrderName() {
+                return orderName;
+            }
+        };
+
         // when
-        //String encodedString = orderIdTranslator.encode(orderId, orderName);
-        //Long decodeId = orderIdTranslator.decode(encodedString);
+        String encodedString = orderIdTranslator.encode(order);
+        Long decodeId = orderIdTranslator.decode(encodedString);
 
         // then
-        //assertThat(orderId).isEqualTo(decodeId);
+        assertThat(orderId).isEqualTo(decodeId);
     }
 
     @Test
