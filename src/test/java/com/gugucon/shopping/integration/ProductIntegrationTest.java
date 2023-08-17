@@ -1,5 +1,6 @@
 package com.gugucon.shopping.integration;
 
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -11,8 +12,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@IntegrationTest
 @DisplayName("상품 기능 통합 테스트")
-class ProductIntegrationTest extends IntegrationTest {
+class ProductIntegrationTest {
 
     @Test
     @DisplayName("상품 전체 목록을 조회한다.")

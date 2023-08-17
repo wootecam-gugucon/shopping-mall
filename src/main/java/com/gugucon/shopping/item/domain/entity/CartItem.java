@@ -4,25 +4,16 @@ import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigInteger;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigInteger;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cart_items")
@@ -44,9 +35,9 @@ public class CartItem extends BaseTimeEntity {
     private Product product;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     @Valid
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;
 
     @Builder
@@ -64,7 +55,7 @@ public class CartItem extends BaseTimeEntity {
         this.quantity = quantity;
     }
 
-    public void validateUserHasId(final Long memberId) {
+    public void validateMember(final Long memberId) {
         if (!Objects.equals(this.memberId, memberId)) {
             throw new ShoppingException(ErrorCode.INVALID_CART_ITEM);
         }
@@ -73,5 +64,9 @@ public class CartItem extends BaseTimeEntity {
     public BigInteger getTotalPrice() {
         return BigInteger.valueOf(product.getPrice().getValue())
                 .multiply(BigInteger.valueOf(quantity.getValue()));
+    }
+
+    public boolean isAvailableQuantity() {
+        return product.canReduceStockBy(quantity.getValue());
     }
 }
