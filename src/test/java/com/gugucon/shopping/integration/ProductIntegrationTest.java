@@ -1,11 +1,9 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.TestUtils.login;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -24,13 +22,9 @@ class ProductIntegrationTest {
     @Test
     @DisplayName("페이징 조건이 기재되지 않으면 기본 설정에 따라 페이징하여 반환한다.")
     void readAllProducts_defaultPaging() {
-        /* given */
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
-
         /* when */
         final ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .auth().oauth2(accessToken)
             .when().get("/api/v1/product")
             .then().log().all()
             .extract();
@@ -42,20 +36,16 @@ class ProductIntegrationTest {
         final List<ProductResponse> products = result.getList("data", ProductResponse.class);
         final int totalPage = result.getInt("totalPage");
 
-        assertThat(products).hasSize(3);
+        assertThat(products).hasSize(4);
         assertThat(totalPage).isEqualTo(1);
     }
 
     @Test
     @DisplayName("입력된 페이징 조건에 따라 페이징하여 반환한다.")
     void readAllProducts_paging() {
-        /* given */
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
-
         /* when */
         final ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .auth().oauth2(accessToken)
             .when().get("/api/v1/product?page=0&size=1")
             .then().log().all()
             .extract();
@@ -69,19 +59,15 @@ class ProductIntegrationTest {
         final int totalPage = result.getInt("totalPage");
 
         assertThat(products).hasSize(1);
-        assertThat(totalPage).isEqualTo(3);
+        assertThat(totalPage).isEqualTo(4);
     }
 
     @Test
     @DisplayName("정렬 조건이 기재되지 않은 경우 최신순으로 정렬하여 반환한다")
     void readAllProducts_defaultSorting() {
-        /* given */
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
-
         /* when */
         final ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .auth().oauth2(accessToken)
             .when().get("/api/v1/product")
             .then().contentType(ContentType.JSON).log().all()
             .extract();
