@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "members")
@@ -39,10 +40,14 @@ public class Member extends BaseTimeEntity {
     private Nickname nickname;
 
     @Builder
-    public Member(final Long id, final String email, final String password, final String nickname) {
+    public Member(final Long id, final String email, final Password password, final String nickname) {
         this.id = id;
         this.email = Email.from(email);
-        this.password = Password.from(password);
+        this.password = password;
         this.nickname = Nickname.from(nickname);
+    }
+
+    public boolean matchPassword(final String password, final PasswordEncoder passwordEncoder) {
+        return this.password.hasValue(password, passwordEncoder);
     }
 }
