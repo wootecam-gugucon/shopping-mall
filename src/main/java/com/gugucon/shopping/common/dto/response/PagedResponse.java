@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PagedResponse<T> {
 
-    private List<T> data;
-
+    private List<T> contents;
     private int totalPage;
+    private int currentPage;
+    private int size;
 }

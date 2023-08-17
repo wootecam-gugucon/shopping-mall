@@ -20,9 +20,7 @@ public class ProductService {
 
     public PagedResponse<ProductResponse> readAllProducts(final Pageable pageable) {
         final Page<Product> products = productRepository.findAll(pageable);
-        final List<ProductResponse> data = products.stream()
-            .map(ProductResponse::from)
-            .toList();
-        return new PagedResponse<>(data, products.getTotalPages());
+        final List<ProductResponse> contents = products.map(ProductResponse::from).toList();
+        return new PagedResponse<>(contents, products.getTotalPages(), products.getNumber(), products.getSize());
     }
 }
