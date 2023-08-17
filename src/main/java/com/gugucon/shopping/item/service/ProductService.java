@@ -18,12 +18,6 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public List<ProductResponse> readAllProducts() {
-        return productRepository.findAll().stream()
-                .map(ProductResponse::from)
-                .toList();
-    }
-
     public PagedResponse<ProductResponse> readAllProducts(final Pageable pageable) {
         final Page<Product> products = productRepository.findAll(pageable);
         final List<ProductResponse> data = products.stream()
