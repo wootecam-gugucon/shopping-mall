@@ -2,6 +2,7 @@ package com.gugucon.shopping.integration;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
@@ -28,8 +29,9 @@ import java.util.List;
 import static com.gugucon.shopping.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@IntegrationTest
 @DisplayName("주문 기능 통합 테스트")
-class OrderIntegrationTest extends IntegrationTest {
+class OrderIntegrationTest {
 
     @Autowired
     private CartItemRepository cartItemRepository;
