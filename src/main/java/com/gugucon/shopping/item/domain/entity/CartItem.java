@@ -35,9 +35,9 @@ public class CartItem extends BaseTimeEntity {
     private Product product;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     @Valid
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;
 
     @Builder
@@ -55,7 +55,7 @@ public class CartItem extends BaseTimeEntity {
         this.quantity = quantity;
     }
 
-    public void validateUserHasId(final Long memberId) {
+    public void validateMemberHasId(final Long memberId) {
         if (!Objects.equals(this.memberId, memberId)) {
             throw new ShoppingException(ErrorCode.INVALID_CART_ITEM);
         }
@@ -66,8 +66,7 @@ public class CartItem extends BaseTimeEntity {
                 .multiply(BigInteger.valueOf(quantity.getValue()));
     }
 
-    public void validateStock() {
-        product.validateSoldOut();
-        product.validateCanBuy(quantity.getValue());
+    public boolean isAvailableQuantity() {
+        return product.canReduceStockBy(quantity.getValue());
     }
 }

@@ -1,7 +1,5 @@
 package com.gugucon.shopping.item.domain.entity;
 
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,8 +8,6 @@ import java.math.BigInteger;
 import static com.gugucon.shopping.TestUtils.createProduct;
 import static com.gugucon.shopping.TestUtils.createSoldOutProduct;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("CartItem 단위 테스트")
 class CartItemTest {
@@ -35,8 +31,8 @@ class CartItemTest {
     }
 
     @Test
-    @DisplayName("장바구니 아이템이 품절인지 검사한다.")
-    void validateSoldOut() {
+    @DisplayName("장바구니 아이템의 수량이 주문 가능한 수량이면 true를 반환한다.")
+    void checkAvailableQuantity() {
         // given
         final CartItem cartItem = CartItem.builder()
                 .id(1L)
@@ -45,13 +41,16 @@ class CartItemTest {
                 .quantity(4)
                 .build();
 
-        // when & then
-        assertThatNoException().isThrownBy(cartItem::validateStock);
+        // when
+        final boolean result = cartItem.isAvailableQuantity();
+
+        // then
+        assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("장바구니 아이템이 품절인지 검사할 때 품절이면 예외를 반환한다.")
-    void throwException_validateSoldOut() {
+    @DisplayName("장바구니 아이템의 수량이 주문 가능하지 않은 수량이면 false를 반환한다.")
+    void checkAvailableQuantity_tooManyQuantity() {
         // given
         final CartItem cartItem = CartItem.builder()
                 .id(1L)
@@ -60,7 +59,10 @@ class CartItemTest {
                 .quantity(4)
                 .build();
 
-        // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class, cartItem::validateStock);
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.SOLD_OUT);    }
+        // when
+        final boolean result = cartItem.isAvailableQuantity();
+
+        // then
+        assertThat(result).isFalse();
+    }
 }
