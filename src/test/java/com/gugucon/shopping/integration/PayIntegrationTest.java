@@ -73,7 +73,7 @@ class PayIntegrationTest extends IntegrationTest {
                 .body(payCreateRequest)
                 .when()
                 .put("/api/v1/pay")
-                .then()
+                .then().log().all()
                 .extract();
 
         // then
@@ -97,7 +97,7 @@ class PayIntegrationTest extends IntegrationTest {
                 .auth().oauth2(accessToken)
                 .when()
                 .get("/api/v1/pay/{payId}", payId)
-                .then()
+                .then().log().all()
                 .extract();
 
         // then
@@ -140,7 +140,7 @@ class PayIntegrationTest extends IntegrationTest {
                 .body(payValidationRequest)
                 .when()
                 .post("/api/v1/pay/validate")
-                .then()
+                .then().log().all()
                 .extract();
 
         // then
@@ -176,7 +176,7 @@ class PayIntegrationTest extends IntegrationTest {
                 .body(payValidationRequest)
                 .when()
                 .post("/api/v1/pay/validate")
-                .then()
+                .then().log().all()
                 .extract();
 
         // then
@@ -214,7 +214,7 @@ class PayIntegrationTest extends IntegrationTest {
                 .body(payValidationRequest)
                 .when()
                 .post("/api/v1/pay/validate")
-                .then()
+                .then().log().all()
                 .extract();
 
         // then
@@ -252,7 +252,7 @@ class PayIntegrationTest extends IntegrationTest {
                 .body(payValidationRequest)
                 .when()
                 .post("/api/v1/pay/validate")
-                .then()
+                .then().log().all()
                 .extract();
 
         // then
@@ -262,7 +262,7 @@ class PayIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("다른 사람의 주문에 대해 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
+    @DisplayName("다른 회원의 주문에 대해 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_orderOfOtherMember() {
         // given
         String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
@@ -290,7 +290,7 @@ class PayIntegrationTest extends IntegrationTest {
                 .body(payValidationRequest)
                 .when()
                 .post("/api/v1/pay/validate")
-                .then()
+                .then().log().all()
                 .extract();
 
         // then

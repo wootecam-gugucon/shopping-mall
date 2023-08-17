@@ -94,7 +94,7 @@ public class TestUtils {
                 .auth().oauth2(accessToken)
                 .when()
                 .post("/api/v1/order")
-                .then()
+                .then().log().all()
                 .extract();
         return Long.parseLong(response.header("Location").split("/")[2]);
     }
@@ -107,7 +107,7 @@ public class TestUtils {
                 .body(payCreateRequest)
                 .when()
                 .put("/api/v1/pay")
-                .then()
+                .then().log().all()
                 .extract()
                 .as(PayCreateResponse.class)
                 .getPayId();
@@ -119,7 +119,7 @@ public class TestUtils {
                 .auth().oauth2(accessToken)
                 .when()
                 .get("/api/v1/pay/{payId}", payId)
-                .then()
+                .then().log().all()
                 .extract()
                 .as(PayInfoResponse.class);
     }
@@ -132,7 +132,7 @@ public class TestUtils {
                 .body(payValidationRequest)
                 .when()
                 .post("/api/v1/pay/validate")
-                .then()
+                .then().log().all()
                 .extract()
                 .as(PayValidationResponse.class)
                 .getOrderId();
