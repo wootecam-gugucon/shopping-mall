@@ -1,5 +1,6 @@
 package com.gugucon.shopping;
 
+import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
@@ -61,6 +62,16 @@ public class TestUtils {
                 .email("test_email" + sequence + "@gmail.com")
                 .password("test_password")
                 .nickname("test_nickname_" + sequence)
+                .build();
+    }
+
+    public static CartItem createCartItem() {
+        sequence++;
+        return CartItem.builder()
+                .id(sequence)
+                .memberId(1L)
+                .product(createProduct(100))
+                .quantity(1)
                 .build();
     }
 
