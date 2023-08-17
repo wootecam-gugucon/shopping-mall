@@ -27,11 +27,11 @@ public final class Stock {
         }
     }
 
-    public boolean isSoldOut() {
+    public boolean isZero() {
         return value == 0;
     }
 
-    public boolean canBuy(final int quantity) {
+    public boolean isNotLessThan(final int quantity) {
         return value >= quantity;
     }
 }

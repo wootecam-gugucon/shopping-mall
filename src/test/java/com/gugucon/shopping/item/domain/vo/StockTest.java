@@ -37,12 +37,12 @@ class StockTest {
 
     @Test
     @DisplayName("재고가 0일 시 품절 여부를 true로 반환한다.")
-    void isSoldOut() {
+    void isZero() {
         // given
         final Stock stock = Stock.from(0);
 
         // when
-        final boolean result = stock.isSoldOut();
+        final boolean result = stock.isZero();
 
         // then
         assertThat(result).isTrue();
@@ -51,12 +51,12 @@ class StockTest {
     @ParameterizedTest
     @ValueSource(ints = {1, Integer.MAX_VALUE})
     @DisplayName("재고가 0이 아닐 시 품절 여부를 false로 반환한다.")
-    void isSoldOut_valueIsNotZero(final int value) {
+    void isZero_valueIsNotZero(final int value) {
         // given
         final Stock stock = Stock.from(value);
 
         // when
-        final boolean result = stock.isSoldOut();
+        final boolean result = stock.isZero();
 
         // then
         assertThat(result).isFalse();
@@ -65,12 +65,12 @@ class StockTest {
     @ParameterizedTest
     @ValueSource(ints = {4, 5})
     @DisplayName("요청 수량보다 재고가 같거나 많으면 true를 반환하다.")
-    void canBuy(final int quantity) {
+    void isNotLessThan(final int quantity) {
         // given
         final Stock stock = Stock.from(5);
 
         // when
-        final boolean result = stock.canBuy(quantity);
+        final boolean result = stock.isNotLessThan(quantity);
 
         // then
         assertThat(result).isTrue();
@@ -79,12 +79,12 @@ class StockTest {
     @ParameterizedTest
     @ValueSource(ints = {6, Integer.MAX_VALUE})
     @DisplayName("요청 수량보다 재고가 적으면 false를 반환한다.")
-    void canBuy_manyQuantity(final int quantity) {
+    void isNotLessThan_manyQuantity(final int quantity) {
         // given
         final Stock stock = Stock.from(5);
 
         // when
-        final boolean result = stock.canBuy(quantity);
+        final boolean result = stock.isNotLessThan(quantity);
 
         // then
         assertThat(result).isFalse();
