@@ -1,11 +1,5 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.TestUtils.insertCartItem;
-import static com.gugucon.shopping.TestUtils.login;
-import static com.gugucon.shopping.TestUtils.placeOrder;
-import static com.gugucon.shopping.TestUtils.readCartItems;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -16,6 +10,7 @@ import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
@@ -32,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -57,6 +53,14 @@ class OrderIntegrationTest {
     @Autowired
     private ProductRepository productRepository;
 
+    @AfterEach
+    void tearDown() {
+        cartItemRepository.deleteAll();
+        orderItemRepository.deleteAll();
+        orderRepository.deleteAll();
+        memberRepository.deleteAll();
+    }
+
     private static List<String> toNames(final OrderDetailResponse orderDetailResponse) {
         return orderDetailResponse.getOrderItems().stream()
                 .map(OrderItemResponse::getName)
@@ -67,14 +71,6 @@ class OrderIntegrationTest {
         return orderHistoryResponse.stream()
                 .map(OrderHistoryResponse::getOrderId)
                 .toList();
-    }
-
-    @AfterEach
-    void tearDown() {
-        cartItemRepository.deleteAll();
-        orderRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        memberRepository.deleteAll();
     }
 
     @Test
@@ -133,10 +129,16 @@ class OrderIntegrationTest {
     @DisplayName("품절된 상품을 포함해 주문을 요청했을 때 400 상태코드를 응답한다.")
     void orderFail_soldOutProduct() {
         /* given */
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        final String accessToken = TestUtils.login(new LoginRequest(email, password));
+
+        final Long memberId = memberRepository.findByEmail(Email.from(email)).orElseThrow().getId();
         cartItemRepository.save(CartItem.builder()
                                         .product(productRepository.findById(4L).orElseThrow())
-                                        .memberId(1L)
+                                        .memberId(memberId)
                                         .quantity(1)
                                         .build());
 
@@ -159,14 +161,21 @@ class OrderIntegrationTest {
     @DisplayName("주문을 요청했을 때 재고가 부족하면 400 상태코드를 응답한다.")
     void orderFail_lackOfStock() {
         /* given */
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        updateCartItem(accessToken, new CartItemUpdateRequest(500));
+        final Long cartItemId = readCartItems(accessToken).get(0).getCartItemId();
+        updateCartItem(accessToken, cartItemId, new CartItemUpdateRequest(500));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/api/v1/order")
                 .then()
@@ -188,8 +197,10 @@ class OrderIntegrationTest {
         final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
         TestUtils.signup(signupRequest);
         String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         insertCartItem(accessToken, new CartItemInsertRequest(2L));
+
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final List<String> cartItemNames = toNames(cartItemResponses);
         final Long orderId = placeOrder(accessToken);
@@ -219,6 +230,7 @@ class OrderIntegrationTest {
         final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
         TestUtils.signup(signupRequest);
         String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         final Long invalidOrderId = Long.MAX_VALUE;
 
         /* when */
@@ -246,8 +258,10 @@ class OrderIntegrationTest {
         final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
         TestUtils.signup(signupRequest);
         String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
+
         final String otherEmail = "other_test_email@woowafriends.com";
         final String otherPassword = "test_password!";
         final String otherNickname = "tester2";
@@ -279,35 +293,10 @@ class OrderIntegrationTest {
         final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
         TestUtils.signup(signupRequest);
         String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long firstOrderId = placeOrder(accessToken);
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final Long secondOrderId = placeOrder(accessToken);
 
-        /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .get("/api/v1/order-history")
-                .then()
-                .extract();
-
-        /* then */
-        final List<OrderHistoryResponse> orderHistoryResponse = response.jsonPath()
-                .getList(".", OrderHistoryResponse.class);
-        final List<Long> orderIds = toOrderIds(orderHistoryResponse);
-        assertThat(orderIds).containsExactly(secondOrderId, firstOrderId);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    @Test
-    @DisplayName("주문 목록을 조회할 때 존재하지 않는 사용자이면 예외를 반환한다.")
-    void readOrderHistory_MemberNoExist() {
-        /* given */
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final Long firstOrderId = placeOrder(accessToken);
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long secondOrderId = placeOrder(accessToken);
 

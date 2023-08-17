@@ -14,10 +14,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-
-import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 public class TestUtils {
 
@@ -114,14 +114,15 @@ public class TestUtils {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> updateCartItem(String accessToken,
-                                                               CartItemUpdateRequest cartItemUpdateRequest) {
+    public static ExtractableResponse<Response> updateCartItem(final String accessToken,
+                                                               final long cartItemId,
+                                                               final CartItemUpdateRequest cartItemUpdateRequest) {
         return RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", 1)
+                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
                 .then().log().all()
                 .extract();
     }
