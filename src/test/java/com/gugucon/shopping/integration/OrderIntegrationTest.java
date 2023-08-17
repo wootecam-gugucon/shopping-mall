@@ -4,6 +4,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
@@ -126,6 +127,29 @@ class OrderIntegrationTest extends IntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.SOLD_OUT);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("주문을 요청했을 때 재고가 부족하면 400 상태코드를 응답한다.")
+    void orderFail_lackOfStock() {
+        /* given */
+        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        updateCartItem(accessToken, new CartItemUpdateRequest(500));
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
+
+        /* then */
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.LACK_OF_STOCK);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 

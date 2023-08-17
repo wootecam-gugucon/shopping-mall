@@ -2,6 +2,7 @@ package com.gugucon.shopping;
 
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
@@ -83,6 +84,18 @@ public class TestUtils {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemInsertRequest)
                 .when().post("/api/v1/cart/items")
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> updateCartItem(String accessToken,
+                                                               CartItemUpdateRequest cartItemUpdateRequest) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(cartItemUpdateRequest)
+                .when().put("/api/v1/cart/items/{cartItemId}/quantity", 1)
                 .then().log().all()
                 .extract();
     }
