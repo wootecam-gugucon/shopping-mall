@@ -6,7 +6,9 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -14,10 +16,14 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class TestUtils {
 
     private static Long sequence = 0L;
+
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public static Product createProduct(String name, long price) {
         sequence++;
@@ -60,7 +66,7 @@ public class TestUtils {
         return Member.builder()
                 .id(sequence)
                 .email("test_email" + sequence + "@gmail.com")
-                .password("test_password")
+                .password(Password.of("test_password", passwordEncoder))
                 .nickname("test_nickname_" + sequence)
                 .build();
     }
@@ -85,6 +91,15 @@ public class TestUtils {
                 .extract()
                 .as(LoginResponse.class)
                 .getAccessToken();
+    }
+
+    public static void signup(final SignupRequest signupRequest) {
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(signupRequest)
+                .when().post("/api/v1/signup")
+                .then().log().all();
     }
 
     public static ExtractableResponse<Response> insertCartItem(String accessToken,

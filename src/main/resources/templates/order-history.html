@@ -9,14 +9,7 @@
 </head>
 <body>
 <div class="root">
-  <nav class="nav flex justify-end">
-    <div class="flex-center gap-15">
-      <a href="/" class="nav-button">상품</a>
-      <a href="/cart" class="nav-button">장바구니</a>
-      <a href="/order-history" class="nav-button">주문목록</a>
-      <a href="/login" class="nav-button">로그인</a>
-    </div>
-  </nav>
+  <div th:replace="~{layouts/header :: header}"></div>
 
   <section class="order-section">
   </section>

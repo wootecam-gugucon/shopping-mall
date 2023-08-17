@@ -12,17 +12,23 @@
   <div th:replace="~{layouts/header :: header}"></div>
 
   <section class="form-container">
-    <form id="login-form" class="mt-40">
+    <form id="signup-form" class="mt-40">
       <label for="email">Email</label>
       <input class="text-input mb-10" type="text" id="email" name="email" required>
 
       <label for="password">Password</label>
       <input class="text-input mb-10" type="password" id="password" name="password" required>
 
-      <button type="submit" class="primary-button-small form-submit-button">Login</button>
+      <label for="passwordCheck">Check Password</label>
+      <input class="text-input mb-10" type="password" id="passwordCheck" name="passwordCheck" required>
+
+      <label for="nickname">Nickname</label>
+      <input class="text-input mb-10" type="text" id="nickname" name="nickname" required>
+
+      <button type="submit" class="primary-button-small form-submit-button">Sign up</button>
     </form>
-  </section>
+  </section>을
 </div>
-<script th:src="@{/js/login.js}"></script>
+<script th:src="@{/js/signup.js}"></script>
 </body>
 </html>
