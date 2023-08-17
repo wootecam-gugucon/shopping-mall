@@ -4,6 +4,7 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
@@ -13,6 +14,7 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class TestUtils {
 
@@ -30,12 +32,12 @@ public class TestUtils {
                 .build();
     }
 
-    public static Member createMember() {
+    public static Member createMember(PasswordEncoder passwordEncoder) {
         sequence++;
         return Member.builder()
                 .id(sequence)
                 .email("test_email" + sequence + "@gmail.com")
-                .password("test_password")
+                .password(Password.of("test_password", passwordEncoder))
                 .nickname("test_nickname_" + sequence)
                 .build();
     }

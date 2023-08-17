@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.gugucon.shopping.TestUtils.createMember;
 import static com.gugucon.shopping.TestUtils.createProduct;
@@ -28,6 +29,8 @@ class OrderServiceTest {
     private OrderRepository orderRepository;
     @Mock
     private CartItemRepository cartItemRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private OrderService orderService;
 
@@ -35,7 +38,8 @@ class OrderServiceTest {
     @DisplayName("주문한다.")
     void order() {
         /* given */
-        final Long memberId = createMember().getId();
+        doReturn("password").when(passwordEncoder).encode(any());
+        final Long memberId = createMember(passwordEncoder).getId();
         final CartItem cartItem1 = CartItem.builder()
                 .id(1L)
                 .memberId(memberId)
