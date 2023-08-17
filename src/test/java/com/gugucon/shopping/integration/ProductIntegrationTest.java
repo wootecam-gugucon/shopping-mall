@@ -38,7 +38,10 @@ class ProductIntegrationTest {
         final int currentPage = result.getInt("currentPage");
         final int size = result.getInt("size");
 
-        assertThat(products).hasSize(4);
+        List<String> actualNames = products.stream()
+            .map(ProductResponse::getName)
+            .toList();
+        assertThat(actualNames).containsExactly("품절된 치킨", "사케", "피자", "치킨");
         assertThat(currentPage).isZero();
         assertThat(size).isEqualTo(20);
         assertThat(totalPage).isEqualTo(1);
@@ -63,7 +66,7 @@ class ProductIntegrationTest {
         final int currentPage = result.getInt("currentPage");
         final int size = result.getInt("size");
 
-        assertThat(products).hasSize(1);
+        assertThat(products.get(0).getName()).isEqualTo("품절된 치킨");
         assertThat(totalPage).isEqualTo(4);
         assertThat(currentPage).isZero();
         assertThat(size).isEqualTo(1);
