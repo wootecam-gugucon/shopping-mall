@@ -12,20 +12,46 @@
   <div th:replace="~{layouts/header :: header}"></div>
 
   <section class="product-container">
-    <div th:each="product : ${products}">
-      <img class="w-280 h-280 cover-image" th:src="|assets/${product.imageFileName}|"/>
-      <div class="flex justify-between w-280 p-5">
-        <div class="product-info">
-          <span class="product-info__name" th:text="${product.name}"></span>
-          <span class="product-info__price" th:text="${product.price}"></span>
-        </div>
-        <button type="submit" class="product-btn" th:disabled="${product.stock <= 0}" th:onclick="addCartItem([[${product.id}]])">
-          <img src="/assets/svgs/cart.svg" alt="장바구니"/>
-        </button>
-      </div>
+    <div class="product-list">
     </div>
   </section>
 </div>
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    fetch('/api/v1/product', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response.json();
+    }).then((data) => {
+      let element = '';
+      data.contents.forEach(product => {
+        element += `
+              <div>
+                <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
+                <div class="flex justify-between w-280 p-5">
+                <div class="product-info">
+                  <span class="product-info__name">${product.name}</span>
+                  <span class="product-info__price">${product.price}</span>
+                </div>
+                <button type="submit" class="product-btn" ${product.stock <= 0 ? 'disabled' : ''} onclick="addCartItem(${product.id})">
+                  <img src="assets/svgs/cart.svg" alt="장바구니"/>
+                </button>
+                </div>
+              </div>
+              `;
+      });
+
+      document.querySelector('.product-list').innerHTML = element;
+    }).catch((error) => {
+      console.error(error);
+    });
+
+  });
+</script>
 <script th:src="@{/js/cart.js}"></script>
 </html>
