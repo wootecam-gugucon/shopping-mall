@@ -29,8 +29,6 @@ class OrderServiceTest {
     private OrderRepository orderRepository;
     @Mock
     private CartItemRepository cartItemRepository;
-    @Mock
-    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private OrderService orderService;
 
@@ -38,8 +36,7 @@ class OrderServiceTest {
     @DisplayName("주문한다.")
     void order() {
         /* given */
-        doReturn("password").when(passwordEncoder).encode(any());
-        final Long memberId = createMember(passwordEncoder).getId();
+        final Long memberId = createMember().getId();
         final CartItem cartItem1 = CartItem.builder()
                 .id(1L)
                 .memberId(memberId)

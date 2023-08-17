@@ -14,11 +14,14 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class TestUtils {
 
     private static Long sequence = 0L;
+
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public static Product createProduct(String name, long price) {
         sequence++;
@@ -32,7 +35,7 @@ public class TestUtils {
                 .build();
     }
 
-    public static Member createMember(PasswordEncoder passwordEncoder) {
+    public static Member createMember() {
         sequence++;
         return Member.builder()
                 .id(sequence)

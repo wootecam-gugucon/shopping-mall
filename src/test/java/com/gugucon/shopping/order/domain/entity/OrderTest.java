@@ -20,13 +20,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @DisplayName("Order 단위 테스트")
 class OrderTest {
 
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     @Test
     @DisplayName("총 주문 금액을 계산한다.")
     void calculateTotalPrice() {
         /* given */
-        final Long memberId = createMember(passwordEncoder).getId();
+        final Long memberId = createMember().getId();
         final CartItem cartItem1 = CartItem.builder()
                 .id(1L)
                 .memberId(memberId)
@@ -49,7 +47,7 @@ class OrderTest {
     @DisplayName("주문 총액이 100_000_000_000원을 넘으면 검증 시 예외가 발생한다.")
     void validateTotalPriceFail_outOfBound() {
         /* given */
-        final Long memberId = createMember(passwordEncoder).getId();
+        final Long memberId = createMember().getId();
         final CartItem validCartItem = CartItem.builder()
                 .id(1L)
                 .memberId(memberId)
@@ -75,7 +73,7 @@ class OrderTest {
     @DisplayName("주어진 ID가 주문자의 ID와 다르면 검증 시 예외가 발생한다.")
     void validateUserHasId() {
         /* given */
-        final Long memberId = createMember(passwordEncoder).getId();
+        final Long memberId = createMember().getId();
         final Order order = Order.from(memberId, Collections.emptyList());
 
         /* when & then */
