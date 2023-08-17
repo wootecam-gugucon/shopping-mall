@@ -57,14 +57,12 @@ public class Product extends BaseTimeEntity {
     }
 
     public void validateSoldOut() {
-        if (stock.isSoldOut()) {
+        if (stock.isZero()) {
             throw new ShoppingException(ErrorCode.SOLD_OUT);
         }
     }
 
-    public void validateCanBuy(final int quantity) {
-        if (!stock.canBuy(quantity)) {
-            throw new ShoppingException(ErrorCode.LACK_OF_STOCK);
-        }
+    public boolean canReduceStockBy(final int quantity) {
+        return stock.isNotLessThan(quantity);
     }
 }

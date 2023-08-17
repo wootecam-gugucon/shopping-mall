@@ -38,25 +38,29 @@ class ProductTest {
 
     @ParameterizedTest
     @ValueSource(ints = {4, 5})
-    @DisplayName("주문 수량만큼 물품을 살 수 있는 지 검사한다.")
-    void validateCanBuy(final int quantity) {
+    @DisplayName("요청한 수량으로 재고를 줄일 수 있으면 true를 반환한다.")
+    void canReduceStock(final int quantity) {
         // given
         final Product product = TestUtils.createProduct(5);
 
-        // when & then
-        assertThatNoException().isThrownBy(() -> product.validateCanBuy(quantity));
+        // when
+        final boolean result = product.canReduceStockBy(quantity);
+
+        // then
+        assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("주문 수량이 재고보다 많으면 예외를 반환한다.")
-    void validateCanBuy_manyQuantity() {
+    @DisplayName("요청한 수량으로 재고를 줄일 수 없으면 false를 반환한다.")
+    void canReduceStock_manyQuantity() {
         // given
         final int stock = 5;
         final Product product = TestUtils.createProduct(stock);
 
-        // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class,
-                                                         () -> product.validateCanBuy(stock + 1));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.LACK_OF_STOCK);
+        // when
+        final boolean result = product.canReduceStockBy(stock + 1);
+
+        // then
+        assertThat(result).isFalse();
     }
 }
