@@ -7,6 +7,7 @@ import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Comparator;
@@ -98,13 +99,15 @@ class ProductIntegrationTest extends IntegrationTest {
             .given().log().all()
             .auth().oauth2(accessToken)
             .when().get("/api/v1/product")
-            .then().log().all()
+            .then().contentType(ContentType.JSON).log().all()
             .extract();
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        final List<ProductResponse> products = response.body().jsonPath().getList("$.data", ProductResponse.class);
+        final List<ProductResponse> products = response.body()
+            .jsonPath()
+            .getList("data", ProductResponse.class);
         final List<ProductResponse> sortedProducts = products.stream()
             .sorted(Comparator.comparing(ProductResponse::getId).reversed())
             .toList();
