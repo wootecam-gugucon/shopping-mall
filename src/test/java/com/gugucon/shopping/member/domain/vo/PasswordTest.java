@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -19,9 +21,10 @@ class PasswordTest {
     @DisplayName("비밀번호를 생성한다.")
     void create(final String value) {
         /* given */
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         /* when & then */
-        assertThatNoException().isThrownBy(() -> Password.from(value));
+        assertThatNoException().isThrownBy(() -> Password.of(value, passwordEncoder));
     }
 
     @ParameterizedTest
@@ -29,10 +32,11 @@ class PasswordTest {
     @DisplayName("올바른 비밀번호 형식이 아닌 경우 비밀번호를 생성할 때 예외가 발생한다.")
     void createFail_invalidPattern(final String value) {
         /* given */
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-                () -> Password.from(value));
+                () -> Password.of(value, passwordEncoder));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD_PATTERN);
     }
 
@@ -40,10 +44,11 @@ class PasswordTest {
     @DisplayName("해당 비밀번호 값을 가진다.")
     void hasValue() {
         /* given */
-        final Password password = Password.from("test_password");
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        final Password password = Password.of("test_password", passwordEncoder);
 
         /* when & then*/
-        assertThat(password.hasValue("test_password")).isTrue();
-        assertThat(password.hasValue("invalid_password")).isFalse();
+        assertThat(password.hasValue("test_password", passwordEncoder)).isTrue();
+        assertThat(password.hasValue("invalid_password", passwordEncoder)).isFalse();
     }
 }

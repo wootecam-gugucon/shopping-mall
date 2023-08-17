@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.gugucon.shopping.TestUtils.createMember;
 import static com.gugucon.shopping.TestUtils.createProduct;

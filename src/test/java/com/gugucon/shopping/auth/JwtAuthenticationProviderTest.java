@@ -9,6 +9,7 @@ import com.gugucon.shopping.auth.security.JwtAuthenticationProvider;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @DisplayName("JwtAuthenticationProvider 단위 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +35,8 @@ class JwtAuthenticationProviderTest {
     private JwtProvider jwtProvider;
     @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Test
     @DisplayName("JwtAuthenticationToken 클래스를 지원한다")
@@ -58,11 +62,13 @@ class JwtAuthenticationProviderTest {
     @DisplayName("JwtAuthenticationToken 인증에 성공한다")
     void authenticate() {
         // given
+        when(passwordEncoder.encode("password")).thenReturn("password");
+
         final String jwtToken = "validJwtToken";
         final String principal = "12";
         final Member member = new Member(Long.valueOf(principal),
                                          "email@test.com",
-                                         "password",
+                                         Password.of("password", passwordEncoder),
                                          "nickname");
         final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwtToken);
 
