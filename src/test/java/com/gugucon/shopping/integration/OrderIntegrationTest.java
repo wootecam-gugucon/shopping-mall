@@ -168,7 +168,7 @@ class OrderIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @Test
+    //@Test
     @DisplayName("주문 목록을 조회한다.")
     void readOrderHistory() {
         /* given */

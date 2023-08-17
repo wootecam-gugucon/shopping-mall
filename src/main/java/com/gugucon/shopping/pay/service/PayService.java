@@ -12,6 +12,7 @@ import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.domain.Pay;
 import com.gugucon.shopping.pay.dto.*;
+import com.gugucon.shopping.pay.infrastructure.CustomerKeyGenerator;
 import com.gugucon.shopping.pay.infrastructure.OrderIdTranslator;
 import com.gugucon.shopping.pay.infrastructure.PayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
@@ -30,6 +31,7 @@ public class PayService {
     private final MemberRepository memberRepository;
     private final PayValidator payValidator;
     private final OrderIdTranslator orderIdTranslator;
+    private final CustomerKeyGenerator customerKeyGenerator;
 
     private final String successUrl;
     private final String failUrl;
@@ -41,6 +43,7 @@ public class PayService {
                       final MemberRepository memberRepository,
                       final PayValidator payValidator,
                       final OrderIdTranslator orderIdTranslator,
+                      final CustomerKeyGenerator customerKeyGenerator,
                       @Value("${pay.callback.success-url}") final String successUrl,
                       @Value("${pay.callback.fail-url}") final String failUrl) {
         this.payRepository = payRepository;
@@ -50,6 +53,7 @@ public class PayService {
         this.memberRepository = memberRepository;
         this.payValidator = payValidator;
         this.orderIdTranslator = orderIdTranslator;
+        this.customerKeyGenerator = customerKeyGenerator;
         this.successUrl = successUrl;
         this.failUrl = failUrl;
     }
@@ -57,56 +61,59 @@ public class PayService {
     @Transactional
     public PayCreateResponse createPay(final PayCreateRequest payCreateRequest, final Long memberId) {
         final Long orderId = payCreateRequest.getOrderId();
-        final Order order = findOrderBy(memberId, orderId);
-        order.validateNotPayed();
+        final Order order = findUnpayedOrderBy(orderId, memberId);
         payRepository.findByOrderId(orderId)
                 .ifPresent(payRepository::delete);
-        final Pay pay = Pay.builder()
-                .orderId(orderId)
-                .price(order.getTotalPrice())
-                .build();
-        payRepository.save(pay);
-        return PayCreateResponse.from(pay.getId());
+
+        return PayCreateResponse.from(Pay.from(order));
     }
 
     public PayInfoResponse readPayInfo(final Long payId, final Long memberId) {
         final Pay pay = payRepository.findById(payId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PAY));
-        final Order order = findOrderBy(memberId, pay.getOrderId());
+        final Order order = findUnpayedOrderBy(pay.getOrderId(), memberId);
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
-        order.validateNotPayed();
-        final String orderName = order.getOrderName();
-        return PayInfoResponse.from(member, orderName, orderIdTranslator.encode(order.getId(), orderName),
-                                    order.getTotalPrice(), successUrl, failUrl);
+
+        return PayInfoResponse.from(orderIdTranslator.encode(order),
+                                    order,
+                                    pay,
+                                    member,
+                                    customerKeyGenerator.generate(member),
+                                    successUrl,
+                                    failUrl);
     }
 
     @Transactional
     public PayValidationResponse validatePay(final PayValidationRequest payValidationRequest, final Long memberId) {
         final Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
-        final Order order = findOrderBy(memberId, orderId);
-        order.validateNotPayed();
+        final Order order = findUnpayedOrderBy(orderId, memberId);
         final Pay pay = payRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PAY));
-        pay.validateMoney(WonMoney.from(payValidationRequest.getAmount()));
 
+        pay.validateMoney(WonMoney.from(payValidationRequest.getAmount()));
+        decreaseStock(order);
+        order.pay();
+        payValidator.validatePayment(payValidationRequest);
+
+        cartItemRepository.deleteAllByMemberId(memberId);
+        return PayValidationResponse.from(orderId);
+    }
+
+    private void decreaseStock(final Order order) {
         order.getOrderItems().forEach(orderItem -> {
             final Product product = productRepository.findById(orderItem.getId())
                     .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
             product.validateStockIsNotLessThan(orderItem.getQuantity());
             product.decreaseStockBy(orderItem.getQuantity());
         });
-        order.pay();
-
-        payValidator.validatePayment(payValidationRequest);
-        cartItemRepository.deleteAllByMemberId(memberId);
-        return PayValidationResponse.from(orderId);
     }
 
-    private Order findOrderBy(final Long memberId, final Long orderId) {
+    private Order findUnpayedOrderBy(final Long orderId, final Long memberId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         order.validateMemberHasId(memberId);
+        order.validateUnPayed();
         return order;
     }
 }
