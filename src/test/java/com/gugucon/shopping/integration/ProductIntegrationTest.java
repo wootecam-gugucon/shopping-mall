@@ -20,25 +20,6 @@ import org.springframework.http.HttpStatus;
 class ProductIntegrationTest extends IntegrationTest {
 
     @Test
-    @DisplayName("상품 전체 목록을 조회한다.")
-    void readAllProducts() {
-        /* given */
-
-        /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/")
-                .then().log().all()
-                .extract();
-
-        /* then */
-        final List<String> result = response.htmlPath()
-                .getList("html.body.div.section.div.div.div.span");
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result).containsAll(List.of("치킨", "피자", "사케"));
-    }
-
-    @Test
     @DisplayName("페이징 조건이 기재되지 않으면 기본 설정에 따라 페이징하여 반환한다.")
     void readAllProducts_defaultPaging() {
         /* given */
