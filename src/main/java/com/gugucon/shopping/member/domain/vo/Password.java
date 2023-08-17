@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,9 +14,11 @@ import lombok.NoArgsConstructor;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @Getter
 public class Password {
@@ -27,16 +30,6 @@ public class Password {
     @NotNull
     private String value;
 
-    private Password(final String value) {
-        validatePattern(value);
-
-        this.value = value;
-    }
-
-    public static Password from(final String value) {
-        return new Password(value);
-    }
-
     private static void validatePattern(final String value) {
         final Matcher matcher = PASSWORD_PATTERN.matcher(value);
 
@@ -45,7 +38,12 @@ public class Password {
         }
     }
 
-    public boolean hasValue(final String value) {
-        return Objects.equals(this.value, value);
+    public static Password of(final String rawPassword, final PasswordEncoder passwordEncoder) {
+        validatePattern(rawPassword);
+        return new Password(passwordEncoder.encode(rawPassword));
+    }
+
+    public boolean hasValue(final String rawValue, final PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(rawValue, this.value);
     }
 }

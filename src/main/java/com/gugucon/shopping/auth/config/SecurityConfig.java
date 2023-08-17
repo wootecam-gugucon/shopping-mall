@@ -12,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -33,7 +35,8 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/**"))
             )
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/login/token"))
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/login/token"),
+                                 new AntPathRequestMatcher("/api/v1/signup"))
                 .permitAll()
                 .anyRequest().authenticated()
             )
@@ -64,5 +67,10 @@ public class SecurityConfig {
     @Bean
     public AuthenticationEntryPoint jwtAuthenticationEntryPoint() {
         return new JwtAuthenticationEntryPoint(objectMapper);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

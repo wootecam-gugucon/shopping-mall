@@ -1,4 +1,4 @@
-package com.gugucon.shopping.member.controlller;
+package com.gugucon.shopping.member.controlller.api;
 
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
