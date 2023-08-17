@@ -29,9 +29,7 @@
       return response.json();
     }).then((data) => {
       let element = '';
-      console.log(data);
-      data.data.forEach(product => {
-        console.log(product);
+      data.contents.forEach(product => {
         element += `
               <div>
                 <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
@@ -40,7 +38,7 @@
                   <span class="product-info__name">${product.name}</span>
                   <span class="product-info__price">${product.price}</span>
                 </div>
-                <button type="submit" class="product-btn" disabled=${product.stock <=0} onclick="addCartItem(${product.id})">
+                <button type="submit" class="product-btn" ${product.stock <= 0 ? 'disabled' : ''} onclick="addCartItem(${product.id})">
                   <img src="assets/svgs/cart.svg" alt="장바구니"/>
                 </button>
                 </div>
