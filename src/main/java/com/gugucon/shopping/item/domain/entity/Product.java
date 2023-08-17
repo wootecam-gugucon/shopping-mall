@@ -27,6 +27,7 @@ public class Product extends BaseTimeEntity {
     private String imageFileName;
 
     @NotNull
+    @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "stock"))
     private Quantity stock;
 

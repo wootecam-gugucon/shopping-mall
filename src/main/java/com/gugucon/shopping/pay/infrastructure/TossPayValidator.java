@@ -19,8 +19,8 @@ public final class TossPayValidator implements PayValidator {
     private final RestTemplate restTemplate;
     private final HttpHeaders httpHeaders;
 
-    public TossPayValidator(final String secretKey) {
-        this.restTemplate = new RestTemplate();
+    public TossPayValidator(final RestTemplate restTemplate, final String secretKey) {
+        this.restTemplate = restTemplate;
         this.httpHeaders = new HttpHeaders();
         setHeaderForConnect(secretKey);
     }
