@@ -12,6 +12,7 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -68,18 +69,19 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    //TODO : refactor
-    public String getOrderName() {
-        final int size = orderItems.size();
-        if (size == 1) {
-            return orderItems.get(0).getProductName();
-        }
-        return orderItems.get(0).getProductName() + " 외 " + (size - 1) + "건";
-    }
-
     private void addOrderItem(final OrderItem orderItem) {
         orderItems.add(orderItem);
         totalPrice = totalPrice.add(orderItem.getTotalPrice());
+    }
+
+    public String getOrderName() {
+        final int size = orderItems.size();
+        final OrderItem firstOrderItem = orderItems.stream().min(Comparator.comparingLong(OrderItem::getId))
+                .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+        if (size >= 2) {
+            return firstOrderItem.getProductName() + " 외 " + (size - 1) + "건";
+        }
+        return firstOrderItem.getProductName();
     }
 
     public void validateMemberHasId(Long memberId) {
