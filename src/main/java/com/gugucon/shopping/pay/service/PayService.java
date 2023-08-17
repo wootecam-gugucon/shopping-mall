@@ -102,7 +102,7 @@ public class PayService {
 
     private void decreaseStock(final Order order) {
         order.getOrderItems().forEach(orderItem -> {
-            final Product product = productRepository.findById(orderItem.getId())
+            final Product product = productRepository.findById(orderItem.getProductId())
                     .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
             product.validateStockIsNotLessThan(orderItem.getQuantity());
             product.decreaseStockBy(orderItem.getQuantity());
