@@ -73,7 +73,7 @@ class CartServiceTest {
                 .quantity(1)
                 .build();
         final List<CartItem> cartItems = List.of(cartItemChicken, cartItemPizza);
-        when(cartItemRepository.findByMemberId(memberId)).thenReturn(cartItems);
+        when(cartItemRepository.findByMemberIdWithProduct(memberId)).thenReturn(cartItems);
 
         /* when */
         final List<CartItemResponse> cartItemResponses = cartService.readCartItems(memberId);
@@ -105,7 +105,7 @@ class CartServiceTest {
 
         /* when */
         cartService.updateCartItemQuantity(cartItem.getId(),
-                new CartItemUpdateRequest(updateQuantity), memberId);
+                                           new CartItemUpdateRequest(updateQuantity), memberId);
 
         /* then */
         assertThat(cartItem.getQuantity()).isEqualTo(Quantity.from(updateQuantity));

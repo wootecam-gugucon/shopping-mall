@@ -50,7 +50,7 @@ class OrderServiceTest {
                 .build();
         final List<CartItem> cartItems = List.of(cartItem1, cartItem2);
 
-        doReturn(cartItems).when(cartItemRepository).findByMemberId(memberId);
+        doReturn(cartItems).when(cartItemRepository).findByMemberIdWithProduct(memberId);
         doReturn(Order.builder()
                          .id(1L)
                          .memberId(memberId)
