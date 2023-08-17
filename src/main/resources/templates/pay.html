@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <!-- 결제위젯 SDK 추가 -->
-  <script src="https://js.tosspayments.com/v1/payment-widget"></script>
-  <title>결제하기</title>
+    <meta charset="utf-8"/>
+    <!-- 결제위젯 SDK 추가 -->
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+    <title>결제하기</title>
 </head>
 <body>
-  <div>
+<div>
+    <span>주문 이름: </span>
+    <span id="order-name" th:text="${request.getOrderName()}"></span><br/>
     <span>총 결제 금액: </span>
-    <span id="payment-value"></span>
-  </div>
-  <!-- 결제위젯, 이용약관 영역 -->
-  <div id="payment-method"></div>
-  <div id="agreement"></div>
-  <!-- 결제하기 버튼 -->
-  <button id="payment-button">결제하기</button>
-  <label for="orderId">주문 id</label>
-  <input class="text-input mb-10" type="text" id="orderId" name="orderId">
+    <span id="payment-value" th:text="|${request.getPrice()} 원|"></span>
+</div>
+<!-- 결제위젯, 이용약관 영역 -->
+<div id="payment-method"></div>
+<div id="agreement"></div>
+<!-- 결제하기 버튼 -->
+<button id="payment-button">결제하기</button>
+<script th:inline="javascript">
 
-  <label for="orderName">주문 이름</label>
-  <input class="text-input mb-10" type="text" id="orderName" name="orderName">
-  <script>
-    const money = 15000;
-    document.getElementById("payment-value").innerText = money + "원";
+    /*<![CDATA[*/
+    var orderId = [[${request.getOrderId()}]];
+    var orderName = [[${request.getOrderName()}]];
+    var price = [[${request.getPrice()}]];
+    /*]]>*/
 
     const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq"
     const customerKey = "aB7WwWjcDeHkNUmCmeFkY" // 내 상점에서 고객을 구분하기 위해 발급한 고객의 고유 ID
@@ -36,7 +37,7 @@
     // 결제수단 UI를 렌더링할 위치를 지정합니다. `#payment-method`와 같은 CSS 선택자와 결제 금액 객체를 추가하세요.
     // DOM이 생성된 이후에 렌더링 메서드를 호출하세요.
     // https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    paymentWidget.renderPaymentMethods("#payment-method", { value: 15000 })
+    paymentWidget.renderPaymentMethods("#payment-method", {value: price})
     // ------  이용약관 렌더링 ------
     // 이용약관 UI를 렌더링할 위치를 지정합니다. `#agreement`와 같은 CSS 선택자를 추가하세요.
     // https://docs.tosspayments.com/reference/widget-sdk#renderagreement선택자
@@ -46,30 +47,31 @@
     // https://docs.tosspayments.com/reference/widget-sdk#requestpayment결제-정보
     button.addEventListener("click", function () {
 
-      fetch('/api/pay', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          "orderId": document.getElementById("orderId").value,
-          "price": money,
-          "orderName": document.getElementById("orderName").value})
-      }).then((response) => {
-        return response.json();
-      }).then((data) => {
-        paymentWidget.requestPayment({
-          orderId: data.encodedOrderId,
-          orderName: data.orderName,
-          successUrl: data.successUrl,
-          failUrl: data.failUrl,
-          customerEmail: data.customerEmail,
-          customerName: data.customerName
-        })
-      }).catch((error) => {
-        console.error(error);
-      });
+        fetch('/api/pay', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "orderId": orderId,
+                "price": price,
+                "orderName": orderName
+            })
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            paymentWidget.requestPayment({
+                orderId: data.encodedOrderId,
+                orderName: data.orderName,
+                successUrl: data.successUrl,
+                failUrl: data.failUrl,
+                customerEmail: data.customerEmail,
+                customerName: data.customerName
+            })
+        }).catch((error) => {
+            console.error(error);
+        });
     })
-  </script>
+</script>
 </body>
 </html>

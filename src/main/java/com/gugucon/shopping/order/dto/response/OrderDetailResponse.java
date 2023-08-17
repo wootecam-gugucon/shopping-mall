@@ -15,6 +15,7 @@ public final class OrderDetailResponse {
 
     private Long orderId;
     private List<OrderItemResponse> orderItems;
+    private String orderName;
     private long totalPrice;
 
     public static OrderDetailResponse from(final Order order) {
@@ -22,7 +23,7 @@ public final class OrderDetailResponse {
                 .map(OrderItemResponse::from)
                 .toList();
 
-        return new OrderDetailResponse(order.getId(), orderItemResponses,
-                order.getTotalPrice().getValue());
+        return new OrderDetailResponse(order.getId(), orderItemResponses, order.getOrderName(),
+                                       order.getTotalPrice().getValue());
     }
 }

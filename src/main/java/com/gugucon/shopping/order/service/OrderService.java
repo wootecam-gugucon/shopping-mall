@@ -32,7 +32,7 @@ public class OrderService {
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
         final Order order = Order.from(memberId, cartItems);
-        cartItemRepository.deleteAll(cartItems);
+        //cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }
 
@@ -46,7 +46,7 @@ public class OrderService {
 
     public List<OrderHistoryResponse> getOrderHistory(final Long memberId) {
         final List<Order> orders = orderRepository.findAllByMemberIdWithOrderItems(memberId,
-                Sort.by(Direction.DESC, "id"));
+                                                                                   Sort.by(Direction.DESC, "id"));
         return orders.stream()
                 .map(OrderHistoryResponse::from)
                 .toList();

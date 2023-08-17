@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 승인 대기 중</title>
+</head>
+<body>
+<span>결제 승인 대기 중 입니다.</span>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentKey = urlParams.get('paymentKey');
+        const orderId = urlParams.get('orderId');
+        const amount = urlParams.get('amount');
+        const paymentType = urlParams.get('paymentType');
+        let status;
+
+        fetch('/api/pay/validate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "paymentKey": paymentKey,
+                "orderId": orderId,
+                "amount": amount,
+                "paymentType": paymentType
+            })
+        }).then((response) => {
+            status = response.status;
+            return response.json();
+        }).then((data) => {
+            if (status === 200) {
+                top.opener.location.href = `/pay/success?orderId=${data.orderId}`;
+            } else {
+                alert("결제가 승인되지 않았습니다");
+                top.opener.location.href = '/pay/fail';
+            }
+            self.close();
+        }).catch((error) => {
+            console.error(error);
+        });
+    })
+</script>
+</body>
+</html>

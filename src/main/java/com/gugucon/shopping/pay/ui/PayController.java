@@ -1,10 +1,7 @@
 package com.gugucon.shopping.pay.ui;
 
 import com.gugucon.shopping.pay.application.PayService;
-import com.gugucon.shopping.pay.dto.PayFailParameter;
-import com.gugucon.shopping.pay.dto.PayRequest;
-import com.gugucon.shopping.pay.dto.PayResponse;
-import com.gugucon.shopping.pay.dto.PayValidationRequest;
+import com.gugucon.shopping.pay.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +19,8 @@ public final class PayController {
     }
 
     @GetMapping("/pay")
-    public String getPayPage() {
+    public String getPayPage(final @ModelAttribute("request") PayPageRequest request) {
+        System.out.println(request);
         return "pay";
     }
 
@@ -33,9 +31,20 @@ public final class PayController {
     }
 
     @PostMapping("/api/pay/validate")
-    public ResponseEntity<Void> validatePayment(@RequestBody final PayValidationRequest payValidationRequest) {
-        payService.validatePay(payValidationRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PayValidationResponse> validatePayment(
+            @RequestBody final PayValidationRequest payValidationRequest) {
+        final PayValidationResponse payValidationResponse = payService.validatePay(payValidationRequest);
+        return ResponseEntity.ok().body(payValidationResponse);
+    }
+
+    @GetMapping("/pay/loading-popup")
+    public String getLoadingPagePopUp(@ModelAttribute final PayValidationRequest payValidationRequest) {
+        return "pay-loading-popup";
+    }
+
+    @GetMapping("/pay/fail-popup")
+    public String getFailPagePopUp(@ModelAttribute final PayFailParameter payFailParameter) {
+        return "pay-fail-popup";
     }
 
     @GetMapping("/pay/success")
@@ -43,14 +52,8 @@ public final class PayController {
         return "pay-success";
     }
 
-    @GetMapping("/pay/loading")
-    public String getLoadingPage(@ModelAttribute final PayValidationRequest payValidationRequest) {
-        return "pay-loading";
-    }
-
     @GetMapping("/pay/fail")
-    public String getFailPage(@ModelAttribute final PayFailParameter payFailParameter) {
+    public String getFailPage() {
         return "pay-fail";
     }
-
 }

@@ -4,6 +4,7 @@ import com.gugucon.shopping.pay.domain.Pay;
 import com.gugucon.shopping.pay.dto.PayRequest;
 import com.gugucon.shopping.pay.dto.PayResponse;
 import com.gugucon.shopping.pay.dto.PayValidationRequest;
+import com.gugucon.shopping.pay.dto.PayValidationResponse;
 import com.gugucon.shopping.pay.infrastructure.OrderIdTranslator;
 import com.gugucon.shopping.pay.infrastructure.PayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
@@ -41,18 +42,19 @@ public class PayService {
         final Long price = payRequest.getPrice();
         final String encodedOrderId = orderIdTranslator.encode(orderId, orderName);
         final Pay pay = Pay.builder()
-                           .orderId(orderId)
-                           .orderName(orderName)
-                           .price(price)
-                           .build();
+                .orderId(orderId)
+                .orderName(orderName)
+                .price(price)
+                .build();
         return PayResponse.from(payRepository.save(pay), encodedOrderId, successUrl, failUrl);
     }
 
-    public void validatePay(final PayValidationRequest payValidationRequest) {
+    public PayValidationResponse validatePay(final PayValidationRequest payValidationRequest) {
         final Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
         final Pay pay = payRepository.findByOrderId(orderId)
-                                     .orElseThrow(RuntimeException::new);
+                .orElseThrow(RuntimeException::new);
         pay.validateMoney(payValidationRequest.getAmount());
         payValidator.validatePayment(payValidationRequest);
+        return PayValidationResponse.from(orderId);
     }
 }
