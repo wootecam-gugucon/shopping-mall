@@ -57,10 +57,10 @@ class ProductIntegrationTest extends IntegrationTest {
 
         final PagedResponse result = response.as(PagedResponse.class);
         final List<ProductResponse> products = result.getData();
-        final boolean lastPage = result.isLastPage();
+        final int totalPage = result.getTotalPage();
 
         assertThat(products).hasSize(3);
-        assertThat(lastPage).isTrue();
+        assertThat(totalPage).isEqualTo(1);
     }
 
     @Test
@@ -82,10 +82,10 @@ class ProductIntegrationTest extends IntegrationTest {
 
         final PagedResponse result = response.as(PagedResponse.class);
         final List<ProductResponse> products = result.getData();
-        final boolean lastPage = result.isLastPage();
+        final int totalPage = result.getTotalPage();
 
         assertThat(products).hasSize(1);
-        assertThat(lastPage).isFalse();
+        assertThat(totalPage).isEqualTo(3);
     }
 
     @Test

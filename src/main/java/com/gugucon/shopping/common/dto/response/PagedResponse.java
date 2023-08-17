@@ -13,5 +13,5 @@ public class PagedResponse<T> {
 
     private List<T> data;
 
-    private boolean lastPage;
+    private int totalPage;
 }

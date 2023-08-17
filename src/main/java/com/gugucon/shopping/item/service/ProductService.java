@@ -29,6 +29,6 @@ public class ProductService {
         final List<ProductResponse> data = products.stream()
             .map(ProductResponse::from)
             .toList();
-        return new PagedResponse<>(data, products.isLast());
+        return new PagedResponse<>(data, products.getTotalPages());
     }
 }
