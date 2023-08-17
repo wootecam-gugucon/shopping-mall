@@ -65,7 +65,7 @@ public class PayService {
         payRepository.findByOrderId(orderId)
                 .ifPresent(payRepository::delete);
 
-        return PayCreateResponse.from(Pay.from(order));
+        return PayCreateResponse.from(payRepository.save(Pay.from(order)));
     }
 
     public PayInfoResponse readPayInfo(final Long payId, final Long memberId) {
