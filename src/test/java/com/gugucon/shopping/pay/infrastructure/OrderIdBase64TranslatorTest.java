@@ -1,10 +1,11 @@
 package com.gugucon.shopping.pay.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
-
+import com.gugucon.shopping.order.domain.entity.Order;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchException;
 
 @DisplayName("OrderIdBase64Translator 단위테스트")
 class OrderIdBase64TranslatorTest {
@@ -18,8 +19,20 @@ class OrderIdBase64TranslatorTest {
         Long orderId = 1L;
         String orderName = "주문 이름";
 
+        final Order order = new Order() {
+            @Override
+            public Long getId() {
+                return orderId;
+            }
+
+            @Override
+            public String createOrderName() {
+                return orderName;
+            }
+        };
+
         // when
-        String encodedString = orderIdTranslator.encode(orderId, orderName);
+        String encodedString = orderIdTranslator.encode(order);
         Long decodeId = orderIdTranslator.decode(encodedString);
 
         // then

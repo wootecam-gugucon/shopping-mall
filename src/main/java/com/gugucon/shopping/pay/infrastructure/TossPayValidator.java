@@ -1,16 +1,15 @@
 package com.gugucon.shopping.pay.infrastructure;
 
-import com.gugucon.shopping.pay.dto.PayValidationRequest;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationResponse;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Base64;
 import java.util.Base64.Encoder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 public final class TossPayValidator implements PayValidator {
 
@@ -20,8 +19,8 @@ public final class TossPayValidator implements PayValidator {
     private final RestTemplate restTemplate;
     private final HttpHeaders httpHeaders;
 
-    public TossPayValidator(final String secretKey) {
-        this.restTemplate = new RestTemplate();
+    public TossPayValidator(final RestTemplate restTemplate, final String secretKey) {
+        this.restTemplate = restTemplate;
         this.httpHeaders = new HttpHeaders();
         setHeaderForConnect(secretKey);
     }
@@ -44,13 +43,13 @@ public final class TossPayValidator implements PayValidator {
 
     private void validateSuccess(final ResponseEntity<TossValidationResponse> response) {
         if (response.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException();
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
         if (response.getBody() == null) {
-            throw new RuntimeException();
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
         if (!response.getBody().getStatus().equals("DONE")) {
-            throw new RuntimeException();
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
     }
 }

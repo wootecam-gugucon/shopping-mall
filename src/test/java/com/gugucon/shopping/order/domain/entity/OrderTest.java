@@ -1,21 +1,20 @@
 package com.gugucon.shopping.order.domain.entity;
 
+import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.item.domain.entity.CartItem;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+import java.util.List;
+
 import static com.gugucon.shopping.TestUtils.createMember;
 import static com.gugucon.shopping.TestUtils.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import com.gugucon.shopping.common.domain.vo.WonMoney;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.item.domain.entity.CartItem;
-import java.util.Collections;
-import java.util.List;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @DisplayName("Order 단위 테스트")
 class OrderTest {
@@ -69,16 +68,16 @@ class OrderTest {
     }
 
     @Test
-    @DisplayName("주어진 ID가 주문자의 ID와 다르면 검증 시 예외가 발생한다.")
-    void validateUserHasId() {
-        /* given */
+    @DisplayName("결제된 주문이면 예외가 발생한다.")
+    void validateUnPayed() {
+        // given
         final Long memberId = createMember().getId();
         final Order order = Order.from(memberId, Collections.emptyList());
+        order.pay();
 
-        /* when & then */
-        assertThatNoException().isThrownBy(() -> order.validateUserHasId(memberId));
-        ShoppingException exception = assertThrows(ShoppingException.class,
-                                                   () -> order.validateUserHasId(Long.MAX_VALUE));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                                                         () -> order.validateUnPayed());
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.PAYED_ORDER);
     }
 }

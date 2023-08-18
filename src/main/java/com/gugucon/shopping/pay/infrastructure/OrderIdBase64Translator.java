@@ -1,5 +1,9 @@
 package com.gugucon.shopping.pay.infrastructure;
 
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.order.domain.entity.Order;
+
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Base64.Decoder;
@@ -18,21 +22,25 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
     }
 
     @Override
-    public String encode(final Long orderId, final String orderName) {
+    public String encode(final Order order) {
         final String joined = String.join(DELIMITER,
-                                           String.valueOf(orderId),
-                                           orderName,
-                                           String.valueOf(LocalDateTime.now()));
+                                          String.valueOf(order.getId()),
+                                          order.createOrderName(),
+                                          String.valueOf(LocalDateTime.now()));
         return encoder.encodeToString(joined.getBytes());
     }
 
     @Override
     public Long decode(final String encodedOrderId) {
-        String decoded = new String(decoder.decode(encodedOrderId.getBytes()));
-        try{
+        if (encodedOrderId == null) {
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
+        }
+
+        final String decoded = new String(decoder.decode(encodedOrderId.getBytes()));
+        try {
             return Long.parseLong(decoded.split(DELIMITER)[0]);
         } catch (NumberFormatException e) {
-            throw new RuntimeException();
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
     }
 }

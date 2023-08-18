@@ -11,8 +11,8 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
@@ -55,26 +55,41 @@ public class Order extends BaseTimeEntity {
         validateRangeOf(totalPrice);
     }
 
-    public WonMoney calculateTotalPrice() {
-        return orderItems.stream()
-            .map(OrderItem::getTotalPrice)
-            .reduce(WonMoney.ZERO, WonMoney::add);
-    }
-
     private static void validateRangeOf(final BigInteger totalPrice) {
         if (totalPrice.compareTo(BigInteger.valueOf(MAX_TOTAL_PRICE)) > 0) {
             throw new ShoppingException(ErrorCode.EXCEED_MAX_TOTAL_PRICE);
         }
     }
 
+    public WonMoney calculateTotalPrice() {
+        return orderItems.stream()
+                .map(OrderItem::getTotalPrice)
+                .reduce(WonMoney.ZERO, WonMoney::add);
+    }
+
     private void addOrderItem(final OrderItem orderItem) {
         orderItems.add(orderItem);
     }
 
-    public void validateUserHasId(Long memberId) {
-        if (!Objects.equals(this.memberId, memberId)) {
-            throw new ShoppingException(ErrorCode.INVALID_ORDER);
+    public String createOrderName() {
+        final int size = orderItems.size();
+        final OrderItem firstOrderItem = orderItems.stream()
+                .min(Comparator.comparingLong(OrderItem::getId))
+                .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+        if (size >= 2) {
+            return firstOrderItem.getName() + " 외 " + (size - 1) + "건";
         }
+        return firstOrderItem.getName();
+    }
+
+    public void validateUnPayed() {
+        if (status != OrderStatus.ORDERED) {
+            throw new ShoppingException(ErrorCode.PAYED_ORDER);
+        }
+    }
+
+    public void pay() {
+        this.status = OrderStatus.PAYED;
     }
 
     public enum OrderStatus {ORDERED, PAYED}

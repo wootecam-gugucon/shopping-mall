@@ -1,10 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>결제 성공</title>
+    <meta charset="UTF-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <title>결제 성공</title>
 </head>
 <body>
-  <span>결제가 성공하였습니다!</span>
+<div class="root">
+    <nav class="nav flex justify-end">
+        <div class="flex-center gap-15">
+            <a class="nav-button" href="/">상품</a>
+            <a class="nav-button" href="/cart">장바구니</a>
+            <a class="nav-button" href="/order-history">주문목록</a>
+            <a class="nav-button" href="/login">로그인</a>
+        </div>
+    </nav>
+
+    <section class="order-section">
+        <div class="flex">
+            <section class="order-left-section">
+                <h3 class="highlight-text">결제 성공!</h3>
+                <h3 class="order-title"></h3>
+                <h3 class="order-name"></h3>
+                <div class="order-item-list">
+                </div>
+            </section>
+            <section class="order-right-section">
+                <div class="order-right-section__top">
+                    <h3 class="order-title">결제정보</h3>
+                </div>
+                <hr class="divide-line-thin"/>
+                <div class="order-right-section__bottom">
+                    <div class="flex justify-between p-20 mt-20">
+                        <span class="highlight-text">주문총액</span>
+                        <span class="highlight-text order-total-price"></span>
+                    </div>
+                    <div class="flex justify-between p-20 mt-20">
+                        <span class="highlight-text">결제금액</span>
+                        <span class="highlight-text pay-total-price"></span>
+                    </div>
+                    <div class="p-20 mt-20 pay-button">
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+</div>
+<script th:src="@{/js/pay.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+
+        const credentials = localStorage.getItem('accessToken');
+        if (!credentials) {
+            alert('사용자 정보가 없습니다.');
+            window.location.href = '/login';
+            return;
+        }
+
+        fetch(`/api/v1/order/${orderId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${credentials}`,
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let element = '<hr class="divide-line-gray mt-10" />';
+            data.orderItems.forEach(orderItem => {
+                console.log(orderItem.imageFileName);
+                element += `
+                    <div class="shopping-container">
+                      <div class="flex gap-15 mt-10">
+                        <img class="w-144 h-144" src="/assets/${orderItem.imageFileName}"/> <!-- 상품 이미지 -->
+                        <div class="flex-col gap-15">
+                          <span class="shopping-name">${orderItem.productName}</span> <!-- 상품 이름 -->
+                          <span class="shopping-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span> <!-- 상품 가격 및 수량 -->
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="divide-line-thin mt-10"/>
+                    `;
+            });
+
+            document.querySelector('.order-item-list').innerHTML = element;
+            document.querySelector('.order-title').innerHTML = `주문 번호 : ${data.orderId}`;
+            document.querySelector('.order-name').innerHTML = `주문 이름 : ${data.orderName}`;
+            document.querySelector(
+                '.order-right-section .order-total-price').innerText = `${data.totalPrice} 원`;
+            document.querySelector(
+                '.order-right-section .pay-total-price').innerText = `${data.totalPrice} 원`;
+        }).catch((error) => {
+            console.error(error);
+        });
+
+    });
+</script>
 </body>
 </html>

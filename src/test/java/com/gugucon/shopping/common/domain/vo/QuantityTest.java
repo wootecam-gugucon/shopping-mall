@@ -25,15 +25,14 @@ class QuantityTest {
                 .isThrownBy(() -> Quantity.from(value));
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {-1, 1001})
-    @DisplayName("값이 정상 범위를 벗어나면 수량을 생성할 수 없다.")
-    void createFail_rangeOutOfBound(final int value) {
+    @Test
+    @DisplayName("값이 음수이면 수량을 생성했을 때 예외가 발생한다.")
+    void createFail_negativeValue() {
         /* given */
 
         /* when & then */
         final ShoppingException exception = assertThrows(ShoppingException.class,
-                () -> Quantity.from(value));
+                                                         () -> Quantity.from(-1));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_QUANTITY);
     }
 
@@ -45,5 +44,46 @@ class QuantityTest {
 
         /* when & then */
         assertThat(zero.isZero()).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, Integer.MAX_VALUE})
+    @DisplayName("수량이 0이 아닐 시 false를 반환한다.")
+    void isZero_valueIsNotZero(final int value) {
+        // given
+        final Quantity quantity = Quantity.from(value);
+
+        // when
+        final boolean result = quantity.isZero();
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("주어진 수량보다 적으면 true를 반환한다.")
+    void isLessThan() {
+        // given
+        final Quantity quantity = Quantity.from(3);
+
+        // when
+        final boolean result = quantity.isLessThan(Quantity.from(4));
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {4, 5})
+    @DisplayName("주어진 수량보다 적지 않으면 false를 반환한다.")
+    void isLessThan_manyQuantity(final int value) {
+        // given
+        final Quantity quantity = Quantity.from(5);
+
+        // when
+        final boolean result = quantity.isLessThan(Quantity.from(value));
+
+        // then
+        assertThat(result).isFalse();
     }
 }

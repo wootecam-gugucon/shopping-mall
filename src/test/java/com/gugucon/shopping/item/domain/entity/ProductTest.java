@@ -1,6 +1,7 @@
 package com.gugucon.shopping.item.domain.entity;
 
 import com.gugucon.shopping.TestUtils;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import org.junit.jupiter.api.DisplayName;
@@ -39,12 +40,12 @@ class ProductTest {
     @ParameterizedTest
     @ValueSource(ints = {4, 5})
     @DisplayName("요청한 수량으로 재고를 줄일 수 있으면 true를 반환한다.")
-    void canReduceStock(final int quantity) {
+    void canReduceStock(final int value) {
         // given
         final Product product = TestUtils.createProduct(5);
 
         // when
-        final boolean result = product.canReduceStockBy(quantity);
+        final boolean result = product.canReduceStockBy(Quantity.from(value));
 
         // then
         assertThat(result).isTrue();
@@ -58,7 +59,7 @@ class ProductTest {
         final Product product = TestUtils.createProduct(stock);
 
         // when
-        final boolean result = product.canReduceStockBy(stock + 1);
+        final boolean result = product.canReduceStockBy(Quantity.from(stock + 1));
 
         // then
         assertThat(result).isFalse();

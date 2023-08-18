@@ -9,16 +9,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
-
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 @Getter
 public class Quantity {
 
-    private static final Integer MIN_VALUE = 0;
-    private static final Integer MAX_VALUE = 1000;
+    public static final int ZERO = 0;
 
     @NotNull
     private Integer value;
@@ -33,20 +30,20 @@ public class Quantity {
     }
 
     public boolean isZero() {
-        return Objects.equals(this.value, MIN_VALUE);
+        return value.equals(ZERO);
     }
 
     private void validateRange(final Integer value) {
-        if (isOutOfBound(value)) {
+        if (value < ZERO) {
             throw new ShoppingException(ErrorCode.INVALID_QUANTITY);
         }
     }
 
-    private boolean isOutOfBound(final Integer value) {
-        return value < MIN_VALUE || MAX_VALUE < value;
+    public boolean isLessThan(final Quantity other) {
+        return this.value < other.value;
     }
 
-    public Integer getValue() {
-        return value;
+    public Quantity decreaseBy(final Quantity other) {
+        return Quantity.from(this.value - other.value);
     }
 }

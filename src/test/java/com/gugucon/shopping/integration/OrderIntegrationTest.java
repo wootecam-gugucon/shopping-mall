@@ -15,7 +15,6 @@ import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
-import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
@@ -53,24 +52,18 @@ class OrderIntegrationTest {
     @Autowired
     private ProductRepository productRepository;
 
-    @AfterEach
-    void tearDown() {
-        cartItemRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        orderRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
-
     private static List<String> toNames(final OrderDetailResponse orderDetailResponse) {
         return orderDetailResponse.getOrderItems().stream()
                 .map(OrderItemResponse::getName)
                 .toList();
     }
 
-    private static List<Long> toOrderIds(final List<OrderHistoryResponse> orderHistoryResponse) {
-        return orderHistoryResponse.stream()
-                .map(OrderHistoryResponse::getOrderId)
-                .toList();
+    @AfterEach
+    void tearDown() {
+        cartItemRepository.deleteAll();
+        orderItemRepository.deleteAll();
+        orderRepository.deleteAll();
+        memberRepository.deleteAll();
     }
 
     @Test
@@ -281,40 +274,6 @@ class OrderIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    @Test
-    @DisplayName("주문 목록을 조회한다.")
-    void readOrderHistory() {
-        /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
-
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final Long firstOrderId = placeOrder(accessToken);
-
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final Long secondOrderId = placeOrder(accessToken);
-
-        /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .get("/api/v1/order-history")
-                .then()
-                .extract();
-
-        /* then */
-        final List<OrderHistoryResponse> orderHistoryResponse = response.jsonPath()
-                .getList(".", OrderHistoryResponse.class);
-        final List<Long> orderIds = toOrderIds(orderHistoryResponse);
-        assertThat(orderIds).containsExactly(secondOrderId, firstOrderId);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     private List<String> toNames(final List<CartItemResponse> cartItemResponses) {

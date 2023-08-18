@@ -5,11 +5,18 @@
     <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <link rel="stylesheet" th:href="@{/css/index.css}">
-    <title>Shopping</title>
+    <title>결제 내역</title>
 </head>
 <body>
 <div class="root">
-    <div th:replace="~{layouts/header :: header}"></div>
+    <nav class="nav flex justify-end">
+        <div class="flex-center gap-15">
+            <a class="nav-button" href="/">상품</a>
+            <a class="nav-button" href="/cart">장바구니</a>
+            <a class="nav-button" href="/order-history">주문목록</a>
+            <a class="nav-button" href="/login">로그인</a>
+        </div>
+    </nav>
 
     <section class="order-section">
         <div class="flex">
@@ -43,14 +50,15 @@
 <script th:src="@{/js/pay.js}"></script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
+
+        const orderId = [[${orderId}]];
+
         const credentials = localStorage.getItem('accessToken');
         if (!credentials) {
             alert('사용자 정보가 없습니다.');
             window.location.href = '/login';
             return;
         }
-
-        const orderId = [[${orderId}]];
 
         fetch(`/api/v1/order/${orderId}`, {
             method: 'GET',
@@ -69,7 +77,7 @@
                       <div class="flex gap-15 mt-10">
                         <img class="w-144 h-144" src="/assets/${orderItem.imageFileName}"/> <!-- 상품 이미지 -->
                         <div class="flex-col gap-15">
-                          <span class="shopping-name">${orderItem.name}</span> <!-- 상품 이름 -->
+                          <span class="shopping-name">${orderItem.productName}</span> <!-- 상품 이름 -->
                           <span class="shopping-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span> <!-- 상품 가격 및 수량 -->
                         </div>
                       </div>
@@ -85,8 +93,6 @@
                 '.order-right-section .order-total-price').innerText = `${data.totalPrice} 원`;
             document.querySelector(
                 '.order-right-section .pay-total-price').innerText = `${data.totalPrice} 원`;
-            document.querySelector('.pay-button').innerHTML =
-                `<button class="primary-button flex-center pay-button" onclick="payPopUp(${data.orderId})">결제하기</button>`
         }).catch((error) => {
             console.error(error);
         });

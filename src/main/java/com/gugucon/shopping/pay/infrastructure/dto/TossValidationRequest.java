@@ -1,6 +1,6 @@
 package com.gugucon.shopping.pay.infrastructure.dto;
 
-import com.gugucon.shopping.pay.dto.PayValidationRequest;
+import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

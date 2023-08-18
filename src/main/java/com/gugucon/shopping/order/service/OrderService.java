@@ -27,27 +27,27 @@ public class OrderService {
 
     @Transactional
     public OrderResponse order(final Long memberId) {
-        final List<CartItem> cartItems = cartItemRepository.findByMemberId(memberId);
+        final List<CartItem> cartItems = cartItemRepository.findAllByMemberIdWithProduct(memberId);
 
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
 
         final Order order = Order.from(memberId, cartItems);
-        cartItemRepository.deleteAll(cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }
 
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long memberId) {
-        final Order order = orderRepository.findById(orderId)
+        final Order order = orderRepository.findByIdAndMemberId(orderId, memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
 
-        order.validateUserHasId(memberId);
         return OrderDetailResponse.from(order);
     }
 
     public List<OrderHistoryResponse> getOrderHistory(final Long memberId) {
-        final List<Order> orders = orderRepository.findAllByMemberIdWithOrderItems(memberId,
-                Sort.by(Direction.DESC, "id"));
+        final List<Order> orders = orderRepository.findAllByMemberIdAndStatusWithOrderItems(memberId,
+                                                                                            Order.OrderStatus.PAYED,
+                                                                                            Sort.by(Direction.DESC,
+                                                                                                    "id"));
         return orders.stream()
                 .map(OrderHistoryResponse::from)
                 .toList();

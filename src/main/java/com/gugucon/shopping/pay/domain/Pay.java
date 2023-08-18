@@ -2,15 +2,11 @@ package com.gugucon.shopping.pay.domain;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.order.domain.entity.Order;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +15,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "pays")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Pay extends BaseTimeEntity {
 
     @Id
@@ -28,25 +23,29 @@ public final class Pay extends BaseTimeEntity {
 
     private Long orderId;
 
-    private String orderName;
-
+    @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
-
-    public void validateMoney(final WonMoney price) {
-        if (!this.price.equals(price)) {
-            throw new RuntimeException();
-        }
-    }
 
     @Builder
     private Pay(final Long id,
                 final Long orderId,
-                final String orderName,
                 final Long price) {
         this.id = id;
         this.orderId = orderId;
-        this.orderName = orderName;
         this.price = WonMoney.from(price);
+    }
+
+    public static Pay from(final Order order) {
+        return Pay.builder()
+                .orderId(order.getId())
+                .price(order.calculateTotalPrice().getValue())
+                .build();
+    }
+
+    public void validateMoney(final WonMoney price) {
+        if (!this.price.equals(price)) {
+            throw new ShoppingException(ErrorCode.PAY_FAILED);
+        }
     }
 }

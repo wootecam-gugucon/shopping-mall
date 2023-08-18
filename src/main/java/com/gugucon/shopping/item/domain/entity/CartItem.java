@@ -67,6 +67,6 @@ public class CartItem extends BaseTimeEntity {
     }
 
     public boolean isAvailableQuantity() {
-        return product.canReduceStockBy(quantity.getValue());
+        return product.canReduceStockBy(quantity);
     }
 }

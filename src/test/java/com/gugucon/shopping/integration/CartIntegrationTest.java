@@ -315,38 +315,6 @@ class CartIntegrationTest {
     }
 
     @Test
-    @DisplayName("변경 수량이 1,000개 초과이면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
-    void updateCartItemQuantityFail_over1000() {
-        /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
-
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
-        final Long cartItemId = cartItemResponses.get(0).getCartItemId();
-        final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(1001);
-
-        /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
-                .then().log().all()
-                .extract();
-
-        /* then */
-        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_QUANTITY);
-    }
-
-    @Test
     @DisplayName("다른 사용자의 장바구니 상품이면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
     void updateCartItemQuantityFail_cartItemOfOtherUser() {
         /* given */
