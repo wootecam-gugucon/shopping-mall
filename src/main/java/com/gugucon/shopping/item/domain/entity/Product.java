@@ -5,22 +5,10 @@ import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.item.domain.vo.Stock;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "products")
@@ -54,12 +42,8 @@ public class Product extends BaseTimeEntity {
     private WonMoney price;
 
     @Builder
-    private Product(final Long id,
-                    final String name,
-                    final String imageFileName,
-                    final Integer stock,
-                    final String description,
-                    final Long price) {
+    private Product(final Long id, final String name, final String imageFileName, final Integer stock,
+                    final String description, final Long price) {
         this.id = id;
         this.name = name;
         this.imageFileName = imageFileName;
