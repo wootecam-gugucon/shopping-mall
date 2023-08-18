@@ -1,7 +1,7 @@
 package com.gugucon.shopping.pay.controller;
 
-import com.gugucon.shopping.pay.dto.PayFailParameter;
-import com.gugucon.shopping.pay.dto.PayValidationRequest;
+import com.gugucon.shopping.pay.dto.request.PayFailParameter;
+import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;

@@ -1,6 +1,10 @@
 package com.gugucon.shopping.pay.controller;
 
-import com.gugucon.shopping.pay.dto.*;
+import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
+import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
+import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
+import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
+import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
 import com.gugucon.shopping.pay.service.PayService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,13 +1,14 @@
-package com.gugucon.shopping.pay.dto;
+package com.gugucon.shopping.pay.dto.response;
 
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.pay.domain.Pay;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PayInfoResponse {
 
     private final String encodedOrderId;

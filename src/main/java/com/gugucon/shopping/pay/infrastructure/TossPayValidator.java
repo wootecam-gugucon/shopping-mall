@@ -2,7 +2,7 @@ package com.gugucon.shopping.pay.infrastructure;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.pay.dto.PayValidationRequest;
+import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationResponse;
 import org.springframework.http.*;
