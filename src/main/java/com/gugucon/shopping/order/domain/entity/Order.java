@@ -74,7 +74,8 @@ public class Order extends BaseTimeEntity {
 
     public String getOrderName() {
         final int size = orderItems.size();
-        final OrderItem firstOrderItem = orderItems.stream().min(Comparator.comparingLong(OrderItem::getId))
+        final OrderItem firstOrderItem = orderItems.stream()
+                .min(Comparator.comparingLong(OrderItem::getId))
                 .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
         if (size >= 2) {
             return firstOrderItem.getName() + " 외 " + (size - 1) + "건";
