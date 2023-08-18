@@ -12,12 +12,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/v1/pay")
 @RequiredArgsConstructor
 public final class PayController {
 
     private final PayService payService;
 
-    @PutMapping("/api/v1/pay")
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public PayCreateResponse createPayment(@RequestBody final PayCreateRequest payCreateRequest,
                                            @AuthenticationPrincipal final Long memberId) {
@@ -25,14 +26,14 @@ public final class PayController {
     }
 
 
-    @GetMapping("/api/v1/pay/{payId}")
+    @GetMapping("/{payId}")
     @ResponseStatus(HttpStatus.OK)
     public PayInfoResponse getPaymentInfo(@PathVariable final Long payId,
                                           @AuthenticationPrincipal final Long memberId) {
         return payService.readPayInfo(payId, memberId);
     }
 
-    @PostMapping("/api/v1/pay/validate")
+    @PostMapping("/validate")
     @ResponseStatus(HttpStatus.OK)
     public PayValidationResponse validatePayment(@RequestBody final PayValidationRequest payValidationRequest,
                                                  @AuthenticationPrincipal final Long memberId) {

@@ -37,10 +37,9 @@ public class OrderService {
     }
 
     public OrderDetailResponse getOrderDetail(final Long orderId, final Long memberId) {
-        final Order order = orderRepository.findById(orderId)
+        final Order order = orderRepository.findByIdAndMemberId(orderId, memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
 
-        order.validateMemberHasId(memberId);
         return OrderDetailResponse.from(order);
     }
 

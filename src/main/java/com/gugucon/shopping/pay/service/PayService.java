@@ -114,9 +114,8 @@ public class PayService {
     }
 
     private Order findUnPayedOrderBy(final Long orderId, final Long memberId) {
-        final Order order = orderRepository.findById(orderId)
+        final Order order = orderRepository.findByIdAndMemberId(orderId, memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
-        order.validateMemberHasId(memberId);
         order.validateUnPayed();
         return order;
     }

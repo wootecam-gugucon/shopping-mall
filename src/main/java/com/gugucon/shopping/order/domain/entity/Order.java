@@ -13,7 +13,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
@@ -81,12 +80,6 @@ public class Order extends BaseTimeEntity {
             return firstOrderItem.getName() + " 외 " + (size - 1) + "건";
         }
         return firstOrderItem.getName();
-    }
-
-    public void validateMemberHasId(Long memberId) {
-        if (!Objects.equals(this.memberId, memberId)) {
-            throw new ShoppingException(ErrorCode.INVALID_ORDER);
-        }
     }
 
     public void validateUnPayed() {
