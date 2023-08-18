@@ -12,6 +12,9 @@ public enum ErrorCode {
     PASSWORD_NOT_CORRECT(BAD_REQUEST, "틀린 비밀번호 입니다."),
     INVALID_EMAIL_PATTERN(BAD_REQUEST, "유효하지 않은 이메일 형식입니다."),
     INVALID_PASSWORD_PATTERN(BAD_REQUEST, "유효하지 않은 비밀번호 형식입니다."),
+    LOGIN_REQUESTED(FORBIDDEN, "로그인이 필요합니다."),
+    EMAIL_ALREADY_EXIST(BAD_REQUEST, "이미 회원가입된 이메일입니다."),
+    PASSWORD_CHECK_NOT_SAME(BAD_REQUEST, "비밀번호와 비밀번호 확인이 서로 다릅니다."),
     NO_AUTHORIZATION_HEADER(UNAUTHORIZED, "인증 정보가 없습니다."),
     INVALID_TOKEN_TYPE(UNAUTHORIZED, "지원하는 토큰 타입이 아닙니다."),
     INVALID_TOKEN(UNAUTHORIZED, "유효한 토큰이 아닙니다."),
@@ -21,13 +24,15 @@ public enum ErrorCode {
     INVALID_PRODUCT(BAD_REQUEST, "존재하지 않는 상품입니다."),
     EXCEED_MAX_TOTAL_PRICE(BAD_REQUEST, "주문 가능한 최대 금액을 초과합니다."),
     INVALID_ORDER(BAD_REQUEST, "존재하지 않는 주문입니다."),
-    FAILED_TO_FETCH_EXCHANGE_RATE(BAD_REQUEST, "환율 정보를 가져올 수 없습니다."),
     EMPTY_CART(BAD_REQUEST, "장바구니가 비어 있습니다."),
     INVALID_EXCHANGE_RATE(INTERNAL_SERVER_ERROR, "환율은 양수여야 합니다."),
     PAYED_ORDER(BAD_REQUEST, "이미 결제 완료된 주문입니다."),
     INVALID_PAY(BAD_REQUEST, "존재하지 않는 결제 정보입니다."),
     PAY_FAILED(INTERNAL_SERVER_ERROR, "결제에 실패했습니다."),
-    STOCK_NOT_ENOUGH(BAD_REQUEST, "상품의 재고가 부족합니다.");
+    STOCK_NOT_ENOUGH(BAD_REQUEST, "상품의 재고가 부족합니다."),
+    SOLD_OUT(BAD_REQUEST, "품절된 상품입니다."),
+    LACK_OF_STOCK(BAD_REQUEST, "재고가 부족합니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;

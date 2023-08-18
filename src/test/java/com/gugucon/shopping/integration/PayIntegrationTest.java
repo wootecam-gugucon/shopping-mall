@@ -1,10 +1,13 @@
 package com.gugucon.shopping.integration;
 
+import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.dto.*;
@@ -30,8 +33,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+@IntegrationTest
 @DisplayName("결제 기능 통합 테스트")
-class PayIntegrationTest extends IntegrationTest {
+class PayIntegrationTest {
 
     @Value("${pay.callback.success-url}")
     private String successUrl;
@@ -60,7 +64,12 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("주문에 대한 결제 정보를 생성한다.")
     void createPayment_() {
         // given
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final PayCreateRequest payCreateRequest = new PayCreateRequest(orderId);
@@ -86,7 +95,12 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("결제 정보를 조회한다.")
     void getPaymentInfo_() {
         // given
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -117,7 +131,12 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("결제를 검증한다.")
     void validatePayment_() {
         // given
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -153,7 +172,12 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("외부 API 검증 요청에 실패하면 결제 검증을 요청했을 때 500 상태코드를 반환한다.")
     void validatePaymentFail_externalValidationFail() {
         // given
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -189,8 +213,13 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("재고가 부족하면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_stockNotEnough() {
         // given
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
-        insertCartItem(accessToken, new CartItemInsertRequest(2L));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
+        insertCartItem(accessToken, new CartItemInsertRequest(3L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
@@ -204,7 +233,12 @@ class PayIntegrationTest extends IntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
 
-        buyProduct("other_test_email@woowafriends.com", "test_password!", 2L, 100);
+        final String otherEmail = "other_test_email@woowafriends.com";
+        final String otherPassword = "test_password!";
+        final String otherNickname = "tester2";
+        TestUtils.signup(new SignupRequest(otherEmail, otherPassword, otherPassword, otherNickname));
+        String otherAccessToken = TestUtils.login(new LoginRequest(otherEmail, otherPassword));
+        buyProduct(otherAccessToken, 3L, 100);
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -227,7 +261,12 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("이미 결제가 완료되었으면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_payedOrder() {
         // given
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -265,7 +304,12 @@ class PayIntegrationTest extends IntegrationTest {
     @DisplayName("다른 회원의 주문에 대해 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_orderOfOtherMember() {
         // given
-        String accessToken = login(new LoginRequest("test_email@woowafriends.com", "test_password!"));
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        String accessToken = TestUtils.login(new LoginRequest(email, password));
+
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -280,7 +324,11 @@ class PayIntegrationTest extends IntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
 
-        String otherAccessToken = login(new LoginRequest("other_test_email@woowafriends.com", "test_password!"));
+        final String otherEmail = "other_test_email@woowafriends.com";
+        final String otherPassword = "test_password!";
+        final String otherNickname = "tester2";
+        TestUtils.signup(new SignupRequest(otherEmail, otherPassword, otherPassword, otherNickname));
+        String otherAccessToken = TestUtils.login(new LoginRequest(otherEmail, otherPassword));
 
         // when
         final ExtractableResponse<Response> response = RestAssured

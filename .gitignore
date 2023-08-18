@@ -38,5 +38,3 @@ out/
 
 ### properties ###
 **/application.properties
-**/application-currencylayer.properties
-**/application-jwt.properties

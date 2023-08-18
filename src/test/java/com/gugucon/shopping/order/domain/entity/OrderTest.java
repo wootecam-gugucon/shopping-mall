@@ -1,27 +1,28 @@
 package com.gugucon.shopping.order.domain.entity;
 
-import com.gugucon.shopping.common.domain.vo.WonMoney;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.item.domain.entity.CartItem;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-import java.util.List;
-
 import static com.gugucon.shopping.TestUtils.createMember;
 import static com.gugucon.shopping.TestUtils.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.item.domain.entity.CartItem;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @DisplayName("Order 단위 테스트")
 class OrderTest {
 
     @Test
-    @DisplayName("총 주문 금액을 반환한다.")
-    void getTotalPrice() {
+    @DisplayName("총 주문 금액을 계산한다.")
+    void calculateTotalPrice() {
         /* given */
         final Long memberId = createMember().getId();
         final CartItem cartItem1 = CartItem.builder()
@@ -39,7 +40,7 @@ class OrderTest {
         final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
 
         /* when & then */
-        assertThat(order.getTotalPrice()).isEqualTo(WonMoney.from(130000L));
+        assertThat(order.calculateTotalPrice()).isEqualTo(WonMoney.from(130000L));
     }
 
     @Test
@@ -61,8 +62,7 @@ class OrderTest {
                 .build();
 
         /* when & then */
-        assertThatNoException()
-                .isThrownBy(() -> Order.validateTotalPrice(List.of(validCartItem)));
+        assertThatNoException().isThrownBy(() -> Order.validateTotalPrice(List.of(validCartItem)));
         final ShoppingException exception = assertThrows(ShoppingException.class,
                                                          () -> Order.validateTotalPrice(List.of(invalidCartItem)));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_MAX_TOTAL_PRICE);

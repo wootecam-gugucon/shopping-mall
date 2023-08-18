@@ -1,25 +1,31 @@
 package com.gugucon.shopping;
 
+import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.pay.dto.*;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
 public class TestUtils {
 
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static Long sequence = 0L;
 
-    public static Product createProduct(final String name, final long price) {
+    public static Product createProduct(String name, long price) {
         sequence++;
         return Product.builder()
                 .id(sequence)
@@ -31,13 +37,47 @@ public class TestUtils {
                 .build();
     }
 
+    public static Product createProduct(int stock) {
+        sequence++;
+        return Product.builder()
+                .id(sequence)
+                .name("name")
+                .imageFileName("image_file_name_" + sequence)
+                .stock(stock)
+                .description("test_description")
+                .price(1000L)
+                .build();
+    }
+
+    public static Product createSoldOutProduct(String name, long price) {
+        sequence++;
+        return Product.builder()
+                .id(sequence)
+                .name(name)
+                .imageFileName("image_file_name_" + sequence)
+                .stock(0)
+                .description("test_description")
+                .price(price)
+                .build();
+    }
+
     public static Member createMember() {
         sequence++;
         return Member.builder()
                 .id(sequence)
                 .email("test_email" + sequence + "@gmail.com")
-                .password("test_password")
+                .password(Password.of("test_password", passwordEncoder))
                 .nickname("test_nickname_" + sequence)
+                .build();
+    }
+
+    public static CartItem createCartItem() {
+        sequence++;
+        return CartItem.builder()
+                .id(sequence)
+                .memberId(1L)
+                .product(createProduct(100))
+                .quantity(1)
                 .build();
     }
 
@@ -53,6 +93,15 @@ public class TestUtils {
                 .getAccessToken();
     }
 
+    public static void signup(final SignupRequest signupRequest) {
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(signupRequest)
+                .when().post("/api/v1/signup")
+                .then().log().all();
+    }
+
     public static ExtractableResponse<Response> insertCartItem(final String accessToken,
                                                                final CartItemInsertRequest cartItemInsertRequest) {
         return RestAssured
@@ -65,16 +114,17 @@ public class TestUtils {
                 .extract();
     }
 
-    public static void updateCartItem(final String accessToken,
-                                      final Long cartItemId,
-                                      final CartItemUpdateRequest cartItemUpdateRequest) {
-        RestAssured
+    public static ExtractableResponse<Response> updateCartItem(final String accessToken,
+                                                               final long cartItemId,
+                                                               final CartItemUpdateRequest cartItemUpdateRequest) {
+        return RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
                 .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
-                .then().log().all();
+                .then().log().all()
+                .extract();
     }
 
     public static List<CartItemResponse> readCartItems(final String accessToken) {
@@ -138,8 +188,7 @@ public class TestUtils {
                 .getOrderId();
     }
 
-    public static Long buyProduct(final String email, final String password, final Long productId, final int quantity) {
-        String accessToken = login(new LoginRequest(email, password));
+    public static Long buyProduct(final String accessToken, final Long productId, final int quantity) {
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         updateCartItem(accessToken, cartItemResponses.get(0).getCartItemId(), new CartItemUpdateRequest(quantity));

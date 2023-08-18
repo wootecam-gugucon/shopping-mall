@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
+@Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -27,7 +28,6 @@ public class Product extends BaseTimeEntity {
     private String imageFileName;
 
     @NotNull
-    @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "stock"))
     private Quantity stock;
 
@@ -36,9 +36,9 @@ public class Product extends BaseTimeEntity {
     private String description;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "price"))
     @Valid
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
 
     @Builder
@@ -56,13 +56,23 @@ public class Product extends BaseTimeEntity {
         this.price = WonMoney.from(price);
     }
 
-    public void validateStockIsNotLessThan(final Quantity other) {
-        if (stock.isLessThan(other)) {
+    public void validateSoldOut() {
+        if (stock.isZero()) {
+            throw new ShoppingException(ErrorCode.SOLD_OUT);
+        }
+    }
+
+    public void validateStockIsNotLessThan(final Quantity quantity) {
+        if (stock.isLessThan(quantity)) {
             throw new ShoppingException(ErrorCode.STOCK_NOT_ENOUGH);
         }
     }
 
     public void decreaseStockBy(final Quantity other) {
         stock = stock.decreaseBy(other);
+    }
+
+    public boolean canReduceStockBy(final Quantity quantity) {
+        return !stock.isLessThan(quantity);
     }
 }

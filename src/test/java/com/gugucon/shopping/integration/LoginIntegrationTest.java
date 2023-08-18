@@ -1,30 +1,49 @@
 package com.gugucon.shopping.integration;
 
+import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
+import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
+import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
+import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@IntegrationTest
 @DisplayName("로그인 기능 통합 테스트")
-class LoginIntegrationTest extends IntegrationTest {
+class LoginIntegrationTest {
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @AfterEach
+    void tearDown() {
+        memberRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("로그인한다.")
     void login() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "test_password!");
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        TestUtils.signup(signupRequest);
+        LoginRequest loginRequest = new LoginRequest(email, password);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -45,8 +64,9 @@ class LoginIntegrationTest extends IntegrationTest {
     @DisplayName("존재하지 않는 이메일이면 로그인을 요청했을 때 400 상태코드를 응답한다.")
     void loginFail_invalidEmail() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("unregistered_email@gmail.com",
-                                                           "test_password!");
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        LoginRequest loginRequest = new LoginRequest(email, password);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -67,8 +87,12 @@ class LoginIntegrationTest extends IntegrationTest {
     @DisplayName("틀린 비밀번호이면 로그인을 요청했을 때 400 상태코드를 응답한다.")
     void loginFail_incorrectPassword() {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com",
-                                                           "invalid_password");
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        TestUtils.signup(signupRequest);
+        LoginRequest loginRequest = new LoginRequest(email, "invalid_password");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -88,9 +112,14 @@ class LoginIntegrationTest extends IntegrationTest {
     @ParameterizedTest
     @NullAndEmptySource
     @DisplayName("이메일 정보가 없으면 로그인을 요청했을 때 400 상태코드를 응답한다.")
-    void loginFail_withoutEmail(final String email) {
+    void loginFail_withoutEmail(final String loginEmail) {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest(email, "test_password!");
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        TestUtils.signup(signupRequest);
+        LoginRequest loginRequest = new LoginRequest(loginEmail, password);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -110,9 +139,14 @@ class LoginIntegrationTest extends IntegrationTest {
     @ParameterizedTest
     @NullAndEmptySource
     @DisplayName("비밀번호 정보가 없으면 로그인을 요청했을 때 400 상태코드를 응답한다.")
-    void loginFail_withoutPassword(final String password) {
+    void loginFail_withoutPassword(final String loginPassword) {
         /* given */
-        final LoginRequest loginRequest = new LoginRequest("test_email@woowafriends.com", password);
+        final String email = "test_email@woowafriends.com";
+        final String password = "test_password!";
+        final String nickname = "tester1";
+        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        TestUtils.signup(signupRequest);
+        LoginRequest loginRequest = new LoginRequest(email, loginPassword);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured

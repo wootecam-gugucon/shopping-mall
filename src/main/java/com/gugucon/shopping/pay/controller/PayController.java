@@ -1,9 +1,9 @@
 package com.gugucon.shopping.pay.controller;
 
-import com.gugucon.shopping.member.argumentresolver.annotation.MemberId;
 import com.gugucon.shopping.pay.dto.*;
 import com.gugucon.shopping.pay.service.PayService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,21 +18,21 @@ public final class PayController {
     @PutMapping("/api/v1/pay")
     @ResponseStatus(HttpStatus.OK)
     public PayCreateResponse createPayment(@RequestBody final PayCreateRequest payCreateRequest,
-                                           @MemberId Long memberId) {
+                                           @AuthenticationPrincipal Long memberId) {
         return payService.createPay(payCreateRequest, memberId);
     }
 
 
     @GetMapping("/api/v1/pay/{payId}")
     @ResponseStatus(HttpStatus.OK)
-    public PayInfoResponse getPaymentInfo(@PathVariable Long payId, @MemberId Long memberId) {
+    public PayInfoResponse getPaymentInfo(@PathVariable Long payId, @AuthenticationPrincipal Long memberId) {
         return payService.readPayInfo(payId, memberId);
     }
 
     @PostMapping("/api/v1/pay/validate")
     @ResponseStatus(HttpStatus.OK)
     public PayValidationResponse validatePayment(@RequestBody final PayValidationRequest payValidationRequest,
-                                                 @MemberId Long memberId) {
+                                                 @AuthenticationPrincipal Long memberId) {
         return payService.validatePay(payValidationRequest, memberId);
     }
 }

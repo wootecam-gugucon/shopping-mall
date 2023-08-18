@@ -3,6 +3,8 @@ package com.gugucon.shopping.order.domain.entity;
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -10,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
+@Table(name = "order_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
@@ -25,27 +28,43 @@ public class OrderItem extends BaseTimeEntity {
     private Long productId;
 
     @NotNull
-    private String productName;
+    private String name;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "price"))
     @Valid
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "price"))
     private WonMoney price;
 
     @NotNull
     private String imageFileName;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     @Valid
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;
 
     public static OrderItem from(final CartItem cartItem) {
-        return new OrderItem(null, cartItem.getProduct().getId(), cartItem.getProduct().getName(),
+        validateSoldOut(cartItem);
+        validateQuantity(cartItem);
+
+        return new OrderItem(null,
+                             cartItem.getProduct().getId(),
+                             cartItem.getProduct().getName(),
                              cartItem.getProduct().getPrice(),
-                             cartItem.getProduct().getImageFileName(), cartItem.getQuantity());
+                             cartItem.getProduct().getImageFileName(),
+                             cartItem.getQuantity());
+    }
+
+    private static void validateSoldOut(final CartItem cartItem) {
+        cartItem.getProduct().validateSoldOut();
+    }
+
+    private static void validateQuantity(final CartItem cartItem) {
+        if (!cartItem.isAvailableQuantity()) {
+            throw new ShoppingException(ErrorCode.LACK_OF_STOCK);
+        }
     }
 
     public WonMoney getTotalPrice() {

@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 @Entity
+@Table(name = "cart_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class CartItem extends BaseTimeEntity {
@@ -34,9 +35,9 @@ public class CartItem extends BaseTimeEntity {
     private Product product;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     @Valid
     @NotNull
+    @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;
 
     @Builder
@@ -54,7 +55,7 @@ public class CartItem extends BaseTimeEntity {
         this.quantity = quantity;
     }
 
-    public void validateUserHasId(final Long memberId) {
+    public void validateMember(final Long memberId) {
         if (!Objects.equals(this.memberId, memberId)) {
             throw new ShoppingException(ErrorCode.INVALID_CART_ITEM);
         }
@@ -63,5 +64,9 @@ public class CartItem extends BaseTimeEntity {
     public BigInteger getTotalPrice() {
         return BigInteger.valueOf(product.getPrice().getValue())
                 .multiply(BigInteger.valueOf(quantity.getValue()));
+    }
+
+    public boolean isAvailableQuantity() {
+        return product.canReduceStockBy(quantity);
     }
 }
