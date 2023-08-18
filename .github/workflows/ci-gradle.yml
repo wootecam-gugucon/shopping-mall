@@ -36,11 +36,6 @@ jobs:
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
 
-    - name: application.properties 파일 생성
-      run: | 
-        touch ./src/main/resources/application.properties
-        echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
-
     - name: 프로젝트 빌드 및 테스트
       run: ./gradlew clean build
 
