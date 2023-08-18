@@ -23,7 +23,7 @@
 <script th:src="@{/js/order.js}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const credentials = sessionStorage.getItem('accessToken');
+        const credentials = localStorage.getItem('accessToken');
         if (!credentials) {
             alert('사용자 정보가 없습니다.');
             window.location.href = '/login';
