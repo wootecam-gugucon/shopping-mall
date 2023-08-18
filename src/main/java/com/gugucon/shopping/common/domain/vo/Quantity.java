@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Quantity {
 
+    public static final int ZERO = 0;
+
     @NotNull
     private Integer value;
 
@@ -28,11 +30,11 @@ public class Quantity {
     }
 
     public boolean isZero() {
-        return value.equals(0);
+        return value.equals(ZERO);
     }
 
     private void validateRange(final Integer value) {
-        if (value < 0) {
+        if (value < ZERO) {
             throw new ShoppingException(ErrorCode.INVALID_QUANTITY);
         }
     }
