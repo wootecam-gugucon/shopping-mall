@@ -27,7 +27,7 @@ public class OrderService {
 
     @Transactional
     public OrderResponse order(final Long memberId) {
-        final List<CartItem> cartItems = cartItemRepository.findByMemberIdWithProduct(memberId);
+        final List<CartItem> cartItems = cartItemRepository.findAllByMemberIdWithProduct(memberId);
 
         validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);

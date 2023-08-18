@@ -73,7 +73,7 @@ class CartServiceTest {
                 .quantity(1)
                 .build();
         final List<CartItem> cartItems = List.of(cartItemChicken, cartItemPizza);
-        when(cartItemRepository.findByMemberIdWithProduct(memberId)).thenReturn(cartItems);
+        when(cartItemRepository.findAllByMemberIdWithProduct(memberId)).thenReturn(cartItems);
 
         /* when */
         final List<CartItemResponse> cartItemResponses = cartService.readCartItems(memberId);

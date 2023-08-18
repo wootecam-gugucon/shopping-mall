@@ -40,7 +40,7 @@ public class CartService {
     }
 
     public List<CartItemResponse> readCartItems(final Long memberId) {
-        return cartItemRepository.findByMemberIdWithProduct(memberId).stream()
+        return cartItemRepository.findAllByMemberIdWithProduct(memberId).stream()
                 .map(CartItemResponse::from)
                 .toList();
     }
