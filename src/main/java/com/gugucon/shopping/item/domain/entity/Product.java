@@ -5,10 +5,21 @@ import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.vo.Stock;
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "products")
@@ -31,8 +42,8 @@ public class Product extends BaseTimeEntity {
     @AttributeOverride(name = "value", column = @Column(name = "stock"))
     private Stock stock;
 
-    @Lob
     @NotNull
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Embedded
