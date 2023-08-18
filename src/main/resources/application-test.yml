@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  datasource:
+    url: jdbc:h2:mem:shopping
+    driver-class-name: org.h2.Driver
+
+  thymeleaf:
+    cache: false
+
+  messages:
+    basename: messages, errors
+
+jwt:
+  secret-key: jwt_secret_key
+  expiration: 50000
+
+pay:
+  callback:
+    fail-url: pay_callback_fail_url
+    success-url: pay_callback_success_url
+  toss:
+    secret-key: pay_toss_secret_key
