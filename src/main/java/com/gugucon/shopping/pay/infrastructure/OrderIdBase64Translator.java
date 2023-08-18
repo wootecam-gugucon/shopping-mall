@@ -25,7 +25,7 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
     public String encode(final Order order) {
         final String joined = String.join(DELIMITER,
                                           String.valueOf(order.getId()),
-                                          order.getOrderName(),
+                                          order.createOrderName(),
                                           String.valueOf(LocalDateTime.now()));
         return encoder.encodeToString(joined.getBytes());
     }
@@ -35,7 +35,7 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
         if (encodedOrderId == null) {
             throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
-        
+
         final String decoded = new String(decoder.decode(encodedOrderId.getBytes()));
         try {
             return Long.parseLong(decoded.split(DELIMITER)[0]);

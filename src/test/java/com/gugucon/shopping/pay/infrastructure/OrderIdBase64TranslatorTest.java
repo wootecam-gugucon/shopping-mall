@@ -26,7 +26,7 @@ class OrderIdBase64TranslatorTest {
             }
 
             @Override
-            public String getOrderName() {
+            public String createOrderName() {
                 return orderName;
             }
         };

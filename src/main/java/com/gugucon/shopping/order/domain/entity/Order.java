@@ -72,7 +72,7 @@ public class Order extends BaseTimeEntity {
         orderItems.add(orderItem);
     }
 
-    public String getOrderName() {
+    public String createOrderName() {
         final int size = orderItems.size();
         final OrderItem firstOrderItem = orderItems.stream()
                 .min(Comparator.comparingLong(OrderItem::getId))

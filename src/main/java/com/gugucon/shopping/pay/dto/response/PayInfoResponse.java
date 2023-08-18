@@ -28,7 +28,7 @@ public final class PayInfoResponse {
                                        final String successUrl,
                                        final String failUrl) {
         return new PayInfoResponse(encodedOrderId,
-                                   order.getOrderName(),
+                                   order.createOrderName(),
                                    pay.getPrice().getValue(),
                                    member.getEmail().getValue(),
                                    member.getNickname().getValue(),
