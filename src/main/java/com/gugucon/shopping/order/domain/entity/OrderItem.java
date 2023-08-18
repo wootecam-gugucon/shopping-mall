@@ -1,15 +1,26 @@
 package com.gugucon.shopping.order.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
+import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.domain.vo.Quantity;
-import com.gugucon.shopping.common.domain.vo.WonMoney;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "order_items")
@@ -34,7 +45,7 @@ public class OrderItem extends BaseTimeEntity {
     @Valid
     @NotNull
     @AttributeOverride(name = "value", column = @Column(name = "price"))
-    private WonMoney price;
+    private Money price;
 
     @NotNull
     private String imageFileName;
@@ -67,7 +78,7 @@ public class OrderItem extends BaseTimeEntity {
         }
     }
 
-    public WonMoney getTotalPrice() {
+    public Money getTotalPrice() {
         return price.multiply(quantity);
     }
 }

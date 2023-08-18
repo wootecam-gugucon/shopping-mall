@@ -1,8 +1,11 @@
 package com.gugucon.shopping.common.exception;
 
-import org.springframework.http.HttpStatus;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
-import static org.springframework.http.HttpStatus.*;
+import org.springframework.http.HttpStatus;
 
 public enum ErrorCode {
 
@@ -20,6 +23,7 @@ public enum ErrorCode {
     INVALID_TOKEN(UNAUTHORIZED, "유효한 토큰이 아닙니다."),
     DUPLICATE_CART_ITEM(BAD_REQUEST, "장바구니에 이미 존재하는 상품입니다."),
     INVALID_QUANTITY(BAD_REQUEST, "장바구니 상품 수량은 1개 이상 1,000개 이하여야 합니다."),
+    INVALID_MONEY(BAD_REQUEST, "금액은 0이상이어야 합니다"),
     INVALID_CART_ITEM(BAD_REQUEST, "존재하지 않는 장바구니 상품입니다."),
     INVALID_PRODUCT(BAD_REQUEST, "존재하지 않는 상품입니다."),
     EXCEED_MAX_TOTAL_PRICE(BAD_REQUEST, "주문 가능한 최대 금액을 초과합니다."),

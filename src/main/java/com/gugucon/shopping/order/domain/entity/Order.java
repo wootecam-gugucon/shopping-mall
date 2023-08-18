@@ -1,18 +1,31 @@
 package com.gugucon.shopping.order.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
-import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "orders")
@@ -61,10 +74,10 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    public WonMoney calculateTotalPrice() {
+    public Money calculateTotalPrice() {
         return orderItems.stream()
                 .map(OrderItem::getTotalPrice)
-                .reduce(WonMoney.ZERO, WonMoney::add);
+                .reduce(Money.ZERO, Money::add);
     }
 
     private void addOrderItem(final OrderItem orderItem) {
