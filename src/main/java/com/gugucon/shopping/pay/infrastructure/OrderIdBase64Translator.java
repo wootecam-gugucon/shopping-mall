@@ -32,7 +32,11 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
 
     @Override
     public Long decode(final String encodedOrderId) {
-        String decoded = new String(decoder.decode(encodedOrderId.getBytes()));
+        if (encodedOrderId == null) {
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
+        }
+        
+        final String decoded = new String(decoder.decode(encodedOrderId.getBytes()));
         try {
             return Long.parseLong(decoded.split(DELIMITER)[0]);
         } catch (NumberFormatException e) {
