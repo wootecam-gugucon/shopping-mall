@@ -23,7 +23,9 @@ public final class OrderDetailResponse {
                 .map(OrderItemResponse::from)
                 .toList();
 
-        return new OrderDetailResponse(order.getId(), orderItemResponses, order.createOrderName(),
+        return new OrderDetailResponse(order.getId(),
+                                       orderItemResponses,
+                                       order.createOrderName(),
                                        order.calculateTotalPrice().getValue());
     }
 }
