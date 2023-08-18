@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" th:href="@{/css/index.css}">
-  <title>Shopping</title>
+    <meta charset="UTF-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <title>Shopping</title>
 </head>
 <body>
 <div class="root">
-  <div th:replace="~{layouts/header :: header}"></div>
+    <div th:replace="~{layouts/header :: header}"></div>
 
     <section class="order-section">
     </section>
@@ -23,7 +23,6 @@
             return;
         }
 
-        // TODO: [4단계] 주문 목록 조회 스펙에 맞게 변경
         fetch('/api/v1/order-history', {
             method: 'GET',
             headers: {

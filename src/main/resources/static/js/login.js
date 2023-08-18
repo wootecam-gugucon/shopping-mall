@@ -11,7 +11,6 @@ form.addEventListener('submit', (event) => {
         loginRequest[key] = value;
     }
 
-    // TODO: [2단계] 로그인 path에 맞게 변경
     fetch('/api/v1/login/token', {
         method: 'POST',
         headers: {
