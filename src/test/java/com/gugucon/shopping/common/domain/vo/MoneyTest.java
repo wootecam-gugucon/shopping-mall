@@ -3,6 +3,7 @@ package com.gugucon.shopping.common.domain.vo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
+import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,8 @@ class MoneyTest {
 
         // then
         assertThat(exception).isInstanceOf(ShoppingException.class);
+        assertThat(((ShoppingException) exception).getErrorCode()).isEqualTo(ErrorCode.INVALID_MONEY);
+
     }
 
     @Test
