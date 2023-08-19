@@ -1,4 +1,4 @@
-package com.gugucon.shopping;
+package com.gugucon.shopping.utils;
 
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
@@ -7,7 +7,7 @@ import com.gugucon.shopping.member.domain.vo.Password;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class TestUtils {
+public class DomainUtils {
 
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static Long sequence = 0L;
@@ -67,6 +67,4 @@ public class TestUtils {
                 .quantity(1)
                 .build();
     }
-
-
 }

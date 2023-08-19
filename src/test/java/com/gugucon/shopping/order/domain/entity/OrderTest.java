@@ -1,7 +1,7 @@
 package com.gugucon.shopping.order.domain.entity;
 
-import static com.gugucon.shopping.TestUtils.createMember;
-import static com.gugucon.shopping.TestUtils.createProduct;
+import static com.gugucon.shopping.utils.DomainUtils.createMember;
+import static com.gugucon.shopping.utils.DomainUtils.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
