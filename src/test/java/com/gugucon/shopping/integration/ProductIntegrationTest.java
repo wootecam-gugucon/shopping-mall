@@ -165,7 +165,7 @@ class ProductIntegrationTest {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .queryParam("keyword", keyword)
-                .queryParam("sort", "price", "desc")
+                .queryParam("sort", "price,desc")
                 .when().get("/api/v1/product/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
