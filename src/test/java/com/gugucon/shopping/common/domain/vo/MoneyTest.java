@@ -12,6 +12,18 @@ import org.junit.jupiter.params.provider.ValueSource;
 @DisplayName("Money 단위 테스트")
 class MoneyTest {
 
+    @DisplayName("Money 를 생성한다")
+    void create() {
+        // given
+        Long value = 10L;
+
+        // when
+        Money money = Money.from(value);
+
+        // then
+        assertThat(money.getValue()).isEqualTo(value);
+    }
+
     @DisplayName("금액은 0보다 작을 수 없다")
     @ParameterizedTest
     @ValueSource(longs = {-1})
