@@ -1,5 +1,6 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.utils.ApiUtils.signUp;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
@@ -7,7 +8,6 @@ import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
@@ -76,10 +76,5 @@ class AuthIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.LOGIN_REQUESTED);
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.LOGIN_REQUESTED.getMessage());
-    }
-
-    private void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
-        ApiUtils.signup(request);
     }
 }

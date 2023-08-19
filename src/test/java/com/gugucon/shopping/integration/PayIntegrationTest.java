@@ -4,6 +4,7 @@ import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
 import static com.gugucon.shopping.utils.ApiUtils.createPayment;
 import static com.gugucon.shopping.utils.ApiUtils.getPaymentInfo;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static com.gugucon.shopping.utils.ApiUtils.validatePayment;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,8 +17,6 @@ import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.CartItemRepository;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
@@ -26,7 +25,6 @@ import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
 import com.gugucon.shopping.pay.repository.PayRepository;
-import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -73,7 +71,7 @@ class PayIntegrationTest {
     @DisplayName("주문에 대한 결제 정보를 생성한다.")
     void createPayment_() {
         // given
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -101,7 +99,7 @@ class PayIntegrationTest {
     void getPaymentInfo_() {
         // given
         final String email = "test_email@woowafriends.com";
-        final String accessToken = signUpAndLogin(email, "test_password!");
+        final String accessToken = loginAfterSignUp(email, "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -132,7 +130,7 @@ class PayIntegrationTest {
     @DisplayName("결제를 검증한다.")
     void validatePayment_() {
         // given
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -169,7 +167,7 @@ class PayIntegrationTest {
     @DisplayName("외부 API 검증 요청에 실패하면 결제 검증을 요청했을 때 500 상태코드를 반환한다.")
     void validatePaymentFail_externalValidationFail() {
         // given
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -206,7 +204,7 @@ class PayIntegrationTest {
     @DisplayName("재고가 부족하면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_stockNotEnough() {
         // given
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(3L));
         final Long orderId = placeOrder(accessToken);
@@ -222,7 +220,7 @@ class PayIntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
 
-        final String otherAccessToken = signUpAndLogin("other_test_email@woowafriends.com", "test_password!");
+        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
         buyProduct(otherAccessToken, 3L, 100);
 
         // when
@@ -246,7 +244,7 @@ class PayIntegrationTest {
     @DisplayName("이미 결제가 완료되었으면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_payedOrder() {
         // given
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -285,7 +283,7 @@ class PayIntegrationTest {
     @DisplayName("다른 회원의 주문에 대해 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_orderOfOtherMember() {
         // given
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -301,7 +299,7 @@ class PayIntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
 
-        final String otherAccessToken = signUpAndLogin("other_test_email@woowafriends.com", "test_password!");
+        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -318,16 +316,5 @@ class PayIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    private void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
-        ApiUtils.signup(request);
-    }
-
-    private String signUpAndLogin(final String email, final String password) {
-        signUp(email, password);
-        final LoginRequest request = new LoginRequest(email, password);
-        return ApiUtils.login(request);
     }
 }

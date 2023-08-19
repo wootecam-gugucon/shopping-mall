@@ -1,6 +1,7 @@
 package com.gugucon.shopping.integration;
 
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
@@ -16,14 +17,11 @@ import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.domain.vo.Email;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
-import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -72,7 +70,7 @@ class OrderIntegrationTest {
     @DisplayName("주문한다.")
     void order() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
 
         /* when */
@@ -93,7 +91,7 @@ class OrderIntegrationTest {
     @DisplayName("장바구니가 비어 있으면 주문을 요청했을 때 400 상태코드를 응답한다.")
     void orderFail_emptyCart() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -115,7 +113,7 @@ class OrderIntegrationTest {
     void orderFail_soldOutProduct() {
         /* given */
         final String email = "test_email@woowafriends.com";
-        final String accessToken = signUpAndLogin(email, "test_password!");
+        final String accessToken = loginAfterSignUp(email, "test_password!");
 
         final Long memberId = memberRepository.findByEmail(Email.from(email)).orElseThrow().getId();
         cartItemRepository.save(CartItem.builder()
@@ -143,7 +141,7 @@ class OrderIntegrationTest {
     @DisplayName("주문을 요청했을 때 재고가 부족하면 400 상태코드를 응답한다.")
     void orderFail_lackOfStock() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long cartItemId = readCartItems(accessToken).get(0).getCartItemId();
@@ -169,7 +167,7 @@ class OrderIntegrationTest {
     @DisplayName("주문 상세 정보를 조회한다.")
     void readOrderDetail() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         insertCartItem(accessToken, new CartItemInsertRequest(2L));
@@ -197,7 +195,7 @@ class OrderIntegrationTest {
     @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_invalidOrderId() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final Long invalidOrderId = Long.MAX_VALUE;
 
@@ -220,12 +218,12 @@ class OrderIntegrationTest {
     @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_orderOfOtherUser() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
 
-        final String otherAccessToken = signUpAndLogin("other_test_email@woowafriends.com", "test_password!");
+        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -246,16 +244,5 @@ class OrderIntegrationTest {
         return cartItemResponses.stream()
                 .map(CartItemResponse::getName)
                 .toList();
-    }
-
-    private void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
-        ApiUtils.signup(request);
-    }
-
-    private String signUpAndLogin(final String email, final String password) {
-        signUp(email, password);
-        final LoginRequest request = new LoginRequest(email, password);
-        return ApiUtils.login(request);
     }
 }

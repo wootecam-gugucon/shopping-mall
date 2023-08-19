@@ -1,6 +1,7 @@
 package com.gugucon.shopping.integration;
 
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,10 +12,7 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
-import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -46,7 +44,7 @@ class CartIntegrationTest {
     @DisplayName("장바구니에 상품을 추가한다.")
     void insertCartItem_() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
 
@@ -68,7 +66,7 @@ class CartIntegrationTest {
     @DisplayName("장바구니에 같은 상품이 들어 있으면 장바구니 상품 추가를 요청했을 때 400 상태코드를 응답한다.")
     void insertCartItemFail_duplicateItem() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
 
@@ -92,7 +90,7 @@ class CartIntegrationTest {
     @DisplayName("productId가 없으면 장바구니 상품 추가를 요청했을 때 400 상태코드를 응답한다.")
     void insertCartItemFail_withoutProductId() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(null);
 
@@ -116,7 +114,7 @@ class CartIntegrationTest {
     @DisplayName("존재하지 않는 상품이면 장바구니 상품 추가를 요청했을 때 400 상태코드를 응답한다.")
     void insertCartItemFail_invalidProduct() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final Long invalidProductId = Long.MAX_VALUE;
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(invalidProductId);
@@ -141,7 +139,7 @@ class CartIntegrationTest {
     @DisplayName("품절된 상품이면 장바구니 상품 추가를 요청했을 때 400 상태코드를 응답한다.")
     void insertCartItemFail_soldOutProduct() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final Long soldOutProductId = 4L;
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(soldOutProductId);
@@ -166,7 +164,7 @@ class CartIntegrationTest {
     @DisplayName("장바구니 상품 목록을 조회한다")
     void readCartItems_() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         insertCartItem(accessToken, new CartItemInsertRequest(2L));
@@ -191,7 +189,7 @@ class CartIntegrationTest {
     @DisplayName("장바구니 상품 하나의 수량을 수정한다.")
     void updateCartItemQuantity() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
@@ -218,7 +216,7 @@ class CartIntegrationTest {
     @DisplayName("장바구니 상품 수량을 0으로 수정하면 삭제된다.")
     void updateCartItemQuantityToZero() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
@@ -245,7 +243,7 @@ class CartIntegrationTest {
     @DisplayName("변경 수량이 0 미만이면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
     void updateCartItemQuantityFail_quantityUnderZero() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
@@ -272,14 +270,14 @@ class CartIntegrationTest {
     @DisplayName("다른 사용자의 장바구니 상품이면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
     void updateCartItemQuantityFail_cartItemOfOtherUser() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long cartItemId = cartItemResponses.get(0).getCartItemId();
         final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(3);
 
-        final String otherAccessToken = signUpAndLogin("other_test_email@woowafriends.com", "test_password!");
+        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -301,7 +299,7 @@ class CartIntegrationTest {
     @DisplayName("변경 수량 정보가 없으면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
     void updateCartItemQuantityFail_withoutQuantity() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
@@ -328,7 +326,7 @@ class CartIntegrationTest {
     @DisplayName("존재하지 않는 장바구니 상품이면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
     void updateCartItemQuantityFail_invalidCartItemId() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final Long invalidCartItemId = Long.MAX_VALUE;
         final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(3);
@@ -353,7 +351,7 @@ class CartIntegrationTest {
     @DisplayName("장바구니 상품을 삭제한다.")
     void removeCartItem() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
@@ -377,7 +375,7 @@ class CartIntegrationTest {
     @DisplayName("존재하지 않는 장바구니 상품을 삭제할 때 400 상태코드를 응답한다.")
     void removeCartItem_productNotExist() {
         /* given */
-        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -397,16 +395,5 @@ class CartIntegrationTest {
         return cartItemResponses.stream()
                 .map(CartItemResponse::getName)
                 .toList();
-    }
-
-    private void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
-        ApiUtils.signup(request);
-    }
-
-    private String signUpAndLogin(final String email, final String password) {
-        signUp(email, password);
-        final LoginRequest request = new LoginRequest(email, password);
-        return ApiUtils.login(request);
     }
 }

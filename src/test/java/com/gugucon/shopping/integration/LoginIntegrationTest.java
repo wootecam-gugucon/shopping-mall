@@ -1,15 +1,14 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.utils.ApiUtils.signUp;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.member.repository.MemberRepository;
-import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -153,10 +152,5 @@ class LoginIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.REQUIRED_FIELD_MISSING);
-    }
-
-    private void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
-        ApiUtils.signup(request);
     }
 }

@@ -40,6 +40,17 @@ public class ApiUtils {
             .then().log().all();
     }
 
+    public static void signUp(final String email, final String password) {
+        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
+        ApiUtils.signup(request);
+    }
+
+    public static String loginAfterSignUp(final String email, final String password) {
+        signUp(email, password);
+        final LoginRequest request = new LoginRequest(email, password);
+        return ApiUtils.login(request);
+    }
+
     public static ExtractableResponse<Response> insertCartItem(final String accessToken,
                                                                final CartItemInsertRequest cartItemInsertRequest) {
         return RestAssured
