@@ -2,9 +2,12 @@ package com.gugucon.shopping.common.domain.vo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.order.domain.entity.Order;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,13 +32,9 @@ class MoneyTest {
     @ParameterizedTest
     @ValueSource(longs = {-1})
     void createFail_negativeValue(long value) {
-        // when
-        final Exception exception = catchException(() -> Money.from(value));
-
-        // then
-        assertThat(exception).isInstanceOf(ShoppingException.class);
-        assertThat(((ShoppingException) exception).getErrorCode()).isEqualTo(ErrorCode.INVALID_MONEY);
-
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> Money.from(value));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MONEY);
     }
 
     @Test
