@@ -187,4 +187,47 @@ class ProductIntegrationTest {
 
         productRepository.deleteAllInBatch(persistProducts);
     }
+
+    @Test
+    @DisplayName("검색어로 검색한 결과를 가격이 비싸지 않은 순으로 정렬하여 반환한다")
+    void searchProducts_sortByPriceAsc() {
+        // given
+        final List<Product> products = List.of(
+                TestUtils.createProductWithoutId("사과", 2500), // O
+                TestUtils.createProductWithoutId("맛있는 사과", 3000), // O
+                TestUtils.createProductWithoutId("사과는 맛있어", 1000), // O
+                TestUtils.createProductWithoutId("가나다라마사과과", 4000), // O
+                TestUtils.createProductWithoutId("가나다라마바사", 2000), // X
+                TestUtils.createProductWithoutId("과놔돠롸", 4500) // X
+        );
+        final List<Product> persistProducts = productRepository.saveAll(products);
+
+        final String keyword = "사과";
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("keyword", keyword)
+                .queryParam("sort", "price,asc")
+                .when().get("/api/v1/product/search")
+                .then().contentType(ContentType.JSON).log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final List<String> names = response.body()
+                .jsonPath()
+                .getList("contents", ProductResponse.class)
+                .stream().map(ProductResponse::getName).toList();
+
+        assertThat(names).containsExactly(
+                "사과는 맛있어",
+                "사과",
+                "맛있는 사과",
+                "가나다라마사과과"
+        );
+
+        productRepository.deleteAllInBatch(persistProducts);
+    }
 }
