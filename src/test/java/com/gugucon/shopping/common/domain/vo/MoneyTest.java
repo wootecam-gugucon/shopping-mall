@@ -15,7 +15,7 @@ class MoneyTest {
     @DisplayName("금액은 0보다 작을 수 없다")
     @ParameterizedTest
     @ValueSource(longs = {-1})
-    void validate(long value) {
+    void createFail_negativeValue(long value) {
         // when
         final Exception exception = catchException(() -> Money.from(value));
 
