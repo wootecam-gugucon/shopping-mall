@@ -15,12 +15,14 @@
     <div class="product-list">
     </div>
   </section>
+  <div class="pagination"></div>
 </div>
 </body>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
 
-    fetch('/api/v1/product', {
+    fetch('/api/v1/product?' + urlParams, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -28,8 +30,13 @@
     }).then((response) => {
       return response.json();
     }).then((data) => {
+      const currentPage = data.currentPage;
+      const totalPage = data.totalPage;
+      const size = data.size;
+
       let element = '';
-      data.contents.forEach(product => {
+      for (let i=0; i<Math.min(size, data.contents.length); i++) {
+        let product = data.contents[i];
         element += `
               <div>
                 <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
@@ -44,8 +51,9 @@
                 </div>
               </div>
               `;
-      });
+      }
 
+      pagination(currentPage, totalPage, size, '.pagination');
       document.querySelector('.product-list').innerHTML = element;
     }).catch((error) => {
       console.error(error);
@@ -53,5 +61,6 @@
 
   });
 </script>
+<script th:src="@{/js/pagination.js}"></script>
 <script th:src="@{/js/cart.js}"></script>
 </html>
