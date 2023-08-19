@@ -63,6 +63,16 @@ public class TestUtils {
                 .build();
     }
 
+    public static Product createProductWithoutId(String name, long price) {
+        return Product.builder()
+                .name(name)
+                .imageFileName("image_file_name_" + sequence++)
+                .stock(100)
+                .description("test_description")
+                .price(price)
+                .build();
+    }
+
     public static Product createSoldOutProduct(String name, long price) {
         sequence++;
         return Product.builder()
