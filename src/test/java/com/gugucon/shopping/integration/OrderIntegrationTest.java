@@ -1,12 +1,11 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.TestUtils.insertCartItem;
-import static com.gugucon.shopping.TestUtils.placeOrder;
-import static com.gugucon.shopping.TestUtils.readCartItems;
-import static com.gugucon.shopping.TestUtils.updateCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
+import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -24,6 +23,7 @@ import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
+import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -250,12 +250,12 @@ class OrderIntegrationTest {
 
     private void signUp(final String email, final String password) {
         final SignupRequest request = new SignupRequest(email, password, password,"testUser");
-        TestUtils.signup(request);
+        ApiUtils.signup(request);
     }
 
     private String signUpAndLogin(final String email, final String password) {
         signUp(email, password);
         final LoginRequest request = new LoginRequest(email, password);
-        return TestUtils.login(request);
+        return ApiUtils.login(request);
     }
 }

@@ -1,17 +1,16 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.TestUtils.buyProduct;
-import static com.gugucon.shopping.TestUtils.createPayment;
-import static com.gugucon.shopping.TestUtils.getPaymentInfo;
-import static com.gugucon.shopping.TestUtils.insertCartItem;
-import static com.gugucon.shopping.TestUtils.placeOrder;
-import static com.gugucon.shopping.TestUtils.validatePayment;
+import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
+import static com.gugucon.shopping.utils.ApiUtils.createPayment;
+import static com.gugucon.shopping.utils.ApiUtils.getPaymentInfo;
+import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.validatePayment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -27,6 +26,7 @@ import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
 import com.gugucon.shopping.pay.repository.PayRepository;
+import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -322,12 +322,12 @@ class PayIntegrationTest {
 
     private void signUp(final String email, final String password) {
         final SignupRequest request = new SignupRequest(email, password, password,"testUser");
-        TestUtils.signup(request);
+        ApiUtils.signup(request);
     }
 
     private String signUpAndLogin(final String email, final String password) {
         signUp(email, password);
         final LoginRequest request = new LoginRequest(email, password);
-        return TestUtils.login(request);
+        return ApiUtils.login(request);
     }
 }
