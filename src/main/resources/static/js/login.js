@@ -17,11 +17,14 @@ form.addEventListener('submit', (event) => {
         },
         body: JSON.stringify(loginRequest)
     }).then((response) => {
-        return response.json();
-    }).then((data) => {
-        const {accessToken} = data;
-        localStorage.setItem('accessToken', accessToken);
-        window.location.href = '/';
+        if (response.status === 200) {
+            response.json().then((data) => {
+                const {accessToken} = data;
+                localStorage.setItem('accessToken', accessToken);
+                window.location.href = '/';
+            });
+        }
+        else response.json().then((data) => alert(data.message));
     }).catch((error) => {
         alert(error);
     });
