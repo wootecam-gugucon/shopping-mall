@@ -61,7 +61,6 @@ class OrderServiceTest {
         orderService.order(memberId);
 
         /* then */
-        //verify(cartItemRepository).deleteAll(cartItems);
         verify(orderRepository).save(any());
     }
 }
