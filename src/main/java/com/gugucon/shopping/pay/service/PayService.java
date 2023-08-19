@@ -1,6 +1,6 @@
 package com.gugucon.shopping.pay.service;
 
-import com.gugucon.shopping.common.domain.vo.WonMoney;
+import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.Product;
@@ -95,7 +95,7 @@ public class PayService {
         final Pay pay = payRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PAY));
 
-        pay.validateMoney(WonMoney.from(payValidationRequest.getAmount()));
+        pay.validateMoney(Money.from(payValidationRequest.getAmount()));
         decreaseStock(order);
         order.pay();
         payValidator.validatePayment(payValidationRequest);
