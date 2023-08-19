@@ -72,9 +72,7 @@ class OrderIntegrationTest {
     @DisplayName("주문한다.")
     void order() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        String accessToken = signUpAndLogin(email, password);
+        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
 
         /* when */
@@ -95,9 +93,7 @@ class OrderIntegrationTest {
     @DisplayName("장바구니가 비어 있으면 주문을 요청했을 때 400 상태코드를 응답한다.")
     void orderFail_emptyCart() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        String accessToken = signUpAndLogin(email, password);
+        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -119,8 +115,7 @@ class OrderIntegrationTest {
     void orderFail_soldOutProduct() {
         /* given */
         final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        String accessToken = signUpAndLogin(email, password);
+        final String accessToken = signUpAndLogin(email, "test_password!");
 
         final Long memberId = memberRepository.findByEmail(Email.from(email)).orElseThrow().getId();
         cartItemRepository.save(CartItem.builder()
@@ -148,9 +143,7 @@ class OrderIntegrationTest {
     @DisplayName("주문을 요청했을 때 재고가 부족하면 400 상태코드를 응답한다.")
     void orderFail_lackOfStock() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        String accessToken = signUpAndLogin(email, password);
+        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long cartItemId = readCartItems(accessToken).get(0).getCartItemId();
@@ -176,9 +169,7 @@ class OrderIntegrationTest {
     @DisplayName("주문 상세 정보를 조회한다.")
     void readOrderDetail() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        String accessToken = signUpAndLogin(email, password);
+        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         insertCartItem(accessToken, new CartItemInsertRequest(2L));
@@ -206,9 +197,7 @@ class OrderIntegrationTest {
     @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_invalidOrderId() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        String accessToken = signUpAndLogin(email, password);
+        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
 
         final Long invalidOrderId = Long.MAX_VALUE;
 
@@ -231,16 +220,12 @@ class OrderIntegrationTest {
     @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
     void readOrderDetailFail_orderOfOtherUser() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        String accessToken = signUpAndLogin(email, password);
+        final String accessToken = signUpAndLogin("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
 
-        final String otherEmail = "other_test_email@woowafriends.com";
-        final String otherPassword = "test_password!";
-        String otherAccessToken = signUpAndLogin(otherEmail, otherPassword);
+        final String otherAccessToken = signUpAndLogin("other_test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
