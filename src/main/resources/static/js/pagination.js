@@ -21,7 +21,7 @@ const pagination = (currentPage, totalPage, size, className) => {
         `;
     document.querySelector(className).innerHTML = pages;
     document.getElementById(`page-${currentPage + 1}`).classList.add("active");
-    if (last + 1 >= totalPage) {
+    if (last >= totalPage) {
       const next = document.getElementById(`page-${last + 1}`);
       next.setAttribute("disabled", true);
     }
