@@ -1,15 +1,13 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.signUp;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
-import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -36,10 +34,7 @@ class AuthIntegrationTest {
     @DisplayName("jwt 토큰 인증에 성공한다")
     void authenticate() {
         // given
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        signUp(email, password);
-        String accessToken = ApiUtils.login(new LoginRequest(email, password));
+        String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         // when
         final ExtractableResponse<Response> response = RestAssured
