@@ -1,5 +1,7 @@
 package com.gugucon.shopping.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -17,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("jwt 토큰 인증 기능 통합 테스트")
@@ -38,8 +38,7 @@ class AuthIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
+        signUp(email, password);
         String accessToken = TestUtils.login(new LoginRequest(email, password));
 
         // when
@@ -77,5 +76,10 @@ class AuthIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.LOGIN_REQUESTED);
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.LOGIN_REQUESTED.getMessage());
+    }
+
+    private void signUp(final String email, final String password) {
+        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
+        TestUtils.signup(request);
     }
 }

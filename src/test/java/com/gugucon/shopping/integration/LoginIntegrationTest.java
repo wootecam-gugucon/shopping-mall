@@ -1,5 +1,7 @@
 package com.gugucon.shopping.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -20,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @IntegrationTest
 @DisplayName("로그인 기능 통합 테스트")
 class LoginIntegrationTest {
@@ -40,9 +40,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(email, password);
 
         /* when */
@@ -89,9 +87,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(email, "invalid_password");
 
         /* when */
@@ -116,9 +112,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(loginEmail, password);
 
         /* when */
@@ -143,9 +137,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(email, loginPassword);
 
         /* when */
@@ -161,5 +153,10 @@ class LoginIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.REQUIRED_FIELD_MISSING);
+    }
+
+    private void signUp(final String email, final String password) {
+        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
+        TestUtils.signup(request);
     }
 }

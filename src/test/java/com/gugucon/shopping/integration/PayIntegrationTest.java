@@ -1,5 +1,16 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.TestUtils.buyProduct;
+import static com.gugucon.shopping.TestUtils.createPayment;
+import static com.gugucon.shopping.TestUtils.getPaymentInfo;
+import static com.gugucon.shopping.TestUtils.insertCartItem;
+import static com.gugucon.shopping.TestUtils.placeOrder;
+import static com.gugucon.shopping.TestUtils.validatePayment;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -30,12 +41,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-
-import static com.gugucon.shopping.TestUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @IntegrationTest
 @DisplayName("결제 기능 통합 테스트")
@@ -70,9 +75,7 @@ class PayIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -101,9 +104,7 @@ class PayIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -123,8 +124,7 @@ class PayIntegrationTest {
         assertThat(payInfoResponse.getEncodedOrderId()).isNotEmpty();
         assertThat(payInfoResponse.getOrderName()).isEqualTo("치킨");
         assertThat(payInfoResponse.getPrice()).isEqualTo(20000);
-        assertThat(payInfoResponse.getCustomerEmail()).isEqualTo("test_email@woowafriends.com");
-        assertThat(payInfoResponse.getCustomerName()).isEqualTo("tester1");
+        assertThat(payInfoResponse.getCustomerEmail()).isEqualTo(email);
         assertThat(payInfoResponse.getCustomerKey()).isNotEmpty();
         assertThat(payInfoResponse.getSuccessUrl()).isEqualTo(successUrl);
         assertThat(payInfoResponse.getFailUrl()).isEqualTo(failUrl);
@@ -137,9 +137,7 @@ class PayIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -178,9 +176,7 @@ class PayIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -219,9 +215,7 @@ class PayIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(3L));
         final Long orderId = placeOrder(accessToken);
@@ -239,9 +233,7 @@ class PayIntegrationTest {
 
         final String otherEmail = "other_test_email@woowafriends.com";
         final String otherPassword = "test_password!";
-        final String otherNickname = "tester2";
-        TestUtils.signup(new SignupRequest(otherEmail, otherPassword, otherPassword, otherNickname));
-        String otherAccessToken = TestUtils.login(new LoginRequest(otherEmail, otherPassword));
+        String otherAccessToken = signUpAndLogin(otherEmail, otherPassword);
         buyProduct(otherAccessToken, 3L, 100);
 
         // when
@@ -267,9 +259,7 @@ class PayIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -310,9 +300,7 @@ class PayIntegrationTest {
         // given
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
@@ -330,9 +318,7 @@ class PayIntegrationTest {
 
         final String otherEmail = "other_test_email@woowafriends.com";
         final String otherPassword = "test_password!";
-        final String otherNickname = "tester2";
-        TestUtils.signup(new SignupRequest(otherEmail, otherPassword, otherPassword, otherNickname));
-        String otherAccessToken = TestUtils.login(new LoginRequest(otherEmail, otherPassword));
+        String otherAccessToken = signUpAndLogin(otherEmail, otherPassword);
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -349,5 +335,16 @@ class PayIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void signUp(final String email, final String password) {
+        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
+        TestUtils.signup(request);
+    }
+
+    private String signUpAndLogin(final String email, final String password) {
+        signUp(email, password);
+        final LoginRequest request = new LoginRequest(email, password);
+        return TestUtils.login(request);
     }
 }

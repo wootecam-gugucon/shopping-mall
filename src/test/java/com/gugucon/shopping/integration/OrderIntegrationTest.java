@@ -1,5 +1,11 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.TestUtils.insertCartItem;
+import static com.gugucon.shopping.TestUtils.placeOrder;
+import static com.gugucon.shopping.TestUtils.readCartItems;
+import static com.gugucon.shopping.TestUtils.updateCartItem;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -21,17 +27,13 @@ import com.gugucon.shopping.order.repository.OrderRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.List;
-
-import static com.gugucon.shopping.TestUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("주문 기능 통합 테스트")
@@ -72,10 +74,7 @@ class OrderIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
 
         /* when */
@@ -98,10 +97,7 @@ class OrderIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -124,9 +120,7 @@ class OrderIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        final String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         final Long memberId = memberRepository.findByEmail(Email.from(email)).orElseThrow().getId();
         cartItemRepository.save(CartItem.builder()
@@ -156,9 +150,7 @@ class OrderIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long cartItemId = readCartItems(accessToken).get(0).getCartItemId();
@@ -186,10 +178,7 @@ class OrderIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         insertCartItem(accessToken, new CartItemInsertRequest(2L));
@@ -219,10 +208,7 @@ class OrderIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         final Long invalidOrderId = Long.MAX_VALUE;
 
@@ -247,19 +233,14 @@ class OrderIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = signUpAndLogin(email, password);
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
 
         final String otherEmail = "other_test_email@woowafriends.com";
         final String otherPassword = "test_password!";
-        final String otherNickname = "tester2";
-        TestUtils.signup(new SignupRequest(otherEmail, otherPassword, otherPassword, otherNickname));
-        String otherAccessToken = TestUtils.login(new LoginRequest(otherEmail, otherPassword));
+        String otherAccessToken = signUpAndLogin(otherEmail, otherPassword);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -280,5 +261,16 @@ class OrderIntegrationTest {
         return cartItemResponses.stream()
                 .map(CartItemResponse::getName)
                 .toList();
+    }
+
+    private void signUp(final String email, final String password) {
+        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
+        TestUtils.signup(request);
+    }
+
+    private String signUpAndLogin(final String email, final String password) {
+        signUp(email, password);
+        final LoginRequest request = new LoginRequest(email, password);
+        return TestUtils.login(request);
     }
 }
