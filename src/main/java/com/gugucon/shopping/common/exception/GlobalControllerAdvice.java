@@ -38,7 +38,6 @@ public class GlobalControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleApplicationException(final ShoppingException e) {
         final ErrorCode errorCode = e.getErrorCode();
-        System.out.println(errorCode.getStatus());
         return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.from(errorCode));
     }
 
