@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "pays")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Pay extends BaseTimeEntity {
 
     @Id
@@ -34,19 +37,10 @@ public final class Pay extends BaseTimeEntity {
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
 
-    @Builder
-    private Pay(final Long id,
-                final Long orderId,
-                final Long price) {
-        this.id = id;
-        this.orderId = orderId;
-        this.price = Money.from(price);
-    }
-
     public static Pay from(final Order order) {
         return Pay.builder()
                 .orderId(order.getId())
-                .price(order.calculateTotalPrice().getValue())
+                .price(order.calculateTotalPrice())
                 .build();
     }
 

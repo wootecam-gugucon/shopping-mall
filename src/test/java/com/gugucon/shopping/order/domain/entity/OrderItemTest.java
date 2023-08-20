@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.domain.entity;
 
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,10 +30,10 @@ class OrderItemTest {
     void createFail_soldOutProduct() {
         // given
         final CartItem cartItem = CartItem.builder()
-                .product(DomainUtils.createSoldOutProduct("name", 1000))
-                .quantity(1)
-                .memberId(1L)
-                .build();
+                                          .product(DomainUtils.createSoldOutProduct("name", 1000))
+                                          .quantity(Quantity.from(1))
+                                          .memberId(1L)
+                                          .build();
 
         // when & then
         final ShoppingException exception = assertThrows(ShoppingException.class, () -> OrderItem.from(cartItem));
@@ -44,10 +45,10 @@ class OrderItemTest {
     void createFail_tooManyQuantity() {
         // given
         final CartItem cartItem = CartItem.builder()
-                .product(DomainUtils.createProduct(1))
-                .quantity(2)
-                .memberId(1L)
-                .build();
+                                          .product(DomainUtils.createProduct(1))
+                                          .quantity(Quantity.from(2))
+                                          .memberId(1L)
+                                          .build();
 
         // when & then
         final ShoppingException exception = assertThrows(ShoppingException.class, () -> OrderItem.from(cartItem));

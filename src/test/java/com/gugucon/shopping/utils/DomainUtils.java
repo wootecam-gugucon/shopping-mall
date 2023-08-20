@@ -1,8 +1,12 @@
 package com.gugucon.shopping.utils;
 
+import com.gugucon.shopping.common.domain.vo.Money;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,9 +22,9 @@ public class DomainUtils {
                 .id(sequence)
                 .name(name)
                 .imageFileName("image_file_name_" + sequence)
-                .stock(100)
+                .stock(Quantity.from(100))
                 .description("test_description")
-                .price(price)
+                .price(Money.from(price))
                 .build();
     }
 
@@ -30,9 +34,31 @@ public class DomainUtils {
                 .id(sequence)
                 .name("name")
                 .imageFileName("image_file_name_" + sequence)
-                .stock(stock)
+                .stock(Quantity.from(stock))
                 .description("test_description")
-                .price(1000L)
+                .price(Money.from(1000L))
+                .build();
+    }
+
+    public static Product createProductWithoutId(String name) {
+        sequence++;
+        return Product.builder()
+                .name(name)
+                .imageFileName("image_file_name_" + sequence)
+                .stock(Quantity.from(100))
+                .description("test_description")
+                .price(Money.from(1000L))
+                .build();
+    }
+
+    public static Product createProductWithoutId(String name, long price) {
+        sequence++;
+        return Product.builder()
+                .name(name)
+                .imageFileName("image_file_name_" + sequence)
+                .stock(Quantity.from(100))
+                .description("test_description")
+                .price(Money.from(price))
                 .build();
     }
 
@@ -42,9 +68,9 @@ public class DomainUtils {
                 .id(sequence)
                 .name(name)
                 .imageFileName("image_file_name_" + sequence)
-                .stock(0)
+                .stock(Quantity.from(0))
                 .description("test_description")
-                .price(price)
+                .price(Money.from(price))
                 .build();
     }
 
@@ -52,9 +78,9 @@ public class DomainUtils {
         sequence++;
         return Member.builder()
                 .id(sequence)
-                .email("test_email" + sequence + "@gmail.com")
+                .email(Email.from("test_email" + sequence + "@gmail.com"))
                 .password(Password.of("test_password", passwordEncoder))
-                .nickname("test_nickname_" + sequence)
+                .nickname(Nickname.from("test_nickname_" + sequence))
                 .build();
     }
 
@@ -64,7 +90,7 @@ public class DomainUtils {
                 .id(sequence)
                 .memberId(1L)
                 .product(createProduct(100))
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
     }
 }

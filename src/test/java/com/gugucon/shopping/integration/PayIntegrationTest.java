@@ -12,6 +12,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import com.gugucon.shopping.common.domain.vo.Money;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -22,8 +24,10 @@ import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
+import com.gugucon.shopping.pay.dto.request.PayFailRequest;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
+import com.gugucon.shopping.pay.dto.response.PayFailResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
 import com.gugucon.shopping.pay.repository.PayRepository;
@@ -158,6 +162,7 @@ class PayIntegrationTest {
                                                                                    payInfoResponse.getEncodedOrderId(),
                                                                                    payInfoResponse.getPrice(),
                                                                                    "mockPaymentType");
+
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -295,7 +300,7 @@ class PayIntegrationTest {
     }
 
     @Test
-    @DisplayName("다른 회원의 주문에 대해 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
+    @DisplayName("다른 회원의 주문에 대해 결제 검증을 요청했을 때 404 상태코드를 반환한다.")
     void validatePaymentFail_orderOfOtherMember() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
@@ -330,7 +335,62 @@ class PayIntegrationTest {
         // then
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    @DisplayName("결제가 실패했을 때 orderId를 decode한 값을 반환한다.")
+    void decodeOrderId() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+
+        final Long orderId = placeOrder(accessToken);
+        final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
+        final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
+        final PayFailRequest payFailRequest = new PayFailRequest("PAY_PROCESS_CANCELED",
+                                                                 "사용자에 의해 결제가 취소되었습니다.",
+                                                                 payInfoResponse.getEncodedOrderId());
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payFailRequest)
+                .when()
+                .post("/api/v1/pay/fail")
+                .then().log().all()
+                .extract();
+
+        // then
+        final PayFailResponse payFailResponse = response.as(PayFailResponse.class);
+        assertThat(payFailResponse.getOrderId()).isEqualTo(orderId);
+    }
+
+    @Test
+    @DisplayName("결제가 실패했을 때 orderId를 decode할 수 없으면 500 상태코드를 반환한다.")
+    void decodeOrderId_cannotDecode() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final PayFailRequest payFailRequest = new PayFailRequest("PAY_PROCESS_CANCELED",
+                                                                 "사용자에 의해 결제가 취소되었습니다.",
+                                                                 "cannotDecodeOrderId");
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(payFailRequest)
+                .when()
+                .post("/api/v1/pay/fail")
+                .then().log().all()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.UNKNOWN_ERROR);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private void addProductToCart(final String accessToken,
@@ -346,9 +406,9 @@ class PayIntegrationTest {
         final Product product = Product.builder()
             .name(productName)
             .imageFileName(imageFileName)
-            .stock(stock)
+            .stock(Quantity.from(stock))
             .description("test product")
-            .price(1000L)
+            .price(Money.from(1000L))
             .build();
         productRepository.save(product);
         return product.getId();

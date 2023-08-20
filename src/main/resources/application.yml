@@ -4,13 +4,8 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MariaDBDialect
-
-  datasource:
-    url: jdbc:mariadb://${DB_PROD_ADDRESS}:3306/shopping
-    username: ${DB_PROD_USERNAME}
-    password: ${DB_PROD_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
+        show_sql: true
+        format_sql: true
 
   thymeleaf:
     cache: false

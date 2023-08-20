@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Entity
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Builder
 public class Member extends BaseTimeEntity {
 
     @Id
@@ -38,14 +41,6 @@ public class Member extends BaseTimeEntity {
     @Embedded
     @Valid
     private Nickname nickname;
-
-    @Builder
-    public Member(final Long id, final String email, final Password password, final String nickname) {
-        this.id = id;
-        this.email = Email.from(email);
-        this.password = password;
-        this.nickname = Nickname.from(nickname);
-    }
 
     public boolean matchPassword(final String rawPassword, final PasswordEncoder passwordEncoder) {
         return this.password.hasValue(rawPassword, passwordEncoder);

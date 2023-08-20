@@ -12,8 +12,10 @@ import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.domain.Pay;
 import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
+import com.gugucon.shopping.pay.dto.request.PayFailRequest;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
+import com.gugucon.shopping.pay.dto.response.PayFailResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
 import com.gugucon.shopping.pay.infrastructure.CustomerKeyGenerator;
@@ -118,5 +120,10 @@ public class PayService {
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         order.validateUnPayed();
         return order;
+    }
+
+    public PayFailResponse decodeOrderId(final PayFailRequest payFailRequest) {
+        final Long orderId = orderIdTranslator.decode(payFailRequest.getOrderId());
+        return PayFailResponse.from(orderId);
     }
 }

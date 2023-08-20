@@ -7,6 +7,8 @@ import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.common.domain.vo.Money;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -184,7 +186,7 @@ class OrderIntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 404 상태코드를 응답한다.")
     void readOrderDetailFail_invalidOrderId() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
@@ -203,11 +205,11 @@ class OrderIntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
-    @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 404 상태코드를 응답한다.")
     void readOrderDetailFail_orderOfOtherUser() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
@@ -229,7 +231,7 @@ class OrderIntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private List<String> toNames(final List<CartItemResponse> cartItemResponses) {
@@ -249,11 +251,11 @@ class OrderIntegrationTest {
         final Product product = productRepository.findById(productId).orElseThrow();
         final Product updatedProduct = Product.builder()
             .id(productId)
-            .price(product.getPrice().getValue())
+            .price(product.getPrice())
             .name(product.getName())
             .description(product.getDescription())
             .imageFileName(product.getImageFileName())
-            .stock(stock)
+            .stock(Quantity.from(stock))
             .build();
         productRepository.save(updatedProduct);
     }
@@ -271,9 +273,9 @@ class OrderIntegrationTest {
         final Product product = Product.builder()
             .name(productName)
             .imageFileName(imageFileName)
-            .stock(10)
+            .stock(Quantity.from(10))
             .description("test product")
-            .price(price)
+            .price(Money.from(price))
             .build();
         productRepository.save(product);
         return product.getId();

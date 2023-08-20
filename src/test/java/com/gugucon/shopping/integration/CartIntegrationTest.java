@@ -5,6 +5,8 @@ import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.common.domain.vo.Money;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -119,7 +121,7 @@ class CartIntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 상품이면 장바구니 상품 추가를 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("존재하지 않는 상품이면 장바구니 상품 추가를 요청했을 때 404 상태코드를 응답한다.")
     void insertCartItemFail_invalidProduct() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
@@ -139,7 +141,7 @@ class CartIntegrationTest {
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCT);
     }
 
@@ -275,7 +277,7 @@ class CartIntegrationTest {
     }
 
     @Test
-    @DisplayName("다른 사용자의 장바구니 상품이면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("다른 사용자의 장바구니 상품이면 장바구니 상품 수량 변경을 요청했을 때 404 상태코드를 응답한다.")
     void updateCartItemQuantityFail_cartItemOfOtherUser() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
@@ -299,7 +301,7 @@ class CartIntegrationTest {
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_CART_ITEM);
     }
 
@@ -331,7 +333,7 @@ class CartIntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 장바구니 상품이면 장바구니 상품 수량 변경을 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("존재하지 않는 장바구니 상품이면 장바구니 상품 수량 변경을 요청했을 때 404 상태코드를 응답한다.")
     void updateCartItemQuantityFail_invalidCartItemId() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
@@ -351,7 +353,7 @@ class CartIntegrationTest {
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_CART_ITEM);
     }
 
@@ -380,7 +382,7 @@ class CartIntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 장바구니 상품을 삭제할 때 400 상태코드를 응답한다.")
+    @DisplayName("존재하지 않는 장바구니 상품을 삭제할 때 404 상태코드를 응답한다.")
     void removeCartItem_productNotExist() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
@@ -395,7 +397,9 @@ class CartIntegrationTest {
 
         /* then */
         final List<CartItemResponse> updatedCartItemResponses = readCartItems(accessToken);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_CART_ITEM);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(updatedCartItemResponses).isEmpty();
     }
 
@@ -419,9 +423,9 @@ class CartIntegrationTest {
         final Product product = Product.builder()
             .name(productName)
             .imageFileName(imageFileName)
-            .stock(stock)
+            .stock(Quantity.from(stock))
             .description("test product")
-            .price(price)
+            .price(Money.from(price))
             .build();
         productRepository.save(product);
         return product.getId();
