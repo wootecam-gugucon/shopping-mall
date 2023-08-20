@@ -137,7 +137,7 @@ class ProductIntegrationTest {
                 .getList("contents", ProductResponse.class)
                 .stream().map(ProductResponse::getName).toList();
 
-        assertThat(names).containsExactlyInAnyOrder(
+        assertThat(names).containsExactly(
                 "가나다라마사과과",
                 "사과는 맛있어",
                 "맛있는 사과",
