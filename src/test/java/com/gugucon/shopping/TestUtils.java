@@ -1,5 +1,6 @@
 package com.gugucon.shopping;
 
+import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
@@ -38,9 +39,9 @@ public class TestUtils {
                 .id(sequence)
                 .name(name)
                 .imageFileName("image_file_name_" + sequence)
-                .stock(100)
+                .stock(Quantity.from(100))
                 .description("test_description")
-                .price(price)
+                .price(Money.from(price))
                 .build();
     }
 
@@ -50,9 +51,9 @@ public class TestUtils {
                 .id(sequence)
                 .name("name")
                 .imageFileName("image_file_name_" + sequence)
-                .stock(stock)
+                .stock(Quantity.from(stock))
                 .description("test_description")
-                .price(1000L)
+                .price(Money.from(1000L))
                 .build();
     }
 
@@ -62,9 +63,9 @@ public class TestUtils {
                 .id(sequence)
                 .name(name)
                 .imageFileName("image_file_name_" + sequence)
-                .stock(0)
+                .stock(Quantity.from(0))
                 .description("test_description")
-                .price(price)
+                .price(Money.from(price))
                 .build();
     }
 

@@ -68,10 +68,12 @@ class JwtAuthenticationProviderTest {
 
         final String jwtToken = "validJwtToken";
         final String principal = "12";
-        final Member member = new Member(Long.valueOf(principal),
-                                         Email.from("email@test.com"),
-                                         Password.of("password", passwordEncoder),
-                                         Nickname.from("nickname"));
+        final Member member = Member.builder()
+                                    .id(Long.valueOf(principal))
+                                    .email(Email.from("email@test.com"))
+                                    .password(Password.of("password", passwordEncoder))
+                                    .nickname(Nickname.from("nickname"))
+                                    .build();
         final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwtToken);
 
         when(jwtProvider.validate(jwtToken)).thenReturn(true);
