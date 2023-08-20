@@ -7,6 +7,7 @@ import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
@@ -72,7 +73,7 @@ public class TestUtils {
                 .id(sequence)
                 .email(Email.from("test_email" + sequence + "@gmail.com"))
                 .password(Password.of("test_password", passwordEncoder))
-                .nickname("test_nickname_" + sequence)
+                .nickname(Nickname.from("test_nickname_" + sequence))
                 .build();
     }
 

@@ -40,11 +40,11 @@ public class Member extends BaseTimeEntity {
     private Nickname nickname;
 
     @Builder
-    public Member(final Long id, final Email email, final Password password, final String nickname) {
+    public Member(final Long id, final Email email, final Password password, final Nickname nickname) {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.nickname = Nickname.from(nickname);
+        this.nickname = nickname;
     }
 
     public boolean matchPassword(final String rawPassword, final PasswordEncoder passwordEncoder) {

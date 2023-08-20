@@ -5,6 +5,7 @@ import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.common.utils.JwtProvider;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
@@ -44,10 +45,11 @@ public class MemberService {
         Email email = Email.from(signupRequest.getEmail());
         validateEmailNotExist(email);
         Password password = Password.of(signupRequest.getPassword(), passwordEncoder);
+        Nickname nickname = Nickname.from(signupRequest.getNickname());
         Member member = Member.builder()
                               .email(email)
                               .password(password)
-                              .nickname(signupRequest.getNickname())
+                              .nickname(nickname)
                               .build();
         memberRepository.save(member);
     }
