@@ -23,13 +23,13 @@ public class ProductController {
         return productService.readAllProducts(pageable);
     }
 
-  @GetMapping("/search")
-  @ResponseStatus(HttpStatus.OK)
-  public PagedResponse<ProductResponse> searchProducts(@RequestParam final String keyword,
-                                                       @SortDefault.SortDefaults(value = {
-                                                               @SortDefault(sort = "createdAt", direction = Direction.DESC),
-                                                               @SortDefault(sort = "price")
-                                                       }) final Pageable pageable) {
-    return productService.searchProducts(keyword, pageable);
-  }
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public PagedResponse<ProductResponse> searchProducts(@RequestParam final String keyword,
+                                                         @SortDefault.SortDefaults(value = {
+                                                                 @SortDefault(sort = "createdAt", direction = Direction.DESC),
+                                                                 @SortDefault(sort = "price")
+                                                         }) final Pageable pageable) {
+        return productService.searchProducts(keyword, pageable);
+    }
 }
