@@ -39,10 +39,7 @@ class ProductIntegrationTest {
     @DisplayName("페이징 조건이 기재되지 않으면 기본 설정 (page=0, size=20) 에 따라 페이징하여 반환한다.")
     void readAllProducts_defaultPaging() {
         /* given */
-        insertProduct("품절된 치킨", 10);
-        insertProduct("사케", 10);
-        insertProduct("피자", 10);
-        insertProduct("치킨", 10);
+        insertAllProducts(List.of("품절된 치킨", "사케", "피자", "치킨"));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -73,10 +70,7 @@ class ProductIntegrationTest {
     @DisplayName("입력된 페이징 조건에 따라 페이징하여 반환한다.")
     void readAllProducts_paging() {
         /* given */
-        insertProduct("품절된 치킨", 10);
-        insertProduct("사케", 10);
-        insertProduct("피자", 10);
-        insertProduct("치킨", 10);
+        insertAllProducts(List.of("품절된 치킨", "사케", "피자", "치킨"));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -104,10 +98,7 @@ class ProductIntegrationTest {
     @DisplayName("정렬 조건이 기재되지 않은 경우 최신순으로 정렬하여 반환한다")
     void readAllProducts_defaultSorting() {
         /* given */
-        insertProduct("품절된 치킨", 10);
-        insertProduct("사케", 10);
-        insertProduct("피자", 10);
-        insertProduct("치킨", 10);
+        insertAllProducts(List.of("품절된 치킨", "사케", "피자", "치킨"));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -300,5 +291,9 @@ class ProductIntegrationTest {
             .price(Money.from(price))
             .build();
         productRepository.save(product);
+    }
+
+    private void insertAllProducts(final List<String> productNames) {
+        productNames.forEach(name -> insertProduct(name, 1000L));
     }
 }
