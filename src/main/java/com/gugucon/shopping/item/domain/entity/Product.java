@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "products")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Product extends BaseTimeEntity {
@@ -51,17 +52,6 @@ public class Product extends BaseTimeEntity {
     @NotNull
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
-
-    @Builder
-    private Product(final Long id, final String name, final String imageFileName, final Integer stock,
-                    final String description, final Long price) {
-        this.id = id;
-        this.name = name;
-        this.imageFileName = imageFileName;
-        this.stock = Quantity.from(stock);
-        this.description = description;
-        this.price = Money.from(price);
-    }
 
     public void validateSoldOut() {
         if (stock.isZero()) {

@@ -47,7 +47,7 @@ class MemberServiceTest {
         final LoginRequest loginRequest = new LoginRequest(userEmail, userPassword);
         final Member member = Member.builder()
                 .id(memberId)
-                .email(userEmail)
+                .email(Email.from(userEmail))
                 .password(Password.of(userPassword, passwordEncoder))
                 .build();
 

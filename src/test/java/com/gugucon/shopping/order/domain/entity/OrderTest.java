@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gugucon.shopping.common.domain.vo.Money;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
@@ -27,13 +28,13 @@ class OrderTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(createProduct("치킨", 10000))
-                .quantity(5)
+                .quantity(Quantity.from(5))
                 .build();
         final CartItem cartItem2 = CartItem.builder()
                 .id(2L)
                 .memberId(memberId)
                 .product(createProduct("피자", 20000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
         final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
 
@@ -50,13 +51,13 @@ class OrderTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(createProduct("치킨", 100_000_000_000L))
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
         final CartItem invalidCartItem = CartItem.builder()
                 .id(2L)
                 .memberId(memberId)
                 .product(createProduct("피자", 100_000_000_001L))
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
 
         /* when & then */

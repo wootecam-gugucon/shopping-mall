@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import java.math.BigInteger;
@@ -23,7 +24,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         /* when */
@@ -41,7 +42,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when & then
@@ -57,7 +58,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when & then
@@ -74,7 +75,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when
@@ -92,7 +93,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createSoldOutProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when
