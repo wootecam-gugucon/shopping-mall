@@ -59,6 +59,10 @@
   border: 1px solid black;
 }
 
+.product-search-result {
+  font-size: 3em;
+}
+
 :disabled {
   background: #ccc;
 }

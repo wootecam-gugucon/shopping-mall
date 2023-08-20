@@ -14,7 +14,7 @@
     <input th:type="text" placeholder="상품을 검색하세요" id="keyword">
     <input th:type="submit" value="검색" onclick="search()">
   </label>
-
+  <div class="product-search-result"><span th:text="${param.keyword}" style="font-weight: bold; color: darkslategray"></span>에 대한 검색 결과입니다</div>
   <section class="product-container">
     <div class="product-list">
     </div>
@@ -26,7 +26,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
 
-        fetch('/api/v1/product?' + urlParams, {
+        fetch('/api/v1/product/search?' + urlParams, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
