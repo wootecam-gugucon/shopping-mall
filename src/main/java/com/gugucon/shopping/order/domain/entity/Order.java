@@ -36,7 +36,8 @@ import lombok.NoArgsConstructor;
 public class Order extends BaseTimeEntity {
 
     private static final long MAX_TOTAL_PRICE = 100_000_000_000L;
-    public static final String MULTIPLE_ITEM_EXPRESSION = " 외 %d건";
+    private static final int SINGLE_ITEM_VALUE = 1;
+    private static final String MULTIPLE_ITEM_EXPRESSION = " 외 %d건";
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
@@ -88,14 +89,14 @@ public class Order extends BaseTimeEntity {
     public String createOrderName() {
         final int size = orderItems.size();
         final OrderItem firstOrderItem = findFirstOrderItem();
-        if (hasMultipleOrderItem(size)) {
+        if (hasMultipleOrderItem()) {
             return firstOrderItem.getName() + String.format(MULTIPLE_ITEM_EXPRESSION, size-1);
         }
         return firstOrderItem.getName();
     }
 
-    private boolean hasMultipleOrderItem(final int size) {
-        return size > 1;
+    private boolean hasMultipleOrderItem() {
+        return orderItems.size() > SINGLE_ITEM_VALUE;
     }
 
     private OrderItem findFirstOrderItem() {
