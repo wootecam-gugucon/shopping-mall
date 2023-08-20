@@ -343,6 +343,7 @@ class PayIntegrationTest {
     void decodeOrderId() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct", "img.png");
 
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
