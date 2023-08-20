@@ -1,5 +1,6 @@
 package com.gugucon.shopping;
 
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
@@ -83,7 +84,7 @@ public class TestUtils {
                 .id(sequence)
                 .memberId(1L)
                 .product(createProduct(100))
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
     }
 

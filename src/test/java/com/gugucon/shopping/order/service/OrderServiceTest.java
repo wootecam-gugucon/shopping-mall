@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.service;
 
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
@@ -40,13 +41,13 @@ class OrderServiceTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(createProduct("치킨", 10000))
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
         final CartItem cartItem2 = CartItem.builder()
                 .id(2L)
                 .memberId(memberId)
                 .product(createProduct("피자", 20000))
-                .quantity(2)
+                .quantity(Quantity.from(2))
                 .build();
         final List<CartItem> cartItems = List.of(cartItem1, cartItem2);
 

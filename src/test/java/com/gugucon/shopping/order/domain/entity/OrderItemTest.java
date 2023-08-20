@@ -1,6 +1,7 @@
 package com.gugucon.shopping.order.domain.entity;
 
 import com.gugucon.shopping.TestUtils;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
@@ -30,7 +31,7 @@ class OrderItemTest {
         // given
         final CartItem cartItem = CartItem.builder()
                 .product(TestUtils.createSoldOutProduct("name", 1000))
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .memberId(1L)
                 .build();
 
@@ -45,7 +46,7 @@ class OrderItemTest {
         // given
         final CartItem cartItem = CartItem.builder()
                 .product(TestUtils.createProduct(1))
-                .quantity(2)
+                .quantity(Quantity.from(2))
                 .memberId(1L)
                 .build();
 

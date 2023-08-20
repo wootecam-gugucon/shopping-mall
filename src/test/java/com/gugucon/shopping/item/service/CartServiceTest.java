@@ -64,13 +64,13 @@ class CartServiceTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(chicken)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
         final CartItem cartItemPizza = CartItem.builder()
                 .id(2L)
                 .memberId(memberId)
                 .product(pizza)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
         final List<CartItem> cartItems = List.of(cartItemChicken, cartItemPizza);
         when(cartItemRepository.findAllByMemberIdWithProduct(memberId)).thenReturn(cartItems);
@@ -97,7 +97,7 @@ class CartServiceTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(product)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
 
         final int updateQuantity = 3;
@@ -121,7 +121,7 @@ class CartServiceTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(product)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
 
         when(cartItemRepository.findById(cartItem.getId())).thenReturn(Optional.of(cartItem));

@@ -1,6 +1,7 @@
 package com.gugucon.shopping.integration;
 
 import com.gugucon.shopping.TestUtils;
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -132,7 +133,7 @@ class OrderIntegrationTest {
         cartItemRepository.save(CartItem.builder()
                                         .product(productRepository.findById(4L).orElseThrow())
                                         .memberId(memberId)
-                                        .quantity(1)
+                                        .quantity(Quantity.from(1))
                                         .build());
 
         /* when */

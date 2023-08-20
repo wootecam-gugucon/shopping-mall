@@ -44,11 +44,11 @@ public class CartItem extends BaseTimeEntity {
     private CartItem(final Long id,
                      final Long memberId,
                      final Product product,
-                     final int quantity) {
+                     final Quantity quantity) {
         this.id = id;
         this.memberId = memberId;
         this.product = product;
-        this.quantity = Quantity.from(quantity);
+        this.quantity = quantity;
     }
 
     public void updateQuantity(final Quantity quantity) {
