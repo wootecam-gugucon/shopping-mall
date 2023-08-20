@@ -32,7 +32,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(final Exception e) {
-        printCustomStackTrace(e);
+        logCustomStackTrace(e);
         return ErrorResponse.from(ErrorCode.UNKNOWN_ERROR);
     }
 
@@ -46,7 +46,7 @@ public class GlobalControllerAdvice {
     public ResponseEntity<ErrorResponse> handleApplicationException(final ShoppingException e) {
         final ErrorCode errorCode = e.getErrorCode();
         if (errorCode.getStatus().is5xxServerError()) {
-            printCustomStackTrace(e);
+            logCustomStackTrace(e);
         }
         return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.from(errorCode));
     }
@@ -73,7 +73,7 @@ public class GlobalControllerAdvice {
                 .orElse(error.getDefaultMessage());
     }
 
-    private void printCustomStackTrace(final Exception e) {
+    private void logCustomStackTrace(final Exception e) {
         final StackTraceElement[] stackTrace = e.getStackTrace();
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
