@@ -6,6 +6,7 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
@@ -69,7 +70,7 @@ public class TestUtils {
         sequence++;
         return Member.builder()
                 .id(sequence)
-                .email("test_email" + sequence + "@gmail.com")
+                .email(Email.from("test_email" + sequence + "@gmail.com"))
                 .password(Password.of("test_password", passwordEncoder))
                 .nickname("test_nickname_" + sequence)
                 .build();

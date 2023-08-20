@@ -40,20 +40,20 @@ public class MemberService {
     }
 
     public void signup(final SignupRequest signupRequest) {
-        validateEmailNotExist(signupRequest.getEmail());
         validatePasswordChecked(signupRequest.getPassword(), signupRequest.getPasswordCheck());
-
+        Email email = Email.from(signupRequest.getEmail());
+        validateEmailNotExist(email);
         Password password = Password.of(signupRequest.getPassword(), passwordEncoder);
         Member member = Member.builder()
-                              .email(signupRequest.getEmail())
+                              .email(email)
                               .password(password)
                               .nickname(signupRequest.getNickname())
                               .build();
         memberRepository.save(member);
     }
 
-    private void validateEmailNotExist(final String email) {
-         if (memberRepository.findByEmail(Email.from(email)).isPresent()) {
+    private void validateEmailNotExist(final Email email) {
+         if (memberRepository.findByEmail(email).isPresent()) {
              throw new ShoppingException(ErrorCode.EMAIL_ALREADY_EXIST);
          }
     }
