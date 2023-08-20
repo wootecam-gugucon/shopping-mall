@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 public class Order extends BaseTimeEntity {
 
     private static final long MAX_TOTAL_PRICE = 100_000_000_000L;
+    public static final String MULTIPLE_ITEM_EXPRESSION = " 외 %d건";
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
@@ -86,13 +87,21 @@ public class Order extends BaseTimeEntity {
 
     public String createOrderName() {
         final int size = orderItems.size();
-        final OrderItem firstOrderItem = orderItems.stream()
-                .min(Comparator.comparingLong(OrderItem::getId))
-                .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
-        if (size >= 2) {
-            return firstOrderItem.getName() + " 외 " + (size - 1) + "건";
+        final OrderItem firstOrderItem = findFirstOrderItem();
+        if (hasMultipleOrderItem(size)) {
+            return firstOrderItem.getName() + String.format(MULTIPLE_ITEM_EXPRESSION, size-1);
         }
         return firstOrderItem.getName();
+    }
+
+    private boolean hasMultipleOrderItem(final int size) {
+        return size > 1;
+    }
+
+    private OrderItem findFirstOrderItem() {
+        return orderItems.stream()
+                         .min(Comparator.comparingLong(OrderItem::getId))
+                         .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
     }
 
     public void validateUnPayed() {
