@@ -1,5 +1,7 @@
 package com.gugucon.shopping.integration;
 
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
@@ -227,6 +229,36 @@ class ProductIntegrationTest {
                 "맛있는 사과",
                 "가나다라마사과과"
         );
+
+        productRepository.deleteAllInBatch(persistProducts);
+    }
+
+    @Test
+    @DisplayName("키워드 없이 검색하면 에러를 반환한다")
+    void searchProducts_emptyKeyword() {
+        // given
+        final List<Product> products = List.of(
+                DomainUtils.createProductWithoutId("사과", 2500), // O
+                DomainUtils.createProductWithoutId("맛있는 사과", 3000), // O
+                DomainUtils.createProductWithoutId("사과는 맛있어", 1000), // O
+                DomainUtils.createProductWithoutId("가나다라마사과과", 4000), // O
+                DomainUtils.createProductWithoutId("가나다라마바사", 2000), // X
+                DomainUtils.createProductWithoutId("과놔돠롸", 4500) // X
+        );
+        final List<Product> persistProducts = productRepository.saveAll(products);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("keyword", "")
+                .when().get("/api/v1/product/search")
+                .then().contentType(ContentType.JSON).log().all()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_STRING);
 
         productRepository.deleteAllInBatch(persistProducts);
     }
