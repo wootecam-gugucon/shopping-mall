@@ -1,17 +1,16 @@
 package com.gugucon.shopping.item.domain.entity;
 
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigInteger;
-
-import static com.gugucon.shopping.TestUtils.createProduct;
-import static com.gugucon.shopping.TestUtils.createSoldOutProduct;
+import static com.gugucon.shopping.utils.DomainUtils.createProduct;
+import static com.gugucon.shopping.utils.DomainUtils.createSoldOutProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import java.math.BigInteger;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("CartItem 단위 테스트")
 class CartItemTest {

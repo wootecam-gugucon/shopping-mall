@@ -1,24 +1,23 @@
 package com.gugucon.shopping.order.service;
 
+import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.ORDERED;
+import static com.gugucon.shopping.utils.DomainUtils.createMember;
+import static com.gugucon.shopping.utils.DomainUtils.createProduct;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-
-import static com.gugucon.shopping.TestUtils.createMember;
-import static com.gugucon.shopping.TestUtils.createProduct;
-import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.ORDERED;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderService 단위 테스트")
