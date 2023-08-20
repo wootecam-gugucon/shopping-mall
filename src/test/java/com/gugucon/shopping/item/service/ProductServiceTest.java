@@ -3,11 +3,11 @@ package com.gugucon.shopping.item.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.utils.DomainUtils;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ class ProductServiceTest {
         final Pageable pageable = PageRequest.of(0, 20, Direction.DESC, "createdAt");
 
         final List<Product> products = List.of(
-            TestUtils.createProduct("치킨", 20000),
-            TestUtils.createProduct("피자", 20000),
-            TestUtils.createProduct("사케", 30000)
+            DomainUtils.createProduct("치킨", 20000),
+            DomainUtils.createProduct("피자", 20000),
+            DomainUtils.createProduct("사케", 30000)
         );
         when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(products));
 
