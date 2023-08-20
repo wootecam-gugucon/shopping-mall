@@ -28,7 +28,7 @@ public class ProductService {
 
     public PagedResponse<ProductResponse> searchProducts(final String keyword, final Pageable pageable) {
         if (keyword.isBlank()) {
-            throw new ShoppingException(ErrorCode.EMPTY_STRING);
+            throw new ShoppingException(ErrorCode.EMPTY_INPUT);
         }
         final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
         return convertToPage(products);

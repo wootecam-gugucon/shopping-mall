@@ -32,7 +32,7 @@ public enum ErrorCode {
     STOCK_NOT_ENOUGH(BAD_REQUEST, "상품의 재고가 부족합니다."),
     SOLD_OUT(BAD_REQUEST, "품절된 상품입니다."),
     LACK_OF_STOCK(BAD_REQUEST, "재고가 부족합니다."),
-    EMPTY_STRING(BAD_REQUEST, "내용을 입력해주세요.");
+    EMPTY_INPUT(BAD_REQUEST, "내용을 입력해주세요.");
 
     private final HttpStatus status;
     private final String message;

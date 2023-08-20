@@ -258,7 +258,7 @@ class ProductIntegrationTest {
         // then
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_STRING);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_INPUT);
 
         productRepository.deleteAllInBatch(persistProducts);
     }
@@ -287,7 +287,7 @@ class ProductIntegrationTest {
         // then
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_STRING);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_INPUT);
 
         productRepository.deleteAllInBatch(persistProducts);
     }
