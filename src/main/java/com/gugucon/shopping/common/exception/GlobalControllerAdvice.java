@@ -77,7 +77,6 @@ public class GlobalControllerAdvice {
         final StackTraceElement[] stackTrace = e.getStackTrace();
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
-                .append("\n")
                 .append("resolved exception : ").append(e.getClass()).append("\n")
                 .append("message : ").append(e.getMessage()).append("\n")
                 .append("cause : ").append(e.getCause()).append("\n");
