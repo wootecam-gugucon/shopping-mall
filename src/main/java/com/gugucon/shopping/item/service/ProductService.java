@@ -1,6 +1,8 @@
 package com.gugucon.shopping.item.service;
 
 import com.gugucon.shopping.common.dto.response.PagedResponse;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
@@ -25,6 +27,9 @@ public class ProductService {
     }
 
     public PagedResponse<ProductResponse> searchProducts(final String keyword, final Pageable pageable) {
+        if (keyword.isBlank()) {
+            throw new ShoppingException(ErrorCode.EMPTY_STRING);
+        }
         final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
         return convertToPage(products);
     }
