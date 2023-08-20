@@ -29,7 +29,7 @@ public class ProductService {
         return convertToPage(products);
     }
 
-    private static PagedResponse<ProductResponse> convertToPage(final Page<Product> products) {
+    private PagedResponse<ProductResponse> convertToPage(final Page<Product> products) {
         final List<ProductResponse> contents = products.map(ProductResponse::from).toList();
         return new PagedResponse<>(contents, products.getTotalPages(), products.getNumber(), products.getSize());
     }
