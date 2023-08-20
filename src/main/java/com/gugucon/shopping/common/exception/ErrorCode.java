@@ -3,6 +3,7 @@ package com.gugucon.shopping.common.exception;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import org.springframework.http.HttpStatus;
@@ -24,14 +25,13 @@ public enum ErrorCode {
     DUPLICATE_CART_ITEM(BAD_REQUEST, "장바구니에 이미 존재하는 상품입니다."),
     INVALID_QUANTITY(BAD_REQUEST, "장바구니 상품 수량은 1개 이상 1,000개 이하여야 합니다."),
     INVALID_MONEY(BAD_REQUEST, "금액은 0이상이어야 합니다"),
-    INVALID_CART_ITEM(BAD_REQUEST, "존재하지 않는 장바구니 상품입니다."),
-    INVALID_PRODUCT(BAD_REQUEST, "존재하지 않는 상품입니다."),
+    INVALID_CART_ITEM(NOT_FOUND, "존재하지 않는 장바구니 상품입니다."),
+    INVALID_PRODUCT(NOT_FOUND, "존재하지 않는 상품입니다."),
     EXCEED_MAX_TOTAL_PRICE(BAD_REQUEST, "주문 가능한 최대 금액을 초과합니다."),
-    INVALID_ORDER(BAD_REQUEST, "존재하지 않는 주문입니다."),
+    INVALID_ORDER(NOT_FOUND, "존재하지 않는 주문입니다."),
     EMPTY_CART(BAD_REQUEST, "장바구니가 비어 있습니다."),
-    INVALID_EXCHANGE_RATE(INTERNAL_SERVER_ERROR, "환율은 양수여야 합니다."),
     PAYED_ORDER(BAD_REQUEST, "이미 결제 완료된 주문입니다."),
-    INVALID_PAY(BAD_REQUEST, "존재하지 않는 결제 정보입니다."),
+    INVALID_PAY(NOT_FOUND, "존재하지 않는 결제 정보입니다."),
     PAY_FAILED(INTERNAL_SERVER_ERROR, "결제에 실패했습니다."),
     STOCK_NOT_ENOUGH(BAD_REQUEST, "상품의 재고가 부족합니다."),
     SOLD_OUT(BAD_REQUEST, "품절된 상품입니다."),

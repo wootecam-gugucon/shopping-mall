@@ -305,7 +305,7 @@ class PayIntegrationTest {
     }
 
     @Test
-    @DisplayName("다른 회원의 주문에 대해 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
+    @DisplayName("다른 회원의 주문에 대해 결제 검증을 요청했을 때 404 상태코드를 반환한다.")
     void validatePaymentFail_orderOfOtherMember() {
         // given
         final String email = "test_email@woowafriends.com";
@@ -348,6 +348,6 @@ class PayIntegrationTest {
         // then
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }

@@ -214,7 +214,7 @@ class OrderIntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 404 상태코드를 응답한다.")
     void readOrderDetailFail_invalidOrderId() {
         /* given */
         final String email = "test_email@woowafriends.com";
@@ -238,11 +238,11 @@ class OrderIntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
-    @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 404 상태코드를 응답한다.")
     void readOrderDetailFail_orderOfOtherUser() {
         /* given */
         final String email = "test_email@woowafriends.com";
@@ -273,7 +273,7 @@ class OrderIntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private List<String> toNames(final List<CartItemResponse> cartItemResponses) {
