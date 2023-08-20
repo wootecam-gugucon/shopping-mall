@@ -42,22 +42,27 @@ public class MemberService {
 
     public void signup(final SignupRequest signupRequest) {
         validatePasswordChecked(signupRequest.getPassword(), signupRequest.getPasswordCheck());
-        Email email = Email.from(signupRequest.getEmail());
+        final Email email = Email.from(signupRequest.getEmail());
         validateEmailNotExist(email);
-        Password password = Password.of(signupRequest.getPassword(), passwordEncoder);
-        Nickname nickname = Nickname.from(signupRequest.getNickname());
-        Member member = Member.builder()
-                              .email(email)
-                              .password(password)
-                              .nickname(nickname)
-                              .build();
+        final Password password = Password.of(signupRequest.getPassword(), passwordEncoder);
+        final Nickname nickname = Nickname.from(signupRequest.getNickname());
+        final Member member = Member.builder()
+                                    .email(email)
+                                    .password(password)
+                                    .nickname(nickname)
+                                    .build();
         memberRepository.save(member);
     }
 
     private void validateEmailNotExist(final Email email) {
-         if (memberRepository.findByEmail(email).isPresent()) {
+         if (isEmailExist(email)) {
              throw new ShoppingException(ErrorCode.EMAIL_ALREADY_EXIST);
          }
+    }
+
+    private boolean isEmailExist(final Email email) {
+        return memberRepository.findByEmail(email)
+                               .isPresent();
     }
 
     private void validatePasswordChecked(final String password, final String passwordCheck) {
