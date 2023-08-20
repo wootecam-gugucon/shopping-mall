@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public final class PayFailParameter {
+public final class PayFailRequest {
 
     private final String code;
     private final String message;
