@@ -51,6 +51,14 @@
   color: white;
 }
 
+.product-search-container {
+  margin: 1em;
+}
+
+.product-search-container > input {
+  border: 1px solid black;
+}
+
 :disabled {
   background: #ccc;
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -10,6 +10,10 @@
 <body>
 <div class="root">
   <div th:replace="~{layouts/header :: header}"></div>
+  <label class="product-search-container">
+    <input th:type="text" placeholder="상품을 검색하세요">
+    <input th:type="submit" value="검색">
+  </label>
 
   <section class="product-container">
     <div class="product-list">
@@ -19,25 +23,25 @@
 </div>
 </body>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const urlParams = new URLSearchParams(window.location.search);
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
 
-    fetch('/api/v1/product?' + urlParams, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then((response) => {
-      return response.json();
-    }).then((data) => {
-      const currentPage = data.currentPage;
-      const totalPage = data.totalPage;
-      const size = data.size;
+        fetch('/api/v1/product?' + urlParams, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            const currentPage = data.currentPage;
+            const totalPage = data.totalPage;
+            const size = data.size;
 
-      let element = '';
-      for (let i=0; i<Math.min(size, data.contents.length); i++) {
-        let product = data.contents[i];
-        element += `
+            let element = '';
+            for (let i = 0; i < Math.min(size, data.contents.length); i++) {
+                let product = data.contents[i];
+                element += `
               <div>
                 <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
                 <div class="flex justify-between w-280 p-5">
@@ -51,15 +55,15 @@
                 </div>
               </div>
               `;
-      }
+            }
 
-      pagination(currentPage, totalPage, size, '.pagination');
-      document.querySelector('.product-list').innerHTML = element;
-    }).catch((error) => {
-      console.error(error);
+            pagination(currentPage, totalPage, size, '.pagination');
+            document.querySelector('.product-list').innerHTML = element;
+        }).catch((error) => {
+            console.error(error);
+        });
+
     });
-
-  });
 </script>
 <script th:src="@{/js/pagination.js}"></script>
 <script th:src="@{/js/cart.js}"></script>
