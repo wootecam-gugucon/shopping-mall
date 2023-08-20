@@ -45,9 +45,9 @@ public class DomainUtils {
         return Product.builder()
                 .name(name)
                 .imageFileName("image_file_name_" + sequence)
-                .stock(100)
+                .stock(Quantity.from(100))
                 .description("test_description")
-                .price(1000L)
+                .price(Money.from(1000L))
                 .build();
     }
 
@@ -56,9 +56,9 @@ public class DomainUtils {
         return Product.builder()
                 .name(name)
                 .imageFileName("image_file_name_" + sequence)
-                .stock(100)
+                .stock(Quantity.from(100))
                 .description("test_description")
-                .price(price)
+                .price(Money.from(price))
                 .build();
     }
 
