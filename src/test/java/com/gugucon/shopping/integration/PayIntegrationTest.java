@@ -351,7 +351,7 @@ class PayIntegrationTest {
     }
 
     @Test
-    @DisplayName("결제가 실패했을 때 orderId를 decode할 수 없으면 400 상태코드를 반환한다.")
+    @DisplayName("결제가 실패했을 때 orderId를 decode할 수 없으면 500 상태코드를 반환한다.")
     void decodeOrderId_cannotDecode() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
