@@ -23,10 +23,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "products")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Product extends BaseTimeEntity {
 
     @Id
