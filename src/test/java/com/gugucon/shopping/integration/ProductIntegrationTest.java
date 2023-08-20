@@ -1,10 +1,10 @@
 package com.gugucon.shopping.integration;
 
-import com.gugucon.shopping.TestUtils;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -108,12 +108,12 @@ class ProductIntegrationTest {
     void searchProducts() {
         // given
         final List<Product> products = List.of(
-                TestUtils.createProductWithoutId("사과"), // O
-                TestUtils.createProductWithoutId("맛있는 사과"), // O
-                TestUtils.createProductWithoutId("사과는 맛있어"), // O
-                TestUtils.createProductWithoutId("가나다라마사과과"), // O
-                TestUtils.createProductWithoutId("가나다라마바사"), // X
-                TestUtils.createProductWithoutId("과놔돠롸") // X
+                DomainUtils.createProductWithoutId("사과"), // O
+                DomainUtils.createProductWithoutId("맛있는 사과"), // O
+                DomainUtils.createProductWithoutId("사과는 맛있어"), // O
+                DomainUtils.createProductWithoutId("가나다라마사과과"), // O
+                DomainUtils.createProductWithoutId("가나다라마바사"), // X
+                DomainUtils.createProductWithoutId("과놔돠롸") // X
         );
         final List<Product> persistProducts = productRepository.saveAll(products);
 
@@ -150,12 +150,12 @@ class ProductIntegrationTest {
     void searchProducts_sortByPriceDesc() {
         // given
         final List<Product> products = List.of(
-                TestUtils.createProductWithoutId("사과", 2500), // O
-                TestUtils.createProductWithoutId("맛있는 사과", 3000), // O
-                TestUtils.createProductWithoutId("사과는 맛있어", 1000), // O
-                TestUtils.createProductWithoutId("가나다라마사과과", 4000), // O
-                TestUtils.createProductWithoutId("가나다라마바사", 2000), // X
-                TestUtils.createProductWithoutId("과놔돠롸", 4500) // X
+                DomainUtils.createProductWithoutId("사과", 2500), // O
+                DomainUtils.createProductWithoutId("맛있는 사과", 3000), // O
+                DomainUtils.createProductWithoutId("사과는 맛있어", 1000), // O
+                DomainUtils.createProductWithoutId("가나다라마사과과", 4000), // O
+                DomainUtils.createProductWithoutId("가나다라마바사", 2000), // X
+                DomainUtils.createProductWithoutId("과놔돠롸", 4500) // X
         );
         final List<Product> persistProducts = productRepository.saveAll(products);
 
@@ -189,16 +189,16 @@ class ProductIntegrationTest {
     }
 
     @Test
-    @DisplayName("검색어로 검색한 결과를 가격이 비싸지 않은 순으로 정렬하여 반환한다")
+    @DisplayName("검색어로 검색한 결과를 가격이 저렴한 순으로 정렬하여 반환한다")
     void searchProducts_sortByPriceAsc() {
         // given
         final List<Product> products = List.of(
-                TestUtils.createProductWithoutId("사과", 2500), // O
-                TestUtils.createProductWithoutId("맛있는 사과", 3000), // O
-                TestUtils.createProductWithoutId("사과는 맛있어", 1000), // O
-                TestUtils.createProductWithoutId("가나다라마사과과", 4000), // O
-                TestUtils.createProductWithoutId("가나다라마바사", 2000), // X
-                TestUtils.createProductWithoutId("과놔돠롸", 4500) // X
+                DomainUtils.createProductWithoutId("사과", 2500), // O
+                DomainUtils.createProductWithoutId("맛있는 사과", 3000), // O
+                DomainUtils.createProductWithoutId("사과는 맛있어", 1000), // O
+                DomainUtils.createProductWithoutId("가나다라마사과과", 4000), // O
+                DomainUtils.createProductWithoutId("가나다라마바사", 2000), // X
+                DomainUtils.createProductWithoutId("과놔돠롸", 4500) // X
         );
         final List<Product> persistProducts = productRepository.saveAll(products);
 
