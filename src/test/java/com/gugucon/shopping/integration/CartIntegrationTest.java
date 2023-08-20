@@ -8,10 +8,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
+import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -34,10 +36,14 @@ class CartIntegrationTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     @AfterEach
     void tearDown() {
         cartItemRepository.deleteAll();
         memberRepository.deleteAll();
+        productRepository.deleteAll();
     }
 
     @Test
@@ -46,7 +52,8 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(1L);
+        Long productId = insertProduct("test_product", "img.png", 10, 100L);
+        final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(productId);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -68,14 +75,15 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        Long productId = insertProduct("test_product", "image.png", 10, 100L);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new CartItemInsertRequest(1L))
+                .body(new CartItemInsertRequest(productId))
                 .when().post("/api/v1/cart/items")
                 .then().log().all()
                 .extract();
@@ -141,7 +149,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        final Long soldOutProductId = 4L;
+        Long soldOutProductId = insertProduct("test_product", "image.png", 0, 10L);
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(soldOutProductId);
 
         /* when */
@@ -166,8 +174,8 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        insertCartItem(accessToken, new CartItemInsertRequest(2L));
+        addProductToCart(accessToken, "치킨", "chicken.png");
+        addProductToCart(accessToken, "피자", "pizza.png");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -191,7 +199,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "testProduct", "image.png");
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long cartItemId = cartItemResponses.get(0).getCartItemId();
         final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(3);
@@ -218,7 +226,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "testProduct", "image.png");
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long cartItemId = cartItemResponses.get(0).getCartItemId();
         final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(0);
@@ -245,7 +253,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "testProduct", "image.png");
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long cartItemId = cartItemResponses.get(0).getCartItemId();
         final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(-1);
@@ -272,7 +280,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "testProduct", "image.png");
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long cartItemId = cartItemResponses.get(0).getCartItemId();
         final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(3);
@@ -301,7 +309,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "testProduct", "image.png");
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long cartItemId = cartItemResponses.get(0).getCartItemId();
         final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(null);
@@ -352,8 +360,8 @@ class CartIntegrationTest {
     void removeCartItem() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct", "image.png");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long cartItemId = cartItemResponses.get(0).getCartItemId();
 
@@ -395,5 +403,27 @@ class CartIntegrationTest {
         return cartItemResponses.stream()
                 .map(CartItemResponse::getName)
                 .toList();
+    }
+
+    private void addProductToCart(final String accessToken,
+                                  final String productName,
+                                  final String imageFileName) {
+        final Long productId = insertProduct(productName, imageFileName, 10, 1000L);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+    }
+
+    private Long insertProduct(final String productName,
+                               final String imageFileName,
+                               final int stock,
+                               final long price) {
+        final Product product = Product.builder()
+            .name(productName)
+            .imageFileName(imageFileName)
+            .stock(stock)
+            .description("test product")
+            .price(price)
+            .build();
+        productRepository.save(product);
+        return product.getId();
     }
 }
