@@ -17,7 +17,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Comparator;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +28,6 @@ class ProductIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
-
-    @AfterEach
-    void tearDown() {
-        productRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("페이징 조건이 기재되지 않으면 기본 설정 (page=0, size=20) 에 따라 페이징하여 반환한다.")

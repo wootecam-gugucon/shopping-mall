@@ -14,14 +14,11 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
-import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,20 +30,8 @@ import org.springframework.http.MediaType;
 class CartIntegrationTest {
 
     @Autowired
-    private CartItemRepository cartItemRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
     private ProductRepository productRepository;
 
-    @AfterEach
-    void tearDown() {
-        cartItemRepository.deleteAll();
-        memberRepository.deleteAll();
-        productRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("장바구니에 상품을 추가한다.")

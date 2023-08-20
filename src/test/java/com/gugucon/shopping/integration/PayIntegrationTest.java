@@ -19,10 +19,7 @@ import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.order.repository.OrderItemRepository;
-import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
 import com.gugucon.shopping.pay.dto.request.PayFailRequest;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
@@ -30,11 +27,9 @@ import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
 import com.gugucon.shopping.pay.dto.response.PayFailResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
-import com.gugucon.shopping.pay.repository.PayRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,28 +55,7 @@ class PayIntegrationTest {
     private RestTemplate restTemplate;
 
     @Autowired
-    private PayRepository payRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
-    @Autowired
-    private CartItemRepository cartItemRepository;
-
-    @Autowired
     ProductRepository productRepository;
-
-    @AfterEach
-    void tearDown() {
-        payRepository.deleteAll();
-        orderRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        cartItemRepository.deleteAll();
-        productRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("주문에 대한 결제 정보를 생성한다.")

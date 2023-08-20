@@ -7,28 +7,17 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @IntegrationTest
 @DisplayName("jwt 토큰 인증 기능 통합 테스트")
 class AuthIntegrationTest {
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @AfterEach
-    void tearDown() {
-        memberRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("jwt 토큰 인증에 성공한다")

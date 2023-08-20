@@ -8,30 +8,19 @@ import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
-import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @IntegrationTest
 @DisplayName("로그인 기능 통합 테스트")
 class LoginIntegrationTest {
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @AfterEach
-    void tearDown() {
-        memberRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("로그인한다.")

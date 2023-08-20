@@ -16,17 +16,13 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
-import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
-import com.gugucon.shopping.order.repository.OrderItemRepository;
-import com.gugucon.shopping.order.repository.OrderRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,30 +34,12 @@ import org.springframework.http.MediaType;
 class OrderIntegrationTest {
 
     @Autowired
-    private CartItemRepository cartItemRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
-
-    @Autowired
     private ProductRepository productRepository;
 
     private static List<String> toNames(final OrderDetailResponse orderDetailResponse) {
         return orderDetailResponse.getOrderItems().stream()
             .map(OrderItemResponse::getName)
             .toList();
-    }
-
-    @AfterEach
-    void tearDown() {
-        cartItemRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        orderRepository.deleteAll();
-        productRepository.deleteAll();
     }
 
     @Test
