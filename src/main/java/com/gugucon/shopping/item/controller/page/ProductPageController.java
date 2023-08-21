@@ -10,4 +10,9 @@ public class ProductPageController {
     public String readAllProducts() {
         return "index";
     }
+
+    @GetMapping("/search")
+    public String searchProducts() {
+        return "search";
+    }
 }

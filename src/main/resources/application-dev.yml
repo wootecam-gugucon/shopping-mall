@@ -3,7 +3,6 @@ spring:
     url: jdbc:mariadb://${DB_DEV_ADDRESS}:3306/shopping
     username: ${DB_DEV_USERNAME}
     password: ${DB_DEV_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
 
   thymeleaf:
     cache: false
