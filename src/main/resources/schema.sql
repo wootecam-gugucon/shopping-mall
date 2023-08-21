@@ -65,3 +65,13 @@ CREATE TABLE IF NOT EXISTS pays
     `last_modified_at` datetime              NOT NULL,
     foreign key (order_id) references orders (id)
 );
+
+CREATE TABLE IF NOT EXISTS points
+(
+    `id`               bigint auto_increment NOT NULL primary key,
+    `member_id`        bigint                NOT NULL,
+    `point`            bigint                NOT NULL,
+    `created_at`       datetime              NOT NULL,
+    `last_modified_at` datetime              NOT NULL,
+    foreign key (member_id) references members (id)
+)

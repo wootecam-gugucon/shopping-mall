@@ -1,5 +1,6 @@
 package com.gugucon.shopping.point.domain;
 
+import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Point {
+public class Point extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
