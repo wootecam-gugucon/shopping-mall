@@ -7,7 +7,6 @@ import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -19,6 +18,7 @@ import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
+import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -47,7 +47,7 @@ class OrderIntegrationTest {
     void order() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -91,7 +91,7 @@ class OrderIntegrationTest {
         final String email = "test_email@woowafriends.com";
         final String accessToken = loginAfterSignUp(email, "test_password!");
 
-        final Long productId = insertProduct("testProduct", "img.png", 1000);
+        final Long productId = insertProduct("testProduct", 1000);
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
         changeProductStock(productId, 0);
 
@@ -116,7 +116,7 @@ class OrderIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        final Long productId = insertProduct("testProduct", "img.png", 1000);
+        final Long productId = insertProduct("testProduct", 1000);
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
         updateCartItemQuantity(accessToken, 100);
 
@@ -142,8 +142,8 @@ class OrderIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        addProductToCart(accessToken, "chicken", "chicken.png");
-        addProductToCart(accessToken, "pizza", "pizza.png");
+        addProductToCart(accessToken, "chicken");
+        addProductToCart(accessToken, "pizza");
 
         final Long orderId = placeOrder(accessToken);
 
@@ -192,7 +192,7 @@ class OrderIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
         final Long orderId = placeOrder(accessToken);
 
         final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
@@ -239,22 +239,14 @@ class OrderIntegrationTest {
     }
 
     private void addProductToCart(final String accessToken,
-                                  final String productName,
-                                  final String imageFileName) {
-        final Long productId = insertProduct(productName, imageFileName, 1000L);
+                                  final String productName) {
+        final Long productId = insertProduct(productName, 1000L);
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
     }
 
     private Long insertProduct(final String productName,
-                               final String imageFileName,
                                final long price) {
-        final Product product = Product.builder()
-            .name(productName)
-            .imageFileName(imageFileName)
-            .stock(Quantity.from(10))
-            .description("test product")
-            .price(Money.from(price))
-            .build();
+        final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         productRepository.save(product);
         return product.getId();
     }

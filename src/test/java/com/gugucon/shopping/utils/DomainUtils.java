@@ -40,12 +40,11 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Product createProductWithoutId(final String name, final long price) {
-        sequence++;
+    public static Product createProductWithoutId(final String name, final long price, final int stock) {
         return Product.builder()
                 .name(name)
-                .imageFileName("image_file_name_" + sequence)
-                .stock(Quantity.from(100))
+                .imageFileName("image_file_" + name)
+                .stock(Quantity.from(stock))
                 .description("test_description")
                 .price(Money.from(price))
                 .build();

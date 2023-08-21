@@ -2,14 +2,13 @@ package com.gugucon.shopping.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.gugucon.shopping.common.domain.vo.Money;
-import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -277,13 +276,7 @@ class ProductIntegrationTest {
     }
 
     private void insertProduct(final String productName, final long price) {
-        final Product product = Product.builder()
-            .name(productName)
-            .imageFileName(productName + ".png")
-            .stock(Quantity.from(10))
-            .description("test product")
-            .price(Money.from(price))
-            .build();
+        final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         productRepository.save(product);
     }
 

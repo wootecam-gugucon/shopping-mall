@@ -12,8 +12,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import com.gugucon.shopping.common.domain.vo.Money;
-import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -27,6 +25,7 @@ import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
 import com.gugucon.shopping.pay.dto.response.PayFailResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
+import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -62,7 +61,7 @@ class PayIntegrationTest {
     void createPayment_() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
         final PayCreateRequest payCreateRequest = new PayCreateRequest(orderId);
@@ -91,7 +90,7 @@ class PayIntegrationTest {
         final String email = "test_email@woowafriends.com";
         final String accessToken = loginAfterSignUp(email, "test_password!");
 
-        addProductToCart(accessToken, "치킨", "chicken.png");
+        addProductToCart(accessToken, "치킨");
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
 
@@ -121,7 +120,7 @@ class PayIntegrationTest {
     void validatePayment_() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -159,7 +158,7 @@ class PayIntegrationTest {
     void validatePaymentFail_externalValidationFail() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -198,7 +197,7 @@ class PayIntegrationTest {
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
         final int totalStock = 10;
 
-        Long productId = insertProduct("testProduct", "img.png", totalStock);
+        Long productId = insertProduct("testProduct");
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
         final Long orderId = placeOrder(accessToken);
 
@@ -239,7 +238,7 @@ class PayIntegrationTest {
     void validatePaymentFail_payedOrder() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -278,7 +277,7 @@ class PayIntegrationTest {
     void validatePaymentFail_orderOfOtherMember() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -317,7 +316,7 @@ class PayIntegrationTest {
     void decodeOrderId() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct", "img.png");
+        addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
@@ -369,22 +368,13 @@ class PayIntegrationTest {
     }
 
     private void addProductToCart(final String accessToken,
-                                  final String productName,
-                                  final String imageFileName) {
-        final Long productId = insertProduct(productName, imageFileName, 10);
+                                  final String productName) {
+        final Long productId = insertProduct(productName);
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
     }
 
-    private Long insertProduct(final String productName,
-                               final String imageFileName,
-                               final int stock) {
-        final Product product = Product.builder()
-            .name(productName)
-            .imageFileName(imageFileName)
-            .stock(Quantity.from(stock))
-            .description("test product")
-            .price(Money.from(1000L))
-            .build();
+    private Long insertProduct(final String productName) {
+        final Product product = DomainUtils.createProductWithoutId(productName, 1000L, 10);
         productRepository.save(product);
         return product.getId();
     }
