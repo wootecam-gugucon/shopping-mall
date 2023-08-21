@@ -302,6 +302,28 @@ class ProductIntegrationTest {
         assertThat(result.getPrice()).isEqualTo(price);
     }
 
+    @Test
+    @DisplayName("상품 상세 페이지 조회 시, id 와 일치하는 상품이 없으면 404 를 반환한다")
+    void productDetail_notExistProductId_status404() {
+        // given
+        Long notExistProductId = 100_000L;
+
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/api/v1/product/{productId}", notExistProductId)
+            .then().contentType(ContentType.JSON).log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCT);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_PRODUCT.getMessage());
+    }
+
     private Long insertProduct(final String productName, final long price) {
         final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         productRepository.save(product);
