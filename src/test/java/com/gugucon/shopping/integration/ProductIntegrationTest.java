@@ -336,6 +336,34 @@ class ProductIntegrationTest {
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_INPUT);
     }
 
+    @Test
+    @DisplayName("이상한 정렬 조건으로 검색하면 에러를 반환한다")
+    void searchProducts_invalidSort() {
+        // given
+        insertProduct("사과", 2500);    // O
+        insertProduct("맛있는 사과", 3000);    // O
+        insertProduct("사과는 맛있어", 1000);    // O
+        insertProduct("가나다라마사과과", 4000);    // O
+        insertProduct("가나다라마바사", 2000);    // X
+        insertProduct("과놔돠롸", 4500);    // X
+
+        final String keyword = "사과";
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("keyword", keyword)
+                .queryParam("sort", "invalidSort,desc")
+                .when().get("/api/v1/product/search")
+                .then().contentType(ContentType.JSON).log().all()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_SORT_KEY);
+    }
+
     private Long insertProduct(final String productName, final long price) {
         final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         return productRepository.save(product).getId();
