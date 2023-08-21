@@ -7,6 +7,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
@@ -66,18 +68,18 @@ class RateIntegrationTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 주문 상품에 별점을 남기면 404 상태를 반환한다")
-    void rate_notInvalidOrderItem_status404() {
+    @DisplayName("존재하지 않는 주문 상품에 별점을 남기면 404 상태를 반환한다")
+    void rate_notExistOrderItem_status404() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        final long invalidOrderItemId = 1_000_000L;
+        final long notExistOrderItemId = 1_000_000_000L;
         final short score = 3;
 
         // when
         final ExtractableResponse<Response> response = RestAssured
             .given().log().all()
             .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(invalidOrderItemId, score))
+            .body(new RateCreateRequest(notExistOrderItemId, score))
             .contentType(ContentType.JSON)
             .when()
             .post("/api/v1/rate")
@@ -86,6 +88,67 @@ class RateIntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_ITEM);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_ORDER_ITEM.getMessage());
+    }
+
+    @Test
+    @DisplayName("사용자가 주문하지 않은 주문 상품에 별점을 남기면 404 상태를 반환한다")
+    void rate_otherUsersOrderItem_status404() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+
+        final String othersAccessToken = loginAfterSignUp("other_email@woowafriends.com", "test_password");
+        final Long orderId = buyProductWithSuccess(othersAccessToken, "good product");
+        final long othersOrderItemId = getFirstOrderItem(othersAccessToken, orderId).getId();
+        final short score = 3;
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .body(new RateCreateRequest(othersOrderItemId, score))
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/api/v1/rate")
+            .then()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_ITEM);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_ORDER_ITEM.getMessage());
+    }
+
+    @Test
+    @DisplayName("이미 별점을 남긴 주문 상품에 다시 별점을 남기면 400 상태를 반환한다")
+    void rate_alreadyRated_status400() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+
+        final Long orderId = buyProductWithSuccess(accessToken, "good product");
+        final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+        final short score = 3;
+        createRateToOrderedItem(accessToken, orderItemId, score);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .body(new RateCreateRequest(orderItemId, score))
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/api/v1/rate")
+            .then()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.ALREADY_RATED);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.ALREADY_RATED.getMessage());
     }
 
     @Test
@@ -110,6 +173,9 @@ class RateIntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_RATE);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_RATE.getMessage());
     }
 
     private Long insertProduct(final String productName, final long price) {
@@ -124,5 +190,17 @@ class RateIntegrationTest {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
         return ApiUtils.buyProduct(accessToken, insertProduct(productName, 1000L), 10);
+    }
+
+    private void createRateToOrderedItem(final String accessToken, final Long orderItemId, final short score) {
+        RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .body(new RateCreateRequest(orderItemId, score))
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/api/v1/rate")
+            .then()
+            .extract();
     }
 }
