@@ -84,6 +84,7 @@ public class PayService {
         payRepository.findByOrderId(orderId)
                      .ifPresent(payRepository::delete);
 
+        cartItemRepository.deleteAllByMemberId(memberId);
         return PointPayResponse.from(payRepository.save(Pay.from(order)));
     }
 
