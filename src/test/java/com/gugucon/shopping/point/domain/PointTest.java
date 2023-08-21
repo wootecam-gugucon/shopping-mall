@@ -34,10 +34,10 @@ class PointTest {
                                  .build();
 
         // when
-        final Point charged = point.charge(1000L);
+        point.charge(1000L);
 
         // then
-        assertThat(charged.getPoint()).isEqualTo(2000L);
+        assertThat(point.getPoint()).isEqualTo(2000L);
     }
 
     @ParameterizedTest
@@ -68,10 +68,10 @@ class PointTest {
                                  .build();
 
         // when
-        final Point used = point.use(300L);
+        point.use(300L);
 
         // then
-        assertThat(used.getPoint()).isEqualTo(700L);
+        assertThat(point.getPoint()).isEqualTo(700L);
     }
 
     @Test

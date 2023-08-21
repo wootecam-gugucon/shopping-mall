@@ -42,13 +42,9 @@ public class Point extends BaseTimeEntity {
     }
 
 
-    public Point charge(final Long chargePoint) {
+    public void charge(final Long chargePoint) {
         validatePointPositive(chargePoint);
-        return Point.builder()
-                    .id(id)
-                    .memberId(memberId)
-                    .point(point + chargePoint)
-                    .build();
+        point += chargePoint;
     }
 
     private void validatePointPositive(final Long chargePoint) {
@@ -57,13 +53,9 @@ public class Point extends BaseTimeEntity {
         }
     }
 
-    public Point use(final Long usePoint) {
+    public void use(final Long usePoint) {
         validatePointEnough(usePoint);
-        return Point.builder()
-                    .id(id)
-                    .memberId(memberId)
-                    .point(point - usePoint)
-                    .build();
+        point -= usePoint;
     }
 
     private void validatePointEnough(final Long usePoint) {

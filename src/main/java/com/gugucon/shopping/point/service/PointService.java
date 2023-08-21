@@ -14,10 +14,10 @@ public class PointService {
 
     private final PointRepository pointRepository;
 
+    @Transactional
     public void charge(final PointChargeRequest pointChargeRequest, final Long memberId) {
         final Point point = pointRepository.findByMemberId(memberId)
-                                           .orElse(Point.from(memberId));
-        final Point charged = point.charge(pointChargeRequest.getPoint());
-        pointRepository.save(charged);
+                                           .orElseGet(() -> pointRepository.save(Point.from(memberId)));
+        point.charge(pointChargeRequest.getPoint());
     }
 }
