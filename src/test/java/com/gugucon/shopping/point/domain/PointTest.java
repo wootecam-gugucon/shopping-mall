@@ -27,13 +27,13 @@ class PointTest {
     @DisplayName("포인트를 충전한다.")
     void chargePoint() {
         // given
-        Point point = Point.builder()
-                           .memberId(1L)
-                           .point(Money.from(1000L))
-                           .build();
+        final Point point = Point.builder()
+                                 .memberId(1L)
+                                 .point(Money.from(1000L))
+                                 .build();
 
         // when
-        Point charged = point.charge(Money.from(1000L));
+        final Point charged = point.charge(Money.from(1000L));
 
         // then
         assertThat(charged.getPoint()).isEqualTo(Money.from(2000L));
@@ -43,14 +43,14 @@ class PointTest {
     @DisplayName("0 포인트를 충전하면 예외를 던진다.")
     void chargePointFail_notPositivePoint() {
         // given
-        Point point = Point.builder()
-                           .memberId(1L)
-                           .point(Money.from(1000L))
-                           .build();
+        final Point point = Point.builder()
+                                 .memberId(1L)
+                                 .point(Money.from(1000L))
+                                 .build();
 
         // when
-        Money chargeMoney = Money.from(0L);
-        Exception exception = catchException(() -> point.charge(chargeMoney));
+        final Money chargeMoney = Money.from(0L);
+        final Exception exception = catchException(() -> point.charge(chargeMoney));
 
         // then
         assertThat(exception).isInstanceOf(ShoppingException.class);
