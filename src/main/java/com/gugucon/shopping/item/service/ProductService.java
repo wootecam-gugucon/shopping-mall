@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +31,22 @@ public class ProductService {
     }
 
     public PagedResponse<ProductResponse> searchProducts(final String keyword, final Pageable pageable) {
-        if (keyword.isBlank()) {
-            throw new ShoppingException(ErrorCode.EMPTY_INPUT);
-        }
+        validateNotBlack(keyword);
         if (pageable.getSort().equals(SORT_BY_ORDER_COUNT)) {
             return searchProductsSortByOrderCount(keyword, pageable);
         }
-        final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
-        return convertToPage(products);
+        try {
+            final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
+            return convertToPage(products);
+        } catch (final PropertyReferenceException exception) {
+            throw new ShoppingException(ErrorCode.INVALID_SORT_KEY);
+        }
+    }
+
+    private static void validateNotBlack(final String keyword) {
+        if (keyword.isBlank()) {
+            throw new ShoppingException(ErrorCode.EMPTY_INPUT);
+        }
     }
 
     private PagedResponse<ProductResponse> searchProductsSortByOrderCount(final String keyword,
