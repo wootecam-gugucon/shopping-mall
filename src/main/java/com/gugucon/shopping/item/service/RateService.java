@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RateService {
 
+    private static final short MIN_SCORE = 1;
+    private static final short MAX_SCORE = 5;
+
     private final RateRepository rateRepository;
     private final OrderItemRepository orderItemRepository;
 
@@ -35,7 +38,7 @@ public class RateService {
     }
 
     private void validateScoreRange(final short rate) {
-        if (rate < 1 || rate > 5) {
+        if (rate < MIN_SCORE || rate > MAX_SCORE) {
             throw new ShoppingException(ErrorCode.INVALID_RATE);
         }
     }
