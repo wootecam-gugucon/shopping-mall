@@ -16,7 +16,7 @@ public class DomainUtils {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static Long sequence = 0L;
 
-    public static Product createProduct(String name, long price) {
+    public static Product createProduct(final String name, final long price) {
         sequence++;
         return Product.builder()
                 .id(sequence)
@@ -28,7 +28,7 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Product createProduct(int stock) {
+    public static Product createProduct(final int stock) {
         sequence++;
         return Product.builder()
                 .id(sequence)
@@ -40,7 +40,7 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Product createProductWithoutId(String name, long price) {
+    public static Product createProductWithoutId(final String name, final long price) {
         sequence++;
         return Product.builder()
                 .name(name)
@@ -51,7 +51,7 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Product createSoldOutProduct(String name, long price) {
+    public static Product createSoldOutProduct(final String name, final long price) {
         sequence++;
         return Product.builder()
                 .id(sequence)
