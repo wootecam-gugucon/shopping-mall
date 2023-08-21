@@ -74,4 +74,4 @@ CREATE TABLE IF NOT EXISTS points
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL,
     foreign key (member_id) references members (id)
-)
+);
