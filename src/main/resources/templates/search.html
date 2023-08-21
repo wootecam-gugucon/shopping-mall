@@ -19,10 +19,20 @@
     에 대한 검색 결과입니다
   </div>
   <div class="product-sort-container">
-    <button type="button" th:onclick="|location.href='@{/search(keyword=${param.keyword})}'|">최신순</button>
-    <button type="button" th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|" th:with="value='price,desc'">가격 높은순</button>
-    <button type="button" th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|" th:with="value='price,asc'">가격 낮은순</button>
-    <button type="button" th:onclick="|location.href='@{/search(keyword=${param.keyword})}'|">주문 많은순</button>
+    <button type="button"
+            th:onclick="|location.href='@{/search(keyword=${param.keyword})}'|"
+            name="sort-select-button">최신순</button>
+    <button type="button"
+            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
+            th:with="value='price,desc'"
+            name="sort-select-button">가격 높은순</button>
+    <button type="button"
+            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
+            th:with="value='price,asc'"
+            name="sort-select-button">가격 낮은순</button>
+    <button type="button"
+            th:onclick="|location.href='@{/search(keyword=${param.keyword})}'|"
+            name="sort-select-button">주문 많은순</button>
   </div>
   <section class="product-container">
     <div class="product-list">
@@ -66,7 +76,8 @@
               `;
             }
 
-            pagination(currentPage, totalPage, size, '.pagination');
+            selectSortKey(urlParams.get("sort"));
+            pagination(currentPage, totalPage, size, '.pagination', urlParams);
             document.querySelector('.product-list').innerHTML = element;
         }).catch((error) => {
             console.error(error);

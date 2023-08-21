@@ -57,7 +57,7 @@
               `;
             }
 
-            pagination(currentPage, totalPage, size, '.pagination');
+            pagination(currentPage, totalPage, size, '.pagination', "");
             document.querySelector('.product-list').innerHTML = element;
         }).catch((error) => {
             console.error(error);
