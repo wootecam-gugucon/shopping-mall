@@ -1,7 +1,9 @@
 package com.gugucon.shopping.integration;
 
 import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
+import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -11,6 +13,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
@@ -178,6 +181,60 @@ class RateIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_RATE);
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_RATE.getMessage());
+    }
+
+    @Test
+    @DisplayName("결제가 완료되지 않은 상품에 별점 생성을 시도하면 400 상태를 반환한다")
+    void rate_notPayedOrderItem_status400() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final Long productId = insertProduct("testProduct", 1000L);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+        final Long orderId = placeOrder(accessToken);
+        final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+        final short score = 3;
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .body(new RateCreateRequest(orderItemId, score))
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/api/v1/rate")
+            .then()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.NOT_PAYED_ORDER);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.NOT_PAYED_ORDER.getMessage());
+    }
+
+    @Test
+    @DisplayName("상품의 평균 별점 정보를 가져온다")
+    void getAverageRate() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final Long orderId = buyProductWithSuccess(accessToken, "good product");
+        final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+        final short score = 3;
+        createRateToOrderedItem(accessToken, orderItemId, score);
+
+        // when
+
+        // then
+    }
+
+    @Test
+    @DisplayName("상품의 평균 별점 조회 시, 상품이 존재하지 않으면 404 상태를 반환한다")
+    void getAverageRate_notExistOrderItemId_status404() {
+        // given
+
+        // when
+
+        // then
     }
 
     private Long insertProduct(final String productName, final long price) {

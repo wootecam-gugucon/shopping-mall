@@ -34,6 +34,7 @@ public enum ErrorCode {
     PAYED_ORDER(BAD_REQUEST, "이미 결제 완료된 주문입니다."),
     INVALID_PAY(NOT_FOUND, "존재하지 않는 결제 정보입니다."),
     PAY_FAILED(INTERNAL_SERVER_ERROR, "결제에 실패했습니다."),
+    NOT_PAYED_ORDER(BAD_REQUEST, "아직 결제 처리가 완료되지 않은 주문입니다."),
     STOCK_NOT_ENOUGH(BAD_REQUEST, "상품의 재고가 부족합니다."),
     SOLD_OUT(BAD_REQUEST, "품절된 상품입니다."),
     LACK_OF_STOCK(BAD_REQUEST, "재고가 부족합니다."),
