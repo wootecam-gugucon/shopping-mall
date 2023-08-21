@@ -40,17 +40,6 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Product createProductWithoutId(String name) {
-        sequence++;
-        return Product.builder()
-                .name(name)
-                .imageFileName("image_file_name_" + sequence)
-                .stock(Quantity.from(100))
-                .description("test_description")
-                .price(Money.from(1000L))
-                .build();
-    }
-
     public static Product createProductWithoutId(String name, long price) {
         sequence++;
         return Product.builder()
