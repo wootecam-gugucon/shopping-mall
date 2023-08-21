@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+<div class="root">
+  <div th:replace="~{layouts/header :: header}"></div>
+
+  <section class="order-section">
+    <div class="flex">
+      <section class="order-left-section">
+        <h3 class="order-title"></h3>
+        <h3 class="order-name"></h3>
+        <div class="order-item-list">
+        </div>
+      </section>
+      <section class="product-right-section">
+        <div class="product-right-section__top">
+          <h3 class="product-title">상품명</h3>
+        </div>
+        <hr class="divide-line-thin"/>
+        <div class="product-right-section__bottom">
+          <div class="flex justify-between p-20 mt-20">
+            <span class="highlight-text">상품금액</span>
+            <span class="highlight-text product-price"></span>
+          </div>
+          <div class="flex justify-between p-20 mt-20">
+            <span class="highlight-text">상품설명</span>
+            <span class="highlight-text product-description"></span>
+          </div>
+          <div class="p-20 mt-20 pay-button">
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+<script th:src="@{/js/pay.js}"></script>
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const productId = [[${productId}]];
+
+    fetch(`/api/v1/product/${productId}`, {
+      method: 'GET',
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      response.json().then((data) => alert(data.message));
+      window.location.href = "/";
+    }).then((data) => {
+      document.querySelector('.order-name').innerHTML = `상품 이름 : ${data.name}`;
+      document.querySelector(
+          '.product-right-section .product-price').innerText = `${data.price} 원`;
+      document.querySelector(
+          '.product-right-section .product-description').innerText = `${data.description}`;
+      document.querySelector(
+          '.product-right-section .product-image').src = `${data.imageFileName}`;
+    }).catch((error) => {
+      console.error(error);
+    });
+
+  });
+</script>
+</body>
+</html>
