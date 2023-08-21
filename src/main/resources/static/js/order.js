@@ -13,8 +13,14 @@ const requestOrder = () => {
             'Content-Type': 'application/json'
         }
     }).then((response) => {
-        console.log(response);
-        window.location.href = response.headers.get('Location');
+        if (response.ok) {
+            window.location.href = response.headers.get('Location');
+        }
+        else {
+            response.json().then((data) => {
+                alert(data.message);
+            });
+        }
     }).catch((error) => {
         console.error(error);
     });

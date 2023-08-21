@@ -34,15 +34,18 @@
                 "paymentType": paymentType
             })
         }).then((response) => {
-            status = response.status;
-            return response.json();
-        }).then((data) => {
-            if (status === 200) {
-                top.opener.location.href = `/pay/success?orderId=${data.orderId}`;
-                self.close();
-            } else {
-                window.location.href = '/pay/fail-popup';
+            if (response.ok) {
+                return response.json();
             }
+            else {
+                response.json().then((data) => {
+                    alert(data.message);
+                });
+                self.close();
+            }
+        }).then((data) => {
+            top.opener.location.href = `/pay/success?orderId=${data.orderId}`;
+            self.close();
         }).catch((error) => {
             console.error(error);
         });
