@@ -38,16 +38,16 @@
                 "orderId": orderId,
             })
         }).then((response) => {
-            status = response.status;
-            return response.json();
-        }).then((data) => {
-            if (status === 200) {
-                alert("결제가 승인되지 않았습니다. 주문 화면으로 돌아갑니다.");
-                top.opener.location.href = `/order/${data.orderId}`;
-                self.close();
-            } else {
+            if (response.ok) {
+                return response.json();
+            }
+            else {
                 failToFindOrderId();
             }
+        }).then((data) => {
+            alert("결제가 승인되지 않았습니다. 주문 화면으로 돌아갑니다.");
+            top.opener.location.href = `/order/${data.orderId}`;
+            self.close();
         }).catch((error) => {
             console.error(error);
         });
