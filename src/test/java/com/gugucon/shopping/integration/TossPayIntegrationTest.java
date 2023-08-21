@@ -41,8 +41,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 @IntegrationTest
-@DisplayName("결제 기능 통합 테스트")
-class PayIntegrationTest {
+@DisplayName("토스 결제 기능 통합 테스트")
+class TossPayIntegrationTest {
 
     @Value("${pay.callback.success-url}")
     private String successUrl;
@@ -73,7 +73,7 @@ class PayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(payCreateRequest)
                 .when()
-                .put("/api/v1/pay")
+                .put("/api/v1/pay/toss")
                 .then().log().all()
                 .extract();
 
