@@ -15,10 +15,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
+import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.item.repository.CartItemRepository;
-import com.gugucon.shopping.order.repository.OrderItemRepository;
-import com.gugucon.shopping.order.repository.OrderRepository;
+import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
 import com.gugucon.shopping.pay.dto.request.PayFailRequest;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
@@ -26,11 +25,10 @@ import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
 import com.gugucon.shopping.pay.dto.response.PayFailResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
-import com.gugucon.shopping.pay.repository.PayRepository;
+import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,34 +46,23 @@ class PayIntegrationTest {
 
     @Value("${pay.callback.success-url}")
     private String successUrl;
+
     @Value("${pay.callback.fail-url}")
     private String failUrl;
+
     @Autowired
     private RestTemplate restTemplate;
-    @Autowired
-    private PayRepository payRepository;
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-    @Autowired
-    private CartItemRepository cartItemRepository;
 
-    @AfterEach
-    void tearDown() {
-        payRepository.deleteAll();
-        orderRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        cartItemRepository.deleteAll();
-    }
+    @Autowired
+    ProductRepository productRepository;
 
     @Test
     @DisplayName("주문에 대한 결제 정보를 생성한다.")
     void createPayment_() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final PayCreateRequest payCreateRequest = new PayCreateRequest(orderId);
 
@@ -103,7 +90,7 @@ class PayIntegrationTest {
         final String email = "test_email@woowafriends.com";
         final String accessToken = loginAfterSignUp(email, "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "치킨");
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
 
@@ -120,7 +107,7 @@ class PayIntegrationTest {
         final PayInfoResponse payInfoResponse = response.as(PayInfoResponse.class);
         assertThat(payInfoResponse.getEncodedOrderId()).isNotEmpty();
         assertThat(payInfoResponse.getOrderName()).isEqualTo("치킨");
-        assertThat(payInfoResponse.getPrice()).isEqualTo(20000);
+        assertThat(payInfoResponse.getPrice()).isEqualTo(1000L);
         assertThat(payInfoResponse.getCustomerEmail()).isEqualTo(email);
         assertThat(payInfoResponse.getCustomerKey()).isNotEmpty();
         assertThat(payInfoResponse.getSuccessUrl()).isEqualTo(successUrl);
@@ -133,20 +120,21 @@ class PayIntegrationTest {
     void validatePayment_() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
-        final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
-                                                                                   payInfoResponse.getEncodedOrderId(),
-                                                                                   payInfoResponse.getPrice(),
-                                                                                   "mockPaymentType");
 
         final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
         server.expect(ExpectedCount.once(), anything())
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+
+        final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
+                                                                                   payInfoResponse.getEncodedOrderId(),
+                                                                                   payInfoResponse.getPrice(),
+                                                                                   "mockPaymentType");
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -170,8 +158,8 @@ class PayIntegrationTest {
     void validatePaymentFail_externalValidationFail() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
@@ -207,23 +195,26 @@ class PayIntegrationTest {
     void validatePaymentFail_stockNotEnough() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final int totalStock = 10;
 
-        insertCartItem(accessToken, new CartItemInsertRequest(3L));
+        Long productId = insertProduct("testProduct");
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
         final Long orderId = placeOrder(accessToken);
+
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.twice(), anything())
+            .andExpect(method(HttpMethod.POST))
+            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+
+        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
+        buyProduct(otherAccessToken, productId, totalStock);
+
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
         final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
                                                                                    payInfoResponse.getEncodedOrderId(),
                                                                                    payInfoResponse.getPrice(),
                                                                                    "mockPaymentType");
-
-        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-        server.expect(ExpectedCount.twice(), anything())
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
-
-        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
-        buyProduct(otherAccessToken, 3L, 100);
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -247,8 +238,8 @@ class PayIntegrationTest {
     void validatePaymentFail_payedOrder() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
@@ -286,8 +277,8 @@ class PayIntegrationTest {
     void validatePaymentFail_orderOfOtherMember() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
@@ -325,8 +316,8 @@ class PayIntegrationTest {
     void decodeOrderId() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
@@ -374,5 +365,17 @@ class PayIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.UNKNOWN_ERROR);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    private void addProductToCart(final String accessToken,
+                                  final String productName) {
+        final Long productId = insertProduct(productName);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+    }
+
+    private Long insertProduct(final String productName) {
+        final Product product = DomainUtils.createProductWithoutId(productName, 1000L, 10);
+        productRepository.save(product);
+        return product.getId();
     }
 }

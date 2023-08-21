@@ -16,7 +16,7 @@ public class DomainUtils {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static Long sequence = 0L;
 
-    public static Product createProduct(String name, long price) {
+    public static Product createProduct(final String name, final long price) {
         sequence++;
         return Product.builder()
                 .id(sequence)
@@ -28,7 +28,7 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Product createProduct(int stock) {
+    public static Product createProduct(final int stock) {
         sequence++;
         return Product.builder()
                 .id(sequence)
@@ -40,29 +40,17 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Product createProductWithoutId(String name) {
-        sequence++;
+    public static Product createProductWithoutId(final String name, final long price, final int stock) {
         return Product.builder()
                 .name(name)
-                .imageFileName("image_file_name_" + sequence)
-                .stock(Quantity.from(100))
-                .description("test_description")
-                .price(Money.from(1000L))
-                .build();
-    }
-
-    public static Product createProductWithoutId(String name, long price) {
-        sequence++;
-        return Product.builder()
-                .name(name)
-                .imageFileName("image_file_name_" + sequence)
-                .stock(Quantity.from(100))
+                .imageFileName("image_file_" + name)
+                .stock(Quantity.from(stock))
                 .description("test_description")
                 .price(Money.from(price))
                 .build();
     }
 
-    public static Product createSoldOutProduct(String name, long price) {
+    public static Product createSoldOutProduct(final String name, final long price) {
         sequence++;
         return Product.builder()
                 .id(sequence)

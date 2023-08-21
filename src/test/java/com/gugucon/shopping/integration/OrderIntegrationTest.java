@@ -11,23 +11,18 @@ import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
-import com.gugucon.shopping.item.domain.entity.CartItem;
+import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
-import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.member.domain.vo.Email;
-import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
-import com.gugucon.shopping.order.repository.OrderItemRepository;
-import com.gugucon.shopping.order.repository.OrderRepository;
+import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,32 +34,12 @@ import org.springframework.http.MediaType;
 class OrderIntegrationTest {
 
     @Autowired
-    private CartItemRepository cartItemRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
     private ProductRepository productRepository;
 
     private static List<String> toNames(final OrderDetailResponse orderDetailResponse) {
         return orderDetailResponse.getOrderItems().stream()
-                .map(OrderItemResponse::getName)
-                .toList();
-    }
-
-    @AfterEach
-    void tearDown() {
-        cartItemRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        orderRepository.deleteAll();
-        memberRepository.deleteAll();
+            .map(OrderItemResponse::getName)
+            .toList();
     }
 
     @Test
@@ -72,16 +47,16 @@ class OrderIntegrationTest {
     void order() {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "testProduct");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .post("/api/v1/order")
-                .then()
-                .extract();
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .post("/api/v1/order")
+            .then()
+            .extract();
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -96,12 +71,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .post("/api/v1/order")
-                .then()
-                .extract();
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .post("/api/v1/order")
+            .then()
+            .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -116,21 +91,18 @@ class OrderIntegrationTest {
         final String email = "test_email@woowafriends.com";
         final String accessToken = loginAfterSignUp(email, "test_password!");
 
-        final Long memberId = memberRepository.findByEmail(Email.from(email)).orElseThrow().getId();
-        cartItemRepository.save(CartItem.builder()
-                                        .product(productRepository.findById(4L).orElseThrow())
-                                        .memberId(memberId)
-                                        .quantity(Quantity.from(1))
-                                        .build());
+        final Long productId = insertProduct("testProduct", 1000);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+        changeProductStock(productId, 0);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .post("/api/v1/order")
-                .then()
-                .extract();
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .post("/api/v1/order")
+            .then()
+            .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -144,19 +116,19 @@ class OrderIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        final Long cartItemId = readCartItems(accessToken).get(0).getCartItemId();
-        updateCartItem(accessToken, cartItemId, new CartItemUpdateRequest(500));
+        final Long productId = insertProduct("testProduct", 1000);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+        updateCartItemQuantity(accessToken, 100);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/api/v1/order")
-                .then()
-                .extract();
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/api/v1/order")
+            .then()
+            .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -170,25 +142,24 @@ class OrderIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
-        insertCartItem(accessToken, new CartItemInsertRequest(2L));
+        addProductToCart(accessToken, "chicken");
+        addProductToCart(accessToken, "pizza");
 
-        final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
-        final List<String> cartItemNames = toNames(cartItemResponses);
         final Long orderId = placeOrder(accessToken);
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .get("/api/v1/order/{orderId}", orderId)
-                .then()
-                .extract();
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/api/v1/order/{orderId}", orderId)
+            .then()
+            .extract();
 
         /* then */
+        final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final OrderDetailResponse orderDetailResponse = response.as(OrderDetailResponse.class);
-        assertThat(toNames(orderDetailResponse)).containsExactlyInAnyOrderElementsOf(cartItemNames);
+        assertThat(toNames(orderDetailResponse)).containsExactlyInAnyOrderElementsOf(toNames(cartItemResponses));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -202,12 +173,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .when()
-                .get("/api/v1/order/{orderId}", invalidOrderId)
-                .then()
-                .extract();
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/api/v1/order/{orderId}", invalidOrderId)
+            .then()
+            .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -221,19 +192,19 @@ class OrderIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        insertCartItem(accessToken, new CartItemInsertRequest(1L));
+        addProductToCart(accessToken, "testProduct");
         final Long orderId = placeOrder(accessToken);
 
         final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(otherAccessToken)
-                .when()
-                .get("/api/v1/order/{orderId}", orderId)
-                .then()
-                .extract();
+            .given().log().all()
+            .auth().oauth2(otherAccessToken)
+            .when()
+            .get("/api/v1/order/{orderId}", orderId)
+            .then()
+            .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -243,7 +214,40 @@ class OrderIntegrationTest {
 
     private List<String> toNames(final List<CartItemResponse> cartItemResponses) {
         return cartItemResponses.stream()
-                .map(CartItemResponse::getName)
-                .toList();
+            .map(CartItemResponse::getName)
+            .toList();
+    }
+
+    private void updateCartItemQuantity(String accessToken, int quantity) {
+        final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
+        final Long cartItemId = cartItemResponses.get(0).getCartItemId();
+        final CartItemUpdateRequest cartItemUpdateRequest = new CartItemUpdateRequest(quantity);
+        updateCartItem(accessToken, cartItemId, cartItemUpdateRequest);
+    }
+
+    private void changeProductStock(Long productId, int stock) {
+        final Product product = productRepository.findById(productId).orElseThrow();
+        final Product updatedProduct = Product.builder()
+            .id(productId)
+            .price(product.getPrice())
+            .name(product.getName())
+            .description(product.getDescription())
+            .imageFileName(product.getImageFileName())
+            .stock(Quantity.from(stock))
+            .build();
+        productRepository.save(updatedProduct);
+    }
+
+    private void addProductToCart(final String accessToken,
+                                  final String productName) {
+        final Long productId = insertProduct(productName, 1000L);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+    }
+
+    private Long insertProduct(final String productName,
+                               final long price) {
+        final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
+        productRepository.save(product);
+        return product.getId();
     }
 }

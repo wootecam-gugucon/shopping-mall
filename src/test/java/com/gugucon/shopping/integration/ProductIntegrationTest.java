@@ -1,5 +1,7 @@
 package com.gugucon.shopping.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -12,15 +14,12 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Comparator;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
-import java.util.Comparator;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("상품 기능 통합 테스트")
@@ -32,6 +31,9 @@ class ProductIntegrationTest {
     @Test
     @DisplayName("페이징 조건이 기재되지 않으면 기본 설정 (page=0, size=20) 에 따라 페이징하여 반환한다.")
     void readAllProducts_defaultPaging() {
+        /* given */
+        insertAllProducts(List.of("품절된 치킨", "사케", "피자", "치킨"));
+
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -51,7 +53,7 @@ class ProductIntegrationTest {
         final List<String> actualNames = products.stream()
                 .map(ProductResponse::getName)
                 .toList();
-        assertThat(actualNames).containsExactly("품절된 치킨", "사케", "피자", "치킨");
+        assertThat(actualNames).containsExactly("치킨", "피자", "사케", "품절된 치킨");
         assertThat(currentPage).isZero();
         assertThat(size).isEqualTo(20);
         assertThat(totalPage).isEqualTo(1);
@@ -60,6 +62,9 @@ class ProductIntegrationTest {
     @Test
     @DisplayName("입력된 페이징 조건에 따라 페이징하여 반환한다.")
     void readAllProducts_paging() {
+        /* given */
+        insertAllProducts(List.of("품절된 치킨", "사케", "피자", "치킨"));
+
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -76,7 +81,7 @@ class ProductIntegrationTest {
         final int currentPage = result.getInt("currentPage");
         final int size = result.getInt("size");
 
-        assertThat(products.get(0).getName()).isEqualTo("품절된 치킨");
+        assertThat(products.get(0).getName()).isEqualTo("치킨");
         assertThat(totalPage).isEqualTo(4);
         assertThat(currentPage).isZero();
         assertThat(size).isEqualTo(1);
@@ -85,6 +90,9 @@ class ProductIntegrationTest {
     @Test
     @DisplayName("정렬 조건이 기재되지 않은 경우 최신순으로 정렬하여 반환한다")
     void readAllProducts_defaultSorting() {
+        /* given */
+        insertAllProducts(List.of("품절된 치킨", "사케", "피자", "치킨"));
+
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -109,15 +117,12 @@ class ProductIntegrationTest {
     @DisplayName("검색어로 검색한 결과를 최신순으로 정렬하여 반환한다")
     void searchProducts() {
         // given
-        final List<Product> products = List.of(
-                DomainUtils.createProductWithoutId("사과"), // O
-                DomainUtils.createProductWithoutId("맛있는 사과"), // O
-                DomainUtils.createProductWithoutId("사과는 맛있어"), // O
-                DomainUtils.createProductWithoutId("가나다라마사과과"), // O
-                DomainUtils.createProductWithoutId("가나다라마바사"), // X
-                DomainUtils.createProductWithoutId("과놔돠롸") // X
-        );
-        final List<Product> persistProducts = productRepository.saveAll(products);
+        insertProduct("사과", 10);    // O
+        insertProduct("맛있는 사과", 10);    // O
+        insertProduct("사과는 맛있어", 10);    // O
+        insertProduct("가나다라마사과과", 10);    // O
+        insertProduct("가나다라마바사", 10);    // X
+        insertProduct("과놔돠롸", 10);    // X
 
         final String keyword = "사과";
 
@@ -143,23 +148,18 @@ class ProductIntegrationTest {
                 "맛있는 사과",
                 "사과"
         );
-
-        productRepository.deleteAllInBatch(persistProducts);
     }
 
     @Test
     @DisplayName("검색어로 검색한 결과를 가격이 비싼순으로 정렬하여 반환한다")
     void searchProducts_sortByPriceDesc() {
         // given
-        final List<Product> products = List.of(
-                DomainUtils.createProductWithoutId("사과", 2500), // O
-                DomainUtils.createProductWithoutId("맛있는 사과", 3000), // O
-                DomainUtils.createProductWithoutId("사과는 맛있어", 1000), // O
-                DomainUtils.createProductWithoutId("가나다라마사과과", 4000), // O
-                DomainUtils.createProductWithoutId("가나다라마바사", 2000), // X
-                DomainUtils.createProductWithoutId("과놔돠롸", 4500) // X
-        );
-        final List<Product> persistProducts = productRepository.saveAll(products);
+        insertProduct("사과", 2500);    // O
+        insertProduct("맛있는 사과", 3000);    // O
+        insertProduct("사과는 맛있어", 1000);    // O
+        insertProduct("가나다라마사과과", 4000);    // O
+        insertProduct("가나다라마바사", 2000);    // X
+        insertProduct("과놔돠롸", 4500);    // X
 
         final String keyword = "사과";
 
@@ -186,23 +186,18 @@ class ProductIntegrationTest {
                 "사과",
                 "사과는 맛있어"
         );
-
-        productRepository.deleteAllInBatch(persistProducts);
     }
 
     @Test
     @DisplayName("검색어로 검색한 결과를 가격이 저렴한 순으로 정렬하여 반환한다")
     void searchProducts_sortByPriceAsc() {
         // given
-        final List<Product> products = List.of(
-                DomainUtils.createProductWithoutId("사과", 2500), // O
-                DomainUtils.createProductWithoutId("맛있는 사과", 3000), // O
-                DomainUtils.createProductWithoutId("사과는 맛있어", 1000), // O
-                DomainUtils.createProductWithoutId("가나다라마사과과", 4000), // O
-                DomainUtils.createProductWithoutId("가나다라마바사", 2000), // X
-                DomainUtils.createProductWithoutId("과놔돠롸", 4500) // X
-        );
-        final List<Product> persistProducts = productRepository.saveAll(products);
+        insertProduct("사과", 2500);    // O
+        insertProduct("맛있는 사과", 3000);    // O
+        insertProduct("사과는 맛있어", 1000);    // O
+        insertProduct("가나다라마사과과", 4000);    // O
+        insertProduct("가나다라마바사", 2000);    // X
+        insertProduct("과놔돠롸", 4500);    // X
 
         final String keyword = "사과";
 
@@ -229,23 +224,18 @@ class ProductIntegrationTest {
                 "맛있는 사과",
                 "가나다라마사과과"
         );
-
-        productRepository.deleteAllInBatch(persistProducts);
     }
 
     @Test
     @DisplayName("빈 문자열의 키워드로 검색하면 에러를 반환한다")
     void searchProducts_emptyKeyword() {
         // given
-        final List<Product> products = List.of(
-                DomainUtils.createProductWithoutId("사과", 2500), // O
-                DomainUtils.createProductWithoutId("맛있는 사과", 3000), // O
-                DomainUtils.createProductWithoutId("사과는 맛있어", 1000), // O
-                DomainUtils.createProductWithoutId("가나다라마사과과", 4000), // O
-                DomainUtils.createProductWithoutId("가나다라마바사", 2000), // X
-                DomainUtils.createProductWithoutId("과놔돠롸", 4500) // X
-        );
-        final List<Product> persistProducts = productRepository.saveAll(products);
+        insertProduct("사과", 2500);    // O
+        insertProduct("맛있는 사과", 3000);    // O
+        insertProduct("사과는 맛있어", 1000);    // O
+        insertProduct("가나다라마사과과", 4000);    // O
+        insertProduct("가나다라마바사", 2000);    // X
+        insertProduct("과놔돠롸", 4500);    // X
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -259,23 +249,18 @@ class ProductIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_INPUT);
-
-        productRepository.deleteAllInBatch(persistProducts);
     }
 
     @Test
     @DisplayName("키워드 없이 검색하면 에러를 반환한다")
     void searchProducts_noKeyword() {
         // given
-        final List<Product> products = List.of(
-                DomainUtils.createProductWithoutId("사과", 2500), // O
-                DomainUtils.createProductWithoutId("맛있는 사과", 3000), // O
-                DomainUtils.createProductWithoutId("사과는 맛있어", 1000), // O
-                DomainUtils.createProductWithoutId("가나다라마사과과", 4000), // O
-                DomainUtils.createProductWithoutId("가나다라마바사", 2000), // X
-                DomainUtils.createProductWithoutId("과놔돠롸", 4500) // X
-        );
-        final List<Product> persistProducts = productRepository.saveAll(products);
+        insertProduct("사과", 2500);    // O
+        insertProduct("맛있는 사과", 3000);    // O
+        insertProduct("사과는 맛있어", 1000);    // O
+        insertProduct("가나다라마사과과", 4000);    // O
+        insertProduct("가나다라마바사", 2000);    // X
+        insertProduct("과놔돠롸", 4500);    // X
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -288,7 +273,14 @@ class ProductIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_INPUT);
+    }
 
-        productRepository.deleteAllInBatch(persistProducts);
+    private void insertProduct(final String productName, final long price) {
+        final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
+        productRepository.save(product);
+    }
+
+    private void insertAllProducts(final List<String> productNames) {
+        productNames.forEach(name -> insertProduct(name, 1000L));
     }
 }
