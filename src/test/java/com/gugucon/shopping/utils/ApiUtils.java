@@ -105,7 +105,7 @@ public class ApiUtils {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(tossPayCreateRequest)
             .when()
-            .put("/api/v1/pay")
+            .put("/api/v1/pay/toss")
             .then().log().all()
             .extract()
             .as(TossPayCreateResponse.class)

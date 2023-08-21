@@ -20,7 +20,7 @@ public final class PayController {
 
     private final PayService payService;
 
-    @PutMapping
+    @PutMapping("/toss")
     @ResponseStatus(HttpStatus.OK)
     public TossPayCreateResponse createPayment(@RequestBody final TossPayCreateRequest tossPayCreateRequest,
                                                @AuthenticationPrincipal final Long memberId) {
