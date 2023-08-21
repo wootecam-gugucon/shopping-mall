@@ -35,6 +35,10 @@ public class ProductService {
         if (pageable.getSort().equals(SORT_BY_ORDER_COUNT)) {
             return searchProductsSortByOrderCount(keyword, pageable);
         }
+        return searchProductsSortBy(keyword, pageable);
+    }
+
+    private PagedResponse<ProductResponse> searchProductsSortBy(final String keyword, final Pageable pageable) {
         try {
             final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
             return convertToPage(products);
@@ -43,7 +47,7 @@ public class ProductService {
         }
     }
 
-    private static void validateNotBlack(final String keyword) {
+    private void validateNotBlack(final String keyword) {
         if (keyword.isBlank()) {
             throw new ShoppingException(ErrorCode.EMPTY_INPUT);
         }
@@ -56,7 +60,7 @@ public class ProductService {
         return convertToPage(products);
     }
 
-    private static Pageable createPageable(final Pageable pageable) {
+    private Pageable createPageable(final Pageable pageable) {
         final Pageable newPageable = Pageable.ofSize(pageable.getPageSize());
         newPageable.withPage(pageable.getPageNumber());
         return newPageable;
