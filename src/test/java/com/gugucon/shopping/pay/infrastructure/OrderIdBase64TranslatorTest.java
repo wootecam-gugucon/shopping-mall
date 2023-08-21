@@ -3,6 +3,8 @@ package com.gugucon.shopping.pay.infrastructure;
 import com.gugucon.shopping.order.domain.entity.Order;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
@@ -12,12 +14,12 @@ class OrderIdBase64TranslatorTest {
 
     private final OrderIdTranslator orderIdTranslator = new OrderIdBase64Translator();
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"1", "주문 이름", "검정 하이엔드 골져스 원더풀 레저 스틸 가죽 자켓"})
     @DisplayName("인코딩한 내용을 디코딩하면 같은 내용이 된다")
-    void encodeAndDecodeSuccess_SameString() {
+    void encodeAndDecodeSuccess_SameString(String orderName) {
         // given
-        Long orderId = 1L;
-        String orderName = "주문 이름";
+        Long orderId = 1_000_000L;
 
         final Order order = new Order() {
             @Override
@@ -50,5 +52,31 @@ class OrderIdBase64TranslatorTest {
 
         // then
         assertThat(exception).isInstanceOf(RuntimeException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1", "주문 이름", "검정 하이엔드 골져스 원더풀 레저 스틸 가죽 자켓"})
+    @DisplayName("인코딩 후 길이가 6자 이상 64자 이내이다.")
+    void encodeSuccess_LimitFrom6To64(String orderName) {
+        // given
+        Long orderId = 1L;
+
+        final Order order = new Order() {
+            @Override
+            public Long getId() {
+                return orderId;
+            }
+
+            @Override
+            public String createOrderName() {
+                return orderName;
+            }
+        };
+
+        // when
+        String encodedString = orderIdTranslator.encode(order);
+
+        // then
+        assertThat(encodedString).hasSizeBetween(6, 64);
     }
 }

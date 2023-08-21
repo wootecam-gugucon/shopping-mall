@@ -12,6 +12,7 @@ import java.util.Base64.Encoder;
 public final class OrderIdBase64Translator implements OrderIdTranslator {
 
     private static final String DELIMITER = "--";
+    private static final int MAX_LENGTH = 64;
 
     private final Encoder encoder;
     private final Decoder decoder;
@@ -27,7 +28,15 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
                                           String.valueOf(order.getId()),
                                           order.createOrderName(),
                                           String.valueOf(LocalDateTime.now()));
-        return encoder.encodeToString(joined.getBytes());
+        final String encoded = encoder.encodeToString(joined.getBytes());
+        return limitLength(encoded);
+    }
+
+    private String limitLength(final String encoded) {
+        if (encoded.length() > MAX_LENGTH) {
+            return encoded.substring(0, MAX_LENGTH);
+        }
+        return encoded;
     }
 
     @Override
