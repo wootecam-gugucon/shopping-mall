@@ -22,6 +22,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -151,14 +153,14 @@ class RateIntegrationTest {
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.ALREADY_RATED.getMessage());
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("별점이 1-5 사이의 정수가 아니면 400 상태를 반환한다")
-    void rate_notInvalidScore_status400() {
+    @ValueSource(shorts = {0, 6})
+    void rate_notInvalidScore_status400(final short score) {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
         final Long orderId = buyProductWithSuccess(accessToken, "good product");
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
-        final short score = 6;
 
         // when
         final ExtractableResponse<Response> response = RestAssured

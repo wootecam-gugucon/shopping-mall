@@ -18,8 +18,9 @@ public class RateService {
     private final OrderItemRepository orderItemRepository;
 
     public void createRate(final Long memberId, final RateCreateRequest request) {
-        final OrderItem orderItem = searchOrderItem(memberId, request.getOrderItemId());
+        validateScoreRange(request.getScore());
 
+        final OrderItem orderItem = searchOrderItem(memberId, request.getOrderItemId());
         validateDuplicateRate(orderItem.getId());
 
         final Rate rate = Rate.builder()
@@ -29,6 +30,12 @@ public class RateService {
             .build();
 
         rateRepository.save(rate);
+    }
+
+    private void validateScoreRange(final short rate) {
+        if (rate < 1 || rate > 5) {
+            throw new ShoppingException(ErrorCode.INVALID_RATE);
+        }
     }
 
     private OrderItem searchOrderItem(Long memberId, Long orderItemId) {
