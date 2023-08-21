@@ -64,4 +64,15 @@ class MoneyTest {
         /* then */
         assertThat(result).isEqualTo(Money.from(70000L));
     }
+
+    @ParameterizedTest
+    @ValueSource(longs = {0, 1})
+    @DisplayName("금액이 0 이하인지 확인한다.")
+    void isNotPositive(long price) {
+        // given
+        final Money money = Money.from(price);
+
+        // when & then
+        assertThat(money.isNotPositive()).isEqualTo(price <= 0);
+    }
 }

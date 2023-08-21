@@ -29,6 +29,10 @@ public class Money {
         return new Money(value);
     }
 
+    public static Money sum(final Money money, final Money other) {
+        return Money.from(money.value + other.value);
+    }
+
     public Money add(final Money other) {
         return new Money(value + other.value);
     }
@@ -41,5 +45,9 @@ public class Money {
         if (value < 0) {
             throw new ShoppingException(ErrorCode.INVALID_MONEY);
         }
+    }
+
+    public boolean isNotPositive() {
+        return value <= 0;
     }
 }
