@@ -184,8 +184,8 @@ class RateIntegrationTest {
     }
 
     @Test
-    @DisplayName("결제가 완료되지 않은 상품에 별점 생성을 시도하면 400 상태를 반환한다")
-    void rate_notPayedOrderItem_status400() {
+    @DisplayName("결제가 완료되지 않은 상품에 별점 생성을 시도하면 404 상태를 반환한다")
+    void rate_notPayedOrderItem_status404() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
         final Long productId = insertProduct("testProduct", 1000L);
@@ -206,10 +206,10 @@ class RateIntegrationTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.NOT_PAYED_ORDER);
-        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.NOT_PAYED_ORDER.getMessage());
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_ITEM);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_ORDER_ITEM.getMessage());
     }
 
     @Test

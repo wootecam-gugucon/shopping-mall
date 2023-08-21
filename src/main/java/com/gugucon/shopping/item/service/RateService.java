@@ -5,6 +5,7 @@ import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.Rate;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
 import com.gugucon.shopping.item.repository.RateRepository;
+import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class RateService {
     }
 
     private OrderItem searchOrderItem(Long memberId, Long orderItemId) {
-        return orderItemRepository.findByOrderIdAndMemberId(memberId, orderItemId)
+        return orderItemRepository.findByOrderIdAndMemberIdAndOrderStatus(memberId, orderItemId, OrderStatus.PAYED)
             .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER_ITEM));
     }
 
