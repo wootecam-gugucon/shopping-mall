@@ -31,7 +31,7 @@ public class RateController {
 
     @GetMapping("/product/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public RateResponse getRate(@PathVariable Long productId) {
-        return new RateResponse(3, 4.2);
+    public RateResponse getRates(@PathVariable Long productId) {
+        return rateService.getRates(productId);
     }
 }

@@ -219,7 +219,7 @@ class RateIntegrationTest {
     void getAverageRate() {
         // given
         final Long productId = insertProduct("good Product");
-        final int rateCount = 1;
+        final int rateCount = 5;
         final double averageRate = createRateToProduct(productId, rateCount);
 
         // when
@@ -292,7 +292,7 @@ class RateIntegrationTest {
 
     private double createRateToProduct(final Long productId, final int count) {
         final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-        server.expect(ExpectedCount.twice(), anything())
+        server.expect(ExpectedCount.times(count), anything())
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
         double totalScore = 0;

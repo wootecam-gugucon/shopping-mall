@@ -4,16 +4,19 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.Rate;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
+import com.gugucon.shopping.item.dto.response.RateResponse;
+import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.item.repository.RateRepository;
 import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RateService {
 
@@ -21,8 +24,10 @@ public class RateService {
     private static final short MAX_SCORE = 5;
 
     private final RateRepository rateRepository;
+    private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
 
+    @Transactional
     public void createRate(final Long memberId, final RateCreateRequest request) {
         validateScoreRange(request.getScore());
 
@@ -36,6 +41,21 @@ public class RateService {
             .build();
 
         rateRepository.save(rate);
+    }
+
+    public RateResponse getRates(final Long productId) {
+        validateProduct(productId);
+        final List<Rate> rates = rateRepository.findByProductId(productId);
+        final double averageRate = rates.stream()
+            .mapToInt(Rate::getScore)
+            .average()
+            .orElse(0.0);
+        return new RateResponse(rates.size(), averageRate);
+    }
+
+    private void validateProduct(final Long productId) {
+        productRepository.findById(productId)
+            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
     }
 
     private void validateScoreRange(final short rate) {
