@@ -9,8 +9,8 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
-import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
+import com.gugucon.shopping.pay.dto.point.request.PointPayRequest;
+import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -36,22 +36,22 @@ class PointPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        final PayCreateRequest payCreateRequest = new PayCreateRequest(orderId);
+        final PointPayRequest pointPayRequest = new PointPayRequest(orderId);
 
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(payCreateRequest)
+                .body(pointPayRequest)
                 .when()
                 .put("/api/v1/pay/point")
                 .then().log().all()
                 .extract();
 
         // then
-        final PayCreateResponse payCreateResponse = response.as(PayCreateResponse.class);
-        assertThat(payCreateResponse.getPayId()).isNotNull();
+        final PointPayResponse pointPayResponse = response.as(PointPayResponse.class);
+        assertThat(pointPayResponse.getOrderId()).isEqualTo(orderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
