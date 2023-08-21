@@ -1,5 +1,6 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
 import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
@@ -15,6 +16,7 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
+import com.gugucon.shopping.item.dto.response.RateResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.utils.ApiUtils;
@@ -188,7 +190,7 @@ class RateIntegrationTest {
     void rate_notPayedOrderItem_status404() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        final Long productId = insertProduct("testProduct", 1000L);
+        final Long productId = insertProduct("testProduct");
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
         final Long orderId = placeOrder(accessToken);
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
@@ -216,29 +218,54 @@ class RateIntegrationTest {
     @DisplayName("상품의 평균 별점 정보를 가져온다")
     void getAverageRate() {
         // given
-        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        final Long orderId = buyProductWithSuccess(accessToken, "good product");
-        final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
-        final short score = 3;
-        createRateToOrderedItem(accessToken, orderItemId, score);
+        final Long productId = insertProduct("good Product");
+        final int rateCount = 1;
+        final double averageRate = createRateToProduct(productId, rateCount);
 
         // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when()
+            .get("/api/v1/rate/product/{productId}", productId)
+            .then()
+            .contentType(ContentType.JSON)
+            .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final RateResponse rateResponse = response.as(RateResponse.class);
+        assertThat(rateResponse.getRateCount()).isEqualTo(rateCount);
+        assertThat(rateResponse.getAverageRate()).isEqualTo(averageRate);
     }
 
     @Test
     @DisplayName("상품의 평균 별점 조회 시, 상품이 존재하지 않으면 404 상태를 반환한다")
     void getAverageRate_notExistOrderItemId_status404() {
         // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final long notExistProductId = 1_000_000_000L;
 
         // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/api/v1/rate/product/{productId}", notExistProductId)
+            .then()
+            .contentType(ContentType.JSON)
+            .extract();
 
         // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCT);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_PRODUCT.getMessage());
     }
 
-    private Long insertProduct(final String productName, final long price) {
-        final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
+    private Long insertProduct(final String productName) {
+        final Product product = DomainUtils.createProductWithoutId(productName, 1000, 100);
         productRepository.save(product);
         return product.getId();
     }
@@ -248,7 +275,7 @@ class RateIntegrationTest {
         server.expect(ExpectedCount.twice(), anything())
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
-        return ApiUtils.buyProduct(accessToken, insertProduct(productName, 1000L), 10);
+        return ApiUtils.buyProduct(accessToken, insertProduct(productName), 10);
     }
 
     private void createRateToOrderedItem(final String accessToken, final Long orderItemId, final short score) {
@@ -261,5 +288,22 @@ class RateIntegrationTest {
             .post("/api/v1/rate")
             .then()
             .extract();
+    }
+
+    private double createRateToProduct(final Long productId, final int count) {
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.twice(), anything())
+            .andExpect(method(HttpMethod.POST))
+            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+        double totalScore = 0;
+        for (int i = 0; i < count; i++) {
+            final String accessToken = loginAfterSignUp("test_email" + i + "@woowafriends.com", "test_password!");
+            final Long orderId = buyProduct(accessToken, productId, 5);
+            final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+            final short score = 3;
+            totalScore += score;
+            createRateToOrderedItem(accessToken, orderItemId, score);
+        }
+        return totalScore / count;
     }
 }
