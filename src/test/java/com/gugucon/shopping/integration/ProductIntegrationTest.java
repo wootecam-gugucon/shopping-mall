@@ -1,25 +1,30 @@
 package com.gugucon.shopping.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
+import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.utils.ApiUtils;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Comparator;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import java.util.Comparator;
+import java.util.List;
+
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("상품 기능 통합 테스트")
@@ -227,6 +232,59 @@ class ProductIntegrationTest {
     }
 
     @Test
+    @DisplayName("검색어로 검색한 결과를 주문이 많은 순으로 정렬하여 반환한다")
+    void searchProducts_sortByOrderDesc() {
+        // given
+        final Long 사과_id = insertProduct("사과", 2500);// O
+        final Long 맛있는사과_id = insertProduct("맛있는 사과", 3000);    // O
+        final Long 사과는맛있어_id = insertProduct("사과는 맛있어", 1000);    // O
+        final Long 가나다라마사과과_id = insertProduct("가나다라마사과과", 4000);    // O
+        final Long 가나다라마바사_id = insertProduct("가나다라마바사", 2000);    // X
+        final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
+
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(사과_id));
+        ApiUtils.updateCartItem(accessToken, 1L, new CartItemUpdateRequest(10));
+
+        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(사과는맛있어_id));
+        ApiUtils.updateCartItem(accessToken, 2L, new CartItemUpdateRequest(9));
+
+        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(가나다라마사과과_id));
+        ApiUtils.updateCartItem(accessToken, 3L, new CartItemUpdateRequest(8));
+
+        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(맛있는사과_id));
+        ApiUtils.updateCartItem(accessToken, 4L, new CartItemUpdateRequest(7));
+
+        ApiUtils.placeOrder(accessToken);
+
+        final String keyword = "사과";
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("keyword", keyword)
+                .queryParam("sort", "orderCount,desc")
+                .when().get("/api/v1/product/search")
+                .then().contentType(ContentType.JSON).log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final List<String> names = response.body()
+                .jsonPath()
+                .getList("contents", ProductResponse.class)
+                .stream().map(ProductResponse::getName).toList();
+
+        assertThat(names).containsExactly(
+                "사과",
+                "사과는 맛있어",
+                "가나다라마사과과",
+                "맛있는 사과"
+        );
+    }
+
+    @Test
     @DisplayName("빈 문자열의 키워드로 검색하면 에러를 반환한다")
     void searchProducts_emptyKeyword() {
         // given
@@ -275,9 +333,9 @@ class ProductIntegrationTest {
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_INPUT);
     }
 
-    private void insertProduct(final String productName, final long price) {
+    private Long insertProduct(final String productName, final long price) {
         final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
-        productRepository.save(product);
+        return productRepository.save(product).getId();
     }
 
     private void insertAllProducts(final List<String> productNames) {
