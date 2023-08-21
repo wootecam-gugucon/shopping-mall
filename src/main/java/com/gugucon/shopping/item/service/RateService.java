@@ -50,7 +50,11 @@ public class RateService {
             .mapToInt(Rate::getScore)
             .average()
             .orElse(0.0);
-        return new RateResponse(rates.size(), averageRate);
+        return new RateResponse(rates.size(), roundDownAverage(averageRate));
+    }
+
+    private double roundDownAverage(final double average) {
+        return (double) Math.round(average * 100) / 100;
     }
 
     private void validateProduct(final Long productId) {

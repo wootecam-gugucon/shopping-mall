@@ -235,8 +235,9 @@ class RateIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final RateResponse rateResponse = response.as(RateResponse.class);
+        final double roundedAverageRate = Double.parseDouble(String.format("%.2f", averageRate));
         assertThat(rateResponse.getRateCount()).isEqualTo(rateCount);
-        assertThat(rateResponse.getAverageRate()).isEqualTo(averageRate);
+        assertThat(rateResponse.getAverageRate()).isEqualTo(Double.valueOf(roundedAverageRate));
     }
 
     @Test
@@ -300,7 +301,7 @@ class RateIntegrationTest {
             final String accessToken = loginAfterSignUp("test_email" + i + "@woowafriends.com", "test_password!");
             final Long orderId = buyProduct(accessToken, productId, 5);
             final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
-            final short score = 3;
+            final short score = (short) (Math.random() * 5 + 1);
             totalScore += score;
             createRateToOrderedItem(accessToken, orderItemId, score);
         }
