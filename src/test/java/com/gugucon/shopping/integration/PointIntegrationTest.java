@@ -3,7 +3,6 @@ package com.gugucon.shopping.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gugucon.shopping.integration.config.IntegrationTest;
-import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
 import com.gugucon.shopping.point.dto.request.PointCreateRequest;
 import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;

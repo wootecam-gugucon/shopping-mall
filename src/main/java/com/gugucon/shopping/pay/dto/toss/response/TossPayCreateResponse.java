@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.dto.response;
+package com.gugucon.shopping.pay.dto.toss.response;
 
 import com.gugucon.shopping.pay.domain.Pay;
 import lombok.AccessLevel;
@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class PayCreateResponse {
+public class TossPayCreateResponse {
 
     private Long payId;
 
-    public static PayCreateResponse from(final Pay pay) {
-        return new PayCreateResponse(pay.getId());
+    public static TossPayCreateResponse from(final Pay pay) {
+        return new TossPayCreateResponse(pay.getId());
     }
 }
