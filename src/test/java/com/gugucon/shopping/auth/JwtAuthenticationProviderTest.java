@@ -9,6 +9,8 @@ import com.gugucon.shopping.auth.security.JwtAuthenticationProvider;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import java.util.Optional;
@@ -66,10 +68,12 @@ class JwtAuthenticationProviderTest {
 
         final String jwtToken = "validJwtToken";
         final String principal = "12";
-        final Member member = new Member(Long.valueOf(principal),
-                                         "email@test.com",
-                                         Password.of("password", passwordEncoder),
-                                         "nickname");
+        final Member member = Member.builder()
+                                    .id(Long.valueOf(principal))
+                                    .email(Email.from("email@test.com"))
+                                    .password(Password.of("password", passwordEncoder))
+                                    .nickname(Nickname.from("nickname"))
+                                    .build();
         final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwtToken);
 
         when(jwtProvider.validate(jwtToken)).thenReturn(true);

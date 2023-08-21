@@ -1,5 +1,11 @@
 package com.gugucon.shopping.item.service;
 
+import static com.gugucon.shopping.utils.DomainUtils.createProduct;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
@@ -8,22 +14,15 @@ import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.gugucon.shopping.TestUtils.createProduct;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CartService 단위 테스트")
@@ -64,13 +63,13 @@ class CartServiceTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(chicken)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
         final CartItem cartItemPizza = CartItem.builder()
                 .id(2L)
                 .memberId(memberId)
                 .product(pizza)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
         final List<CartItem> cartItems = List.of(cartItemChicken, cartItemPizza);
         when(cartItemRepository.findAllByMemberIdWithProduct(memberId)).thenReturn(cartItems);
@@ -97,7 +96,7 @@ class CartServiceTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(product)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
 
         final int updateQuantity = 3;
@@ -121,7 +120,7 @@ class CartServiceTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(product)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
 
         when(cartItemRepository.findById(cartItem.getId())).thenReturn(Optional.of(cartItem));

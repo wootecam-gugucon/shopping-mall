@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "cart_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Builder
 public class CartItem extends BaseTimeEntity {
 
     @Id
@@ -39,17 +42,6 @@ public class CartItem extends BaseTimeEntity {
     @NotNull
     @AttributeOverride(name = "value", column = @Column(name = "quantity"))
     private Quantity quantity;
-
-    @Builder
-    private CartItem(final Long id,
-                     final Long memberId,
-                     final Product product,
-                     final int quantity) {
-        this.id = id;
-        this.memberId = memberId;
-        this.product = product;
-        this.quantity = Quantity.from(quantity);
-    }
 
     public void updateQuantity(final Quantity quantity) {
         this.quantity = quantity;

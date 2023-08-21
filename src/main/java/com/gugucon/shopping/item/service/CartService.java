@@ -34,7 +34,7 @@ public class CartService {
         final CartItem cartItem = CartItem.builder()
                 .memberId(memberId)
                 .product(product)
-                .quantity(1)
+                .quantity(Quantity.from(1))
                 .build();
         cartItemRepository.save(cartItem);
     }

@@ -1,6 +1,6 @@
 package com.gugucon.shopping.pay.controller;
 
-import com.gugucon.shopping.pay.dto.request.PayFailParameter;
+import com.gugucon.shopping.pay.dto.request.PayFailRequest;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +25,7 @@ public class PayPageController {
     }
 
     @GetMapping("/fail-popup")
-    public String getFailPagePopUp(@ModelAttribute final PayFailParameter payFailParameter) {
+    public String getFailPagePopUp(@ModelAttribute final PayFailRequest payFailRequest) {
         return "pay-fail-popup";
     }
 

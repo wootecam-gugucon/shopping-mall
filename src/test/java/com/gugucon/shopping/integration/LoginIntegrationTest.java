@@ -1,11 +1,12 @@
 package com.gugucon.shopping.integration;
 
-import com.gugucon.shopping.TestUtils;
+import static com.gugucon.shopping.utils.ApiUtils.signUp;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
@@ -19,8 +20,6 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("로그인 기능 통합 테스트")
@@ -40,9 +39,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(email, password);
 
         /* when */
@@ -89,9 +86,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(email, "invalid_password");
 
         /* when */
@@ -116,9 +111,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(loginEmail, password);
 
         /* when */
@@ -143,9 +136,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
+        signUp(email, password);
         LoginRequest loginRequest = new LoginRequest(email, loginPassword);
 
         /* when */

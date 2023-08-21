@@ -1,17 +1,17 @@
 package com.gugucon.shopping.item.domain.entity;
 
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigInteger;
-
-import static com.gugucon.shopping.TestUtils.createProduct;
-import static com.gugucon.shopping.TestUtils.createSoldOutProduct;
+import static com.gugucon.shopping.utils.DomainUtils.createProduct;
+import static com.gugucon.shopping.utils.DomainUtils.createSoldOutProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.gugucon.shopping.common.domain.vo.Quantity;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
+import java.math.BigInteger;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("CartItem 단위 테스트")
 class CartItemTest {
@@ -24,7 +24,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         /* when */
@@ -42,7 +42,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when & then
@@ -58,7 +58,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(memberId)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when & then
@@ -75,7 +75,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when
@@ -93,7 +93,7 @@ class CartItemTest {
                 .id(1L)
                 .memberId(1L)
                 .product(createSoldOutProduct("치킨", 10000))
-                .quantity(4)
+                .quantity(Quantity.from(4))
                 .build();
 
         // when

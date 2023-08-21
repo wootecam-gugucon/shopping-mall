@@ -1,6 +1,13 @@
 package com.gugucon.shopping.integration;
 
-import com.gugucon.shopping.TestUtils;
+import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
+import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -11,8 +18,6 @@ import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.domain.vo.Email;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
@@ -21,17 +26,13 @@ import com.gugucon.shopping.order.repository.OrderRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.List;
-
-import static com.gugucon.shopping.TestUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("주문 기능 통합 테스트")
@@ -70,12 +71,7 @@ class OrderIntegrationTest {
     @DisplayName("주문한다.")
     void order() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
 
         /* when */
@@ -96,12 +92,7 @@ class OrderIntegrationTest {
     @DisplayName("장바구니가 비어 있으면 주문을 요청했을 때 400 상태코드를 응답한다.")
     void orderFail_emptyCart() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -123,16 +114,13 @@ class OrderIntegrationTest {
     void orderFail_soldOutProduct() {
         /* given */
         final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        final String accessToken = TestUtils.login(new LoginRequest(email, password));
+        final String accessToken = loginAfterSignUp(email, "test_password!");
 
         final Long memberId = memberRepository.findByEmail(Email.from(email)).orElseThrow().getId();
         cartItemRepository.save(CartItem.builder()
                                         .product(productRepository.findById(4L).orElseThrow())
                                         .memberId(memberId)
-                                        .quantity(1)
+                                        .quantity(Quantity.from(1))
                                         .build());
 
         /* when */
@@ -154,11 +142,7 @@ class OrderIntegrationTest {
     @DisplayName("주문을 요청했을 때 재고가 부족하면 400 상태코드를 응답한다.")
     void orderFail_lackOfStock() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long cartItemId = readCartItems(accessToken).get(0).getCartItemId();
@@ -184,12 +168,7 @@ class OrderIntegrationTest {
     @DisplayName("주문 상세 정보를 조회한다.")
     void readOrderDetail() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         insertCartItem(accessToken, new CartItemInsertRequest(2L));
@@ -214,15 +193,10 @@ class OrderIntegrationTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("존재하지 않는 주문이면 주문 상세정보 조회를 요청했을 때 404 상태코드를 응답한다.")
     void readOrderDetailFail_invalidOrderId() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final Long invalidOrderId = Long.MAX_VALUE;
 
@@ -238,28 +212,19 @@ class OrderIntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
-    @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 400 상태코드를 응답한다.")
+    @DisplayName("다른 사용자의 주문이면 주문 상세정보 조회를 요청했을 때 404 상태코드를 응답한다.")
     void readOrderDetailFail_orderOfOtherUser() {
         /* given */
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
-        TestUtils.signup(signupRequest);
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         insertCartItem(accessToken, new CartItemInsertRequest(1L));
         final Long orderId = placeOrder(accessToken);
 
-        final String otherEmail = "other_test_email@woowafriends.com";
-        final String otherPassword = "test_password!";
-        final String otherNickname = "tester2";
-        TestUtils.signup(new SignupRequest(otherEmail, otherPassword, otherPassword, otherNickname));
-        String otherAccessToken = TestUtils.login(new LoginRequest(otherEmail, otherPassword));
+        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -273,7 +238,7 @@ class OrderIntegrationTest {
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private List<String> toNames(final List<CartItemResponse> cartItemResponses) {

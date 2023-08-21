@@ -1,12 +1,12 @@
 package com.gugucon.shopping.integration;
 
-import com.gugucon.shopping.TestUtils;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
-import com.gugucon.shopping.member.dto.request.LoginRequest;
-import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -17,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("jwt 토큰 인증 기능 통합 테스트")
@@ -36,11 +34,7 @@ class AuthIntegrationTest {
     @DisplayName("jwt 토큰 인증에 성공한다")
     void authenticate() {
         // given
-        final String email = "test_email@woowafriends.com";
-        final String password = "test_password!";
-        final String nickname = "tester1";
-        TestUtils.signup(new SignupRequest(email, password, password, nickname));
-        String accessToken = TestUtils.login(new LoginRequest(email, password));
+        String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         // when
         final ExtractableResponse<Response> response = RestAssured

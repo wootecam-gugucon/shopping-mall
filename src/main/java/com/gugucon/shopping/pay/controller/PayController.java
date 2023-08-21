@@ -1,8 +1,10 @@
 package com.gugucon.shopping.pay.controller;
 
 import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
+import com.gugucon.shopping.pay.dto.request.PayFailRequest;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
+import com.gugucon.shopping.pay.dto.response.PayFailResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
 import com.gugucon.shopping.pay.service.PayService;
@@ -38,5 +40,11 @@ public final class PayController {
     public PayValidationResponse validatePayment(@RequestBody final PayValidationRequest payValidationRequest,
                                                  @AuthenticationPrincipal final Long memberId) {
         return payService.validatePay(payValidationRequest, memberId);
+    }
+
+    @PostMapping("/fail")
+    @ResponseStatus(HttpStatus.OK)
+    public PayFailResponse failPayment(@RequestBody final PayFailRequest payFailRequest) {
+        return payService.decodeOrderId(payFailRequest);
     }
 }
