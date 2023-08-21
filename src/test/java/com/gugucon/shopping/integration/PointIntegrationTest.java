@@ -2,6 +2,8 @@ package com.gugucon.shopping.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.point.dto.request.PointChargeRequest;
 import com.gugucon.shopping.utils.ApiUtils;
@@ -61,6 +63,8 @@ class PointIntegrationTest {
                 .extract();
 
         // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

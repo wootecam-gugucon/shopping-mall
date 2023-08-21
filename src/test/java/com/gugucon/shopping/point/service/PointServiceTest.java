@@ -16,6 +16,8 @@ import com.gugucon.shopping.utils.DomainUtils;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -54,7 +56,7 @@ class PointServiceTest {
         assertThat(after).isPresent()
                          .get()
                          .extracting(Point::getMemberId, Point::getPoint)
-                         .containsExactly(memberId, Money.from(1000L));
+                         .containsExactly(memberId, 1000L);
     }
 
     @Test
@@ -66,7 +68,7 @@ class PointServiceTest {
         final Long memberId = memberRepository.save(member).getId();
         pointRepository.save(Point.builder()
                                   .memberId(memberId)
-                                  .point(Money.from(1000L))
+                                  .point(1000L)
                                   .build());
 
         // when
@@ -77,13 +79,14 @@ class PointServiceTest {
         assertThat(after).isPresent()
                          .get()
                          .extracting(Point::getMemberId, Point::getPoint)
-                         .containsExactly(memberId, Money.from(2000L));
+                         .containsExactly(memberId, 2000L);
     }
 
-    @Test
-    @DisplayName("0 포인트 충전을 요청하면 예외를 던진다.")
-    void chargeFail_zeroPoint() {
-        final PointChargeRequest pointChargeRequest = new PointChargeRequest(0L);
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 0L})
+    @DisplayName("0 이하의 포인트 충전을 요청하면 예외를 던진다.")
+    void chargeFail_notPositivePoint(Long chargePoint) {
+        final PointChargeRequest pointChargeRequest = new PointChargeRequest(chargePoint);
         final Member member = DomainUtils.createMember();
         final Long memberId = memberRepository.save(member).getId();
 
@@ -93,20 +96,5 @@ class PointServiceTest {
         // then
         assertThat(exception).isInstanceOf(ShoppingException.class);
         assertThat(((ShoppingException) exception).getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
-    }
-
-    @Test
-    @DisplayName("0 미만의 포인트 충전을 요청하면 예외를 던진다.")
-    void chargeFail_notPositivePoint() {
-        final PointChargeRequest pointChargeRequest = new PointChargeRequest(-1L);
-        final Member member = DomainUtils.createMember();
-        final Long memberId = memberRepository.save(member).getId();
-
-        // when
-        Exception exception = catchException(() -> pointService.charge(pointChargeRequest, memberId));
-
-        // then
-        assertThat(exception).isInstanceOf(ShoppingException.class);
-        assertThat(((ShoppingException) exception).getErrorCode()).isEqualTo(ErrorCode.INVALID_MONEY);
     }
 }
