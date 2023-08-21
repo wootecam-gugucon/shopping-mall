@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+<div class="root">
+  <div th:replace="~{layouts/header :: header}"></div>
+
+  <section class="product-section">
+    <div class="flex">
+      <div class="product-detail-container">
+        <hr class="divide-line-thin"/>
+        <div class="product-right-section__bottom">
+          <div class="flex justify-between p-20 mt-20">
+            <h3 class="highlight-text">상품이름</h3>
+            <span class="highlight-text product-name"></span>
+          </div>
+          <div class="flex justify-between p-20 mt-20">
+            <img class="product-image" />
+          </div>
+          <div class="flex justify-between p-20 mt-20">
+            <span class="highlight-text">상품금액</span>
+            <span class="highlight-text product-price"></span>
+          </div>
+          <div class="flex justify-between p-20 mt-20">
+            <p class="highlight-text">상품설명</p>
+            <p class="product-description" style="font-size:1.5em"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const productId = [[${productId}]];
+
+    fetch(`/api/v1/product/${productId}`, {
+      method: 'GET',
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      response.json().then((data) => alert(data.message));
+      window.location.href = "/";
+    }).then((data) => {
+      document.querySelector('.product-name').innerHTML = `${data.name}`;
+      document.querySelector('.product-price').innerText = `${data.price} 원`;
+      document.querySelector('.product-description').innerText = `${data.description}`;
+      document.querySelector('.product-image').src = `/assets/${data.imageFileName}`;
+    }).catch((error) => {
+      console.error(error);
+    });
+
+  });
+</script>
+</body>
+</html>
