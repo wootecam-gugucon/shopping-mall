@@ -38,7 +38,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        Long productId = insertProduct("test_product",  1000L, 10);
+        final Long productId = insertProduct("test_product",  1000L, 10);
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(productId);
 
         /* when */
@@ -61,7 +61,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        Long productId = insertProduct("test_product", 1000L, 10);
+        final Long productId = insertProduct("test_product", 1000L, 10);
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
 
         /* when */
@@ -135,7 +135,7 @@ class CartIntegrationTest {
         /* given */
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        Long soldOutProductId = insertProduct("test_product", 100L, 0);
+        final Long soldOutProductId = insertProduct("test_product", 100L, 0);
         final CartItemInsertRequest cartItemInsertRequest = new CartItemInsertRequest(soldOutProductId);
 
         /* when */

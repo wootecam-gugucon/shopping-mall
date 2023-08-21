@@ -5,12 +5,14 @@ import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
 import java.util.Base64.Encoder;
 
+@Slf4j
 public final class TossPayValidator implements PayValidator {
 
     private static final String VALIDATE_URL = "https://api.tosspayments.com/v1/payments/confirm";
@@ -35,6 +37,7 @@ public final class TossPayValidator implements PayValidator {
     public void validatePayment(final PayValidationRequest payValidationRequest) {
         final TossValidationRequest tossValidationRequest = TossValidationRequest.of(payValidationRequest);
         final HttpEntity<TossValidationRequest> request = new HttpEntity<>(tossValidationRequest, httpHeaders);
+        log.info("toss validation request sent for orderId: {}", payValidationRequest.getOrderId());
         final ResponseEntity<TossValidationResponse> response = restTemplate.postForEntity(VALIDATE_URL,
                                                                                            request,
                                                                                            TossValidationResponse.class);

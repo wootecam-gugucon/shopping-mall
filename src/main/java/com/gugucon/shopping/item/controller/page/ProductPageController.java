@@ -12,6 +12,11 @@ public class ProductPageController {
         return "index";
     }
 
+    @GetMapping("/search")
+    public String searchProducts() {
+        return "search";
+    }
+
     @GetMapping("/product/{productId}")
     public String productDetailPage(@PathVariable final String productId) {
         return "product-detail";

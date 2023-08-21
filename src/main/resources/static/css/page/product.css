@@ -51,6 +51,27 @@
   color: white;
 }
 
+.product-search-container {
+  margin: 1em;
+}
+
+.product-search-container > input {
+  border: 1px solid black;
+}
+
+.product-search-result {
+  font-size: 3em;
+}
+
+.product-sort-container {
+  display: flex;
+}
+
+.product-sort-container > button {
+  margin: 0 2em 0;
+  border: black solid 1px;
+}
+
 :disabled {
   background: #ccc;
 }
