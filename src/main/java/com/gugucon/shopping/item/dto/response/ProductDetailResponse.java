@@ -1,5 +1,6 @@
 package com.gugucon.shopping.item.dto.response;
 
+import com.gugucon.shopping.item.domain.entity.Product;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,4 +16,14 @@ public class ProductDetailResponse {
     private String imageFileName;
     private String description;
     private long price;
+
+    public static ProductDetailResponse from(Product product) {
+        return new ProductDetailResponse(
+            product.getId(),
+            product.getName(),
+            product.getImageFileName(),
+            product.getDescription(),
+            product.getPrice().getValue()
+        );
+    }
 }

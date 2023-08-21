@@ -42,6 +42,6 @@ public class ProductController {
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public ProductDetailResponse getProductDetail(@PathVariable final Long productId) {
-        return null;
+        return productService.getProductDetail(productId);
     }
 }
