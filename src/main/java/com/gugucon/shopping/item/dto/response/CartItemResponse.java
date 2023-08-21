@@ -16,6 +16,7 @@ public final class CartItemResponse {
     private String imageFileName;
     private long price;
     private int quantity;
+    private boolean soldOut;
 
     public static CartItemResponse from(CartItem cartItem) {
         return new CartItemResponse(
@@ -23,7 +24,8 @@ public final class CartItemResponse {
                 cartItem.getProduct().getName(),
                 cartItem.getProduct().getImageFileName(),
                 cartItem.getProduct().getPrice().getValue(),
-                cartItem.getQuantity().getValue()
+                cartItem.getQuantity().getValue(),
+                cartItem.getProduct().getStock().isZero()
         );
     }
 }
