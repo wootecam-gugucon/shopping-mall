@@ -14,7 +14,12 @@ const addCartItem = (productId) => {
         },
         body: JSON.stringify({"productId": productId})
     }).then((response) => {
-        alert('장바구니에 담았습니다.');
+        if (response.ok) {
+            alert('장바구니에 담았습니다.');
+        }
+        else {
+            response.json().then((data) => {alert(data.message)});
+        }
     }).catch((error) => {
         console.error(error);
     });

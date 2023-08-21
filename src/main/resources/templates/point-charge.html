@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+  <div class="root">
+    <div th:replace="~{layouts/header :: header}"></div>
+    <section class="form-container">
+      <span>포인트 잔액: <span id="totalPoint"></span></span>
+      <form id="point-form" class="mt-40">
+        <label for="point">포인트</label>
+        <input class="text-input mb-10" type="number" id="point" name="point" required>
+
+        <button type="submit" class="primary-button-small form-submit-button">충전</button>
+      </form>
+    </section>
+  </div>
+</body>
+<script th:src="@{/js/point.js}"></script>
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const credentials = localStorage.getItem('accessToken');
+    if (!credentials) {
+      alert('사용자 정보가 없습니다.');
+      window.location.href = '/login';
+      return;
+    }
+
+    fetch(`/api/v1/point`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${credentials}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response.json();
+    }).then((data) => {
+      document.getElementById('totalPoint').innerText = data.point;
+    }).catch((error) => {
+      console.error(error);
+    });
+
+  });
+</script>
+</html>

@@ -45,13 +45,13 @@ const pointPayPopUp = (orderId) => {
         body: JSON.stringify({"orderId": orderId})
     }).then((response) => {
         if (response.ok) {
-            return response.json();
+            response.json().then((data) => {
+                window.location.href = `/pay/success?orderId=${data.orderId}`;
+            });
         }
         else {
             response.json().then((data) => alert(data.message));
         }
-    }).then((data) => {
-        window.location.href = `/pay/success?orderId=${data.orderId}`;
     }).catch((error) => {
         console.error(error);
     });
