@@ -6,6 +6,8 @@ import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
+import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
+import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
 import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
 import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
@@ -96,6 +98,21 @@ public class ApiUtils {
             .then().log().all()
             .extract();
         return Long.parseLong(response.header("Location").split("/")[2]);
+    }
+
+    public static OrderDetailResponse getOrderDetail(final String accessToken, final Long orderId) {
+        return RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/api/v1/order/{orderId}", orderId)
+            .then().log().all()
+            .extract()
+            .as(OrderDetailResponse.class);
+    }
+
+    public static OrderItemResponse getFirstOrderItem(final String accessToken, final Long orderId) {
+         return getOrderDetail(accessToken, orderId).getOrderItems().get(0);
     }
 
     public static Long createPayment(final String accessToken, final PayCreateRequest payCreateRequest) {
