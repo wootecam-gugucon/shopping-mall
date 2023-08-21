@@ -1,5 +1,7 @@
 package com.gugucon.shopping.pay.controller;
 
+import com.gugucon.shopping.pay.dto.point.request.PointPayRequest;
+import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
@@ -19,6 +21,13 @@ import org.springframework.web.bind.annotation.*;
 public final class PayController {
 
     private final PayService payService;
+
+    @PutMapping("/point")
+    @ResponseStatus(HttpStatus.OK)
+    public PointPayResponse createPayment(@RequestBody final PointPayRequest pointPayRequest,
+                                          @AuthenticationPrincipal final Long memberId) {
+        return payService.createPay(pointPayRequest, memberId);
+    }
 
     @PutMapping("/toss")
     @ResponseStatus(HttpStatus.OK)

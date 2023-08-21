@@ -1,10 +1,13 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
@@ -29,12 +32,12 @@ class PointPayIntegrationTest {
     ProductRepository productRepository;
 
     @Test
-    @DisplayName("주문에 대한 결제 정보를 생성한다.")
+    @DisplayName("포인트로 주문하면 결제 정보를 생성한다.")
     void createPayment_() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct");
-
+        chargePoint(accessToken, 2000L);
+        addProductToCart(accessToken, "testProduct", 1000L);
         final Long orderId = placeOrder(accessToken);
         final PointPayRequest pointPayRequest = new PointPayRequest(orderId);
 
@@ -55,14 +58,40 @@ class PointPayIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    private void addProductToCart(final String accessToken,
-                                  final String productName) {
-        final Long productId = insertProduct(productName);
+    @Test
+    @DisplayName("포인트로 주문할 때 가격이 포인트 잔액보다 크면 400 상태코드를 응답한다.")
+    void createPaymentFail_priceOverPointBalance() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        chargePoint(accessToken, 2000L);
+        addProductToCart(accessToken, "testProduct", 3000L);
+        final Long orderId = placeOrder(accessToken);
+        final PointPayRequest pointPayRequest = new PointPayRequest(orderId);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(pointPayRequest)
+                .when()
+                .put("/api/v1/pay/point")
+                .then().log().all()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.POINT_NOT_ENOUGH);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void addProductToCart(final String accessToken, final String productName, final Long price) {
+        final Long productId = insertProduct(productName, price);
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
     }
 
-    private Long insertProduct(final String productName) {
-        final Product product = DomainUtils.createProductWithoutId(productName, 1000L, 10);
+    private Long insertProduct(final String productName, final Long price) {
+        final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         productRepository.save(product);
         return product.getId();
     }

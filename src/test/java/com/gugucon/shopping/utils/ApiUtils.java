@@ -11,6 +11,7 @@ import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayValidationResponse;
+import com.gugucon.shopping.point.dto.request.PointChargeRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -149,5 +150,16 @@ public class ApiUtils {
                                                                                                tossPayInfoResponse.getPrice(),
                                                                                                "mockPaymentType");
         return validatePayment(accessToken, tossPayValidationRequest);
+    }
+
+    public static void chargePoint(String accessToken, Long chargePoint) {
+        RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new PointChargeRequest(chargePoint))
+                .when()
+                .put("/api/v1/point")
+                .then().log().all();
     }
 }
