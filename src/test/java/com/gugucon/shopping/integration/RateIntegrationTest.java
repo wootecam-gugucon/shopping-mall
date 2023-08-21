@@ -271,11 +271,15 @@ class RateIntegrationTest {
         return product.getId();
     }
 
-    private Long buyProductWithSuccess(String accessToken, String productName) {
+    private void mockServerSuccess(int count) {
         final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-        server.expect(ExpectedCount.twice(), anything())
+        server.expect(ExpectedCount.times(count), anything())
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+    }
+
+    private Long buyProductWithSuccess(String accessToken, String productName) {
+        mockServerSuccess(2);
         return ApiUtils.buyProduct(accessToken, insertProduct(productName), 10);
     }
 
@@ -292,10 +296,7 @@ class RateIntegrationTest {
     }
 
     private double createRateToProduct(final Long productId, final int count) {
-        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-        server.expect(ExpectedCount.times(count), anything())
-            .andExpect(method(HttpMethod.POST))
-            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+        mockServerSuccess(count);
         double totalScore = 0;
         for (int i = 0; i < count; i++) {
             final String accessToken = loginAfterSignUp("test_email" + i + "@woowafriends.com", "test_password!");
