@@ -244,16 +244,19 @@ class ProductIntegrationTest {
 
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
         ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(사과_id));
-        ApiUtils.updateCartItem(accessToken, 1L, new CartItemUpdateRequest(10));
-
         ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(사과는맛있어_id));
-        ApiUtils.updateCartItem(accessToken, 2L, new CartItemUpdateRequest(9));
-
         ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(가나다라마사과과_id));
-        ApiUtils.updateCartItem(accessToken, 3L, new CartItemUpdateRequest(8));
-
         ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(맛있는사과_id));
-        ApiUtils.updateCartItem(accessToken, 4L, new CartItemUpdateRequest(7));
+
+        final Long 사과_장바구니_id = ApiUtils.readCartItems(accessToken).get(0).getCartItemId();
+        final Long 사과는맛있어_장바구니_id = ApiUtils.readCartItems(accessToken).get(1).getCartItemId();
+        final Long 가나다라마사과과_장바구니_id = ApiUtils.readCartItems(accessToken).get(2).getCartItemId();
+        final Long 맛있는사과_장바구니_id = ApiUtils.readCartItems(accessToken).get(3).getCartItemId();
+
+        ApiUtils.updateCartItem(accessToken, 사과_장바구니_id, new CartItemUpdateRequest(10));
+        ApiUtils.updateCartItem(accessToken, 사과는맛있어_장바구니_id, new CartItemUpdateRequest(9));
+        ApiUtils.updateCartItem(accessToken, 가나다라마사과과_장바구니_id, new CartItemUpdateRequest(8));
+        ApiUtils.updateCartItem(accessToken, 맛있는사과_장바구니_id, new CartItemUpdateRequest(7));
 
         ApiUtils.placeOrder(accessToken);
 
