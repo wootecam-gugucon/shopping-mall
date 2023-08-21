@@ -31,7 +31,8 @@
             th:with="value='price,asc'"
             name="sort-select-button">가격 낮은순</button>
     <button type="button"
-            th:onclick="|location.href='@{/search(keyword=${param.keyword})}'|"
+            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
+            th:with="value='orderCount,desc'"
             name="sort-select-button">주문 많은순</button>
   </div>
   <section class="product-container">
