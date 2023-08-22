@@ -1,6 +1,7 @@
 package com.gugucon.shopping.item.controller.api;
 
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
+import com.gugucon.shopping.item.dto.response.RateDetailResponse;
 import com.gugucon.shopping.item.dto.response.RateResponse;
 import com.gugucon.shopping.item.service.RateService;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,17 @@ public class RateController {
     private final RateService rateService;
 
     @PostMapping
-    public ResponseEntity<Void> createRate(@AuthenticationPrincipal final Long memberId,
-                                           @RequestBody final RateCreateRequest request) {
+    public ResponseEntity<Void> createRate(@RequestBody final RateCreateRequest request,
+                                           @AuthenticationPrincipal final Long memberId) {
         rateService.createRate(memberId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/orderItem/{orderItemId}")
+    @ResponseStatus(HttpStatus.OK)
+    public RateDetailResponse getRateDetail(@PathVariable final long orderItemId,
+                                            @AuthenticationPrincipal final Long memberId) {
+        return rateService.getRateDetail(memberId, orderItemId);
     }
 
     @GetMapping("/product/{productId}")

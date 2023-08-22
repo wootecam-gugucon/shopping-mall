@@ -16,6 +16,7 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
+import com.gugucon.shopping.item.dto.response.RateDetailResponse;
 import com.gugucon.shopping.item.dto.response.RateResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.utils.DomainUtils;
@@ -174,8 +175,8 @@ class RateIntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_RATE);
-        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_RATE.getMessage());
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_SCORE);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_SCORE.getMessage());
     }
 
     @Test
@@ -258,6 +259,59 @@ class RateIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCT);
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_PRODUCT.getMessage());
+    }
+
+    @Test
+    @DisplayName("사용자가 주문 상품에 남긴 별점 정보를 가져온다")
+    void getRateDetail() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, insertProduct("good product"));
+        final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+        final short score = 3;
+        createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, score));
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/api/v1/rate/orderItem/{orderItemId}", orderItemId)
+            .then()
+            .contentType(ContentType.JSON)
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final RateDetailResponse rateDetailResponse = response.as(RateDetailResponse.class);
+        assertThat(rateDetailResponse.getScore()).isEqualTo(score);
+    }
+
+    @Test
+    @DisplayName("사용자가 주문 상품에 남긴 별점 정보 조회 시, 별점 정보가 존재하지 않으면 404 상태를 반환한다")
+    void getRateDetail_notExistRate_status404() {
+        // given
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, insertProduct("good product"));
+        final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .when()
+            .get("/api/v1/rate/orderItem/{orderItemId}", orderItemId)
+            .then()
+            .contentType(ContentType.JSON)
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_RATE);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_RATE.getMessage());
     }
 
     private Long insertProduct(final String productName) {

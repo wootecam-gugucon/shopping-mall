@@ -32,6 +32,12 @@
             <p class="product-description" style="font-size:1.5em"></p>
           </div>
         </div>
+        <div>
+          <div class="flex justify-between p-20 mt-20">
+            <h3 class="highlight-text">별점</h3>
+            <span class="highlight-text rate"></span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -57,6 +63,17 @@
       console.error(error);
     });
 
+    fetch(`/api/v1/rate/product/${productId}`, {
+      method: 'GET'
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      response.json().then((data) => alert(data.message));
+      window.location.href = "/";
+    }).then((data) => {
+      document.querySelector('.rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
+    })
   });
 </script>
 </body>
