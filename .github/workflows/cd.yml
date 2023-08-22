@@ -1,8 +1,7 @@
 name: 도커 이미지 빌드 후 도커 허브에 배포
 
 on:
-  push:
-    branches: [ "develop" ]
+  push
 
 jobs:
   docker:
@@ -26,3 +25,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: gunner6603/shopping-dev:latest
+          cache-from: type=gha # 여기서 gha 는 Guthub Actions 용 캐시를 의미합니다.
+          cache-to: type=gha,mode=max
