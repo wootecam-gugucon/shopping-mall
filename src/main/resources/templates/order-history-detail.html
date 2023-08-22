@@ -77,6 +77,9 @@
                           <span class="shopping-name">${orderItem.productName}</span> <!-- 상품 이름 -->
                           <span class="shopping-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span> <!-- 상품 가격 및 수량 -->
                         </div>
+                        <button class="flex justify-between p-20 mt-20" onclick="location.href='/rate/orderItem/{orderItem}'">
+                          <span class="highlight-text">별점 남기기</span>
+                        </button>
                       </div>
                     </div>
                     <hr class="divide-line-thin mt-10"/>
