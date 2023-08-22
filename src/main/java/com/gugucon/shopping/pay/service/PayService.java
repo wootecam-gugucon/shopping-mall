@@ -11,6 +11,7 @@ import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.domain.Pay;
+import com.gugucon.shopping.pay.domain.Pay.PayType;
 import com.gugucon.shopping.pay.dto.point.request.PointPayRequest;
 import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
@@ -85,7 +86,7 @@ public class PayService {
 
         cartItemRepository.deleteAllByMemberId(memberId);
         order.pay();
-        return PointPayResponse.from(payRepository.save(Pay.from(order)));
+        return PointPayResponse.from(payRepository.save(Pay.from(order, PayType.POINT)));
     }
 
     @Transactional
@@ -95,7 +96,7 @@ public class PayService {
         payRepository.findByOrderId(orderId)
                 .ifPresent(payRepository::delete);
 
-        return TossPayCreateResponse.from(payRepository.save(Pay.from(order)));
+        return TossPayCreateResponse.from(payRepository.save(Pay.from(order, PayType.NORMAL)));
     }
 
     public TossPayInfoResponse readPayInfo(final Long payId, final Long memberId) {

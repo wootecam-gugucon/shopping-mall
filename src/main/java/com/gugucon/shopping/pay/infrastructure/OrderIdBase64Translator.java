@@ -45,10 +45,10 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
             throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
 
-        final String decoded = new String(decoder.decode(encodedOrderId.getBytes()));
         try {
+            final String decoded = new String(decoder.decode(encodedOrderId.getBytes()));
             return Long.parseLong(decoded.split(DELIMITER)[0]);
-        } catch (NumberFormatException e) {
+        } catch (IllegalArgumentException e) {
             throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
         }
     }

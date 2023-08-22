@@ -1,10 +1,9 @@
 package com.gugucon.shopping.point.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gugucon.shopping.common.config.JpaConfig;
-import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.member.domain.entity.Member;
@@ -90,11 +89,9 @@ class PointServiceTest {
         final Member member = DomainUtils.createMember();
         final Long memberId = memberRepository.save(member).getId();
 
-        // when
-        Exception exception = catchException(() -> pointService.charge(pointChargeRequest, memberId));
-
-        // then
-        assertThat(exception).isInstanceOf(ShoppingException.class);
-        assertThat(((ShoppingException) exception).getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                                                         () -> pointService.charge(pointChargeRequest, memberId));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
     }
 }

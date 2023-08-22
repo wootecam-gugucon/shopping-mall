@@ -2,7 +2,7 @@ package com.gugucon.shopping.point.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
@@ -50,12 +50,9 @@ class PointTest {
                                  .point(1000L)
                                  .build();
 
-        // when
-        final Exception exception = catchException(() -> point.charge(chargePoint));
-
-        // then
-        assertThat(exception).isInstanceOf(ShoppingException.class);
-        assertThat(((ShoppingException) exception).getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> point.charge(chargePoint));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
     }
 
     @Test
@@ -83,11 +80,8 @@ class PointTest {
                                  .point(1000L)
                                  .build();
 
-        // when
-        final Exception exception = catchException(() -> point.use(1200L));
-
-        // then
-        assertThat(exception).isInstanceOf(ShoppingException.class);
-        assertThat(((ShoppingException) exception).getErrorCode()).isEqualTo(ErrorCode.POINT_NOT_ENOUGH);
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> point.use(1200L));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POINT_NOT_ENOUGH);
     }
 }
