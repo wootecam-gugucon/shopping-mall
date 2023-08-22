@@ -68,12 +68,12 @@ public class RateService {
         }
     }
 
-    private OrderItem searchOrderItem(Long memberId, Long orderItemId) {
+    private OrderItem searchOrderItem(final Long memberId, final Long orderItemId) {
         return orderItemRepository.findByOrderIdAndMemberIdAndOrderStatus(memberId, orderItemId, OrderStatus.PAYED)
             .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER_ITEM));
     }
 
-    private void validateDuplicateRate(Long orderItemId) {
+    private void validateDuplicateRate(final Long orderItemId) {
         rateRepository.findByOrderItemId(orderItemId)
             .ifPresent(rate -> {
                 throw new ShoppingException(ErrorCode.ALREADY_RATED);

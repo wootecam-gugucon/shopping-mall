@@ -11,7 +11,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT oi FROM Order o INNER JOIN o.orderItems oi "
         + "WHERE o.memberId = :memberId AND o.status = :orderStatus AND oi.id = :orderItemId")
-    Optional<OrderItem> findByOrderIdAndMemberIdAndOrderStatus(@Param("memberId") Long memberId,
-                                                               @Param("orderItemId") Long orderItemId,
-                                                               @Param("orderStatus") OrderStatus orderStatus);
+    Optional<OrderItem> findByOrderIdAndMemberIdAndOrderStatus(@Param("memberId") final Long memberId,
+                                                               @Param("orderItemId") final Long orderItemId,
+                                                               @Param("orderStatus") final OrderStatus orderStatus);
 }

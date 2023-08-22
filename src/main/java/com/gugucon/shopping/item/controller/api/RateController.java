@@ -23,15 +23,15 @@ public class RateController {
     private final RateService rateService;
 
     @PostMapping
-    public ResponseEntity<Void> createRate(@AuthenticationPrincipal Long memberId,
-                                           @RequestBody RateCreateRequest request) {
+    public ResponseEntity<Void> createRate(@AuthenticationPrincipal final Long memberId,
+                                           @RequestBody final RateCreateRequest request) {
         rateService.createRate(memberId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/product/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public RateResponse getRates(@PathVariable Long productId) {
+    public RateResponse getRates(@PathVariable final Long productId) {
         return rateService.getRates(productId);
     }
 }
