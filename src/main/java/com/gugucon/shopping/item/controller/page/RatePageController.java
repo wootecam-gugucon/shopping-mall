@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class RatePageController {
 
     @GetMapping("/rate/orderItem/{orderItemId}")
-    public String ratePopUp(@PathVariable Long orderItemId, Model model) {
+    public String ratePopUp(@PathVariable final Long orderItemId, final Model model) {
         model.addAttribute("orderItemId", orderItemId);
         return "rate-popup";
     }
