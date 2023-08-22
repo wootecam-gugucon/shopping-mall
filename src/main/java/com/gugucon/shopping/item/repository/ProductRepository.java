@@ -15,7 +15,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllByNameContainingIgnoreCase(final @NotNull String name, final Pageable pageable);
 
     @Query("select p from Product p " +
-            "join OrderItem oi on p.id = oi.productId " +
+            "left join OrderItem oi on p.id = oi.productId " +
             "where p.name like %:keyword% " +
             "group by p.id " +
             "order by sum(oi.quantity.value) desc ")
