@@ -1,6 +1,7 @@
 package com.gugucon.shopping.integration;
 
 import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
+import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
 import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
@@ -138,7 +139,7 @@ class RateIntegrationTest {
         final Long orderId = buyProductWithSuccess(accessToken, "good product");
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         final short score = 3;
-        createRateToOrderedItem(accessToken, orderItemId, score);
+        createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, score));
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -283,18 +284,6 @@ class RateIntegrationTest {
         return ApiUtils.buyProduct(accessToken, insertProduct(productName), 10);
     }
 
-    private void createRateToOrderedItem(final String accessToken, final Long orderItemId, final short score) {
-        RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(orderItemId, score))
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
-    }
-
     private double createRateToProduct(final Long productId, final int count) {
         mockServerSuccess(count);
         double totalScore = 0;
@@ -304,7 +293,7 @@ class RateIntegrationTest {
             final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
             final short score = (short) (Math.random() * 5 + 1);
             totalScore += score;
-            createRateToOrderedItem(accessToken, orderItemId, score);
+            createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, score));
         }
         return totalScore / count;
     }

@@ -2,6 +2,7 @@ package com.gugucon.shopping.utils;
 
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
+import com.gugucon.shopping.item.dto.request.RateCreateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
@@ -14,6 +15,7 @@ import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
 import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
 import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -166,5 +168,17 @@ public class ApiUtils {
                                                                                    payInfoResponse.getPrice(),
                                                                                    "mockPaymentType");
         return validatePayment(accessToken, payValidationRequest);
+    }
+
+    public static void createRateToOrderedItem(final String accessToken, final RateCreateRequest request) {
+        RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .body(request)
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/api/v1/rate")
+            .then()
+            .extract();
     }
 }
