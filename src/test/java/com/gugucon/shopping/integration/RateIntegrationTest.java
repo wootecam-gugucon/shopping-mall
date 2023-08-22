@@ -104,6 +104,7 @@ class RateIntegrationTest {
         final String othersAccessToken = loginAfterSignUp("other_email@woowafriends.com", "test_password");
         final Long orderId = buyProductWithSuccess(restTemplate, othersAccessToken, insertProduct("good product"));
         final long othersOrderItemId = getFirstOrderItem(othersAccessToken, orderId).getId();
+
         final short score = 3;
 
         // when
@@ -133,6 +134,7 @@ class RateIntegrationTest {
         final Long orderId = buyProductWithSuccess(restTemplate, accessToken, insertProduct("good product"));
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         final short score = 3;
+
         createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, score));
 
         // when
@@ -185,10 +187,12 @@ class RateIntegrationTest {
     void rate_notPayedOrderItem_status404() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+
         final Long productId = insertProduct("testProduct");
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
         final Long orderId = placeOrder(accessToken);
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+
         final short score = 3;
 
         // when

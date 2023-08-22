@@ -191,8 +191,8 @@ public class ApiUtils {
     }
 
     public static Long buyProductWithSuccess(final RestTemplate restTemplate,
-                                       final String accessToken,
-                                       final Long productId) {
+                                             final String accessToken,
+                                             final Long productId) {
         mockServerSuccess(restTemplate, 2);
         return ApiUtils.buyProduct(accessToken, productId, 10);
     }
