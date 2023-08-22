@@ -58,7 +58,7 @@ public class RateService {
     }
 
     private double roundDownAverage(final double average) {
-        return (double) Math.round(average * 100) / 100;
+        return Math.floor(average * 100) / 100.0;
     }
 
     private void validateProduct(final Long productId) {
