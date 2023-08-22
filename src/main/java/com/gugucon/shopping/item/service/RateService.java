@@ -4,6 +4,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.Rate;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
+import com.gugucon.shopping.item.dto.response.RateDetailResponse;
 import com.gugucon.shopping.item.dto.response.RateResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.item.repository.RateRepository;
@@ -82,5 +83,11 @@ public class RateService {
             .ifPresent(rate -> {
                 throw new ShoppingException(ErrorCode.ALREADY_RATED);
             });
+    }
+
+    public RateDetailResponse getRateDetail(final Long memberId, final Long orderItemId) {
+        final Rate rate = rateRepository.findByMemberIdAndOrderItemId(memberId, orderItemId)
+            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_RATE));
+        return new RateDetailResponse(rate.getScore());
     }
 }

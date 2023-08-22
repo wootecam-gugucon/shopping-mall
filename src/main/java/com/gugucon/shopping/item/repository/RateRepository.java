@@ -14,4 +14,6 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
 
     @Query("SELECT r FROM Rate r INNER JOIN r.orderItem oi WHERE oi.productId = :productId")
     List<Rate> findByProductId(final Long productId);
+
+    Optional<Rate> findByMemberIdAndOrderItemId(final Long memberId, final Long orderItemId);
 }
