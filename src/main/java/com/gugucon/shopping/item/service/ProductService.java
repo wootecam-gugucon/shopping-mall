@@ -3,6 +3,7 @@ package com.gugucon.shopping.item.service;
 import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
+import com.gugucon.shopping.item.domain.SortKey;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,20 +32,25 @@ public class ProductService {
     }
 
     public PagedResponse<ProductResponse> searchProducts(final String keyword, final Pageable pageable) {
+        final Sort sort = pageable.getSort();
+        validateSort(sort);
         validateNotBlank(keyword);
-        if (pageable.getSort().equals(SORT_BY_ORDER_COUNT)) {
+
+        if (sort.equals(SORT_BY_ORDER_COUNT)) {
             return searchProductsSortByOrderCount(keyword, pageable);
         }
         return searchProductsSortBy(keyword, pageable);
     }
 
-    private PagedResponse<ProductResponse> searchProductsSortBy(final String keyword, final Pageable pageable) {
-        try {
-            final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
-            return convertToPage(products);
-        } catch (final PropertyReferenceException exception) {
-            throw new ShoppingException(ErrorCode.INVALID_SORT_KEY);
+    private void validateSort(final Sort sort) {
+        if (!SortKey.contains(sort)) {
+            throw new ShoppingException(ErrorCode.INVALID_SORT);
         }
+    }
+
+    private PagedResponse<ProductResponse> searchProductsSortBy(final String keyword, final Pageable pageable) {
+        final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
+        return convertToPage(products);
     }
 
     private void validateNotBlank(final String keyword) {
@@ -73,7 +78,7 @@ public class ProductService {
 
     public ProductDetailResponse getProductDetail(final Long productId) {
         final Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
         return ProductDetailResponse.from(product);
     }
 }

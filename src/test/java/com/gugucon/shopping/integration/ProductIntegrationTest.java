@@ -137,6 +137,7 @@ class ProductIntegrationTest {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .queryParam("keyword", keyword)
+                .queryParam("sort", "createdAt,desc")
                 .when().get("/api/v1/product/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
@@ -305,6 +306,7 @@ class ProductIntegrationTest {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .queryParam("keyword", "")
+                .queryParam("sort", "createdAt,desc")
                 .when().get("/api/v1/product/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
@@ -364,7 +366,7 @@ class ProductIntegrationTest {
         // then
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_SORT_KEY);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_SORT);
     }
 
     @Test

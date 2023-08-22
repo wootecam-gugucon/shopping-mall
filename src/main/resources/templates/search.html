@@ -20,7 +20,8 @@
   </div>
   <div class="product-sort-container">
     <button type="button"
-            th:onclick="|location.href='@{/search(keyword=${param.keyword})}'|"
+            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
+            th:with="value='createdAt,desc'"
             name="sort-select-button">최신순</button>
     <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
