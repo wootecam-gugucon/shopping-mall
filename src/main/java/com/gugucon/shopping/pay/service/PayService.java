@@ -77,8 +77,7 @@ public class PayService {
         final Long orderId = pointPayRequest.getOrderId();
         final Order order = findUnPayedOrderBy(orderId, memberId);
 
-        final Point point = pointRepository.findByMemberId(memberId)
-                                           .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
+        final Point point = findPoint(memberId);
         point.use(order.calculateTotalPrice());
 
         payRepository.findByOrderId(orderId)
@@ -87,6 +86,11 @@ public class PayService {
         cartItemRepository.deleteAllByMemberId(memberId);
         order.pay();
         return PointPayResponse.from(payRepository.save(Pay.from(order, PayType.POINT)));
+    }
+
+    private Point findPoint(final Long memberId) {
+        return pointRepository.findByMemberId(memberId)
+                              .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
     }
 
     @Transactional
