@@ -88,6 +88,6 @@ public class RateService {
     public RateDetailResponse getRateDetail(final Long memberId, final Long orderItemId) {
         final Rate rate = rateRepository.findByMemberIdAndOrderItemId(memberId, orderItemId)
             .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_RATE));
-        return new RateDetailResponse(rate.getScore());
+        return RateDetailResponse.from(rate);
     }
 }
