@@ -37,10 +37,10 @@ import org.springframework.web.client.RestTemplate;
 class RateIntegrationTest {
 
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     @Autowired
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
 
     @Autowired
     private RestTemplate restTemplate;
