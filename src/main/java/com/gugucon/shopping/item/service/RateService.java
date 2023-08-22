@@ -46,11 +46,15 @@ public class RateService {
     public RateResponse getRates(final Long productId) {
         validateProduct(productId);
         final List<Rate> rates = rateRepository.findByProductId(productId);
-        final double averageRate = rates.stream()
+        final double averageRate = calculateAverageRate(rates);
+        return new RateResponse(rates.size(), roundDownAverage(averageRate));
+    }
+
+    private double calculateAverageRate(final List<Rate> rates) {
+        return rates.stream()
             .mapToInt(Rate::getScore)
             .average()
             .orElse(0.0);
-        return new RateResponse(rates.size(), roundDownAverage(averageRate));
     }
 
     private double roundDownAverage(final double average) {
