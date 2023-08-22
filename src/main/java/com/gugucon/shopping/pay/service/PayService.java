@@ -11,17 +11,22 @@ import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.domain.Pay;
-import com.gugucon.shopping.pay.dto.request.PayCreateRequest;
-import com.gugucon.shopping.pay.dto.request.PayFailRequest;
-import com.gugucon.shopping.pay.dto.request.PayValidationRequest;
-import com.gugucon.shopping.pay.dto.response.PayCreateResponse;
-import com.gugucon.shopping.pay.dto.response.PayFailResponse;
-import com.gugucon.shopping.pay.dto.response.PayInfoResponse;
-import com.gugucon.shopping.pay.dto.response.PayValidationResponse;
+import com.gugucon.shopping.pay.domain.Pay.PayType;
+import com.gugucon.shopping.pay.dto.point.request.PointPayRequest;
+import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
+import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
+import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
+import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
+import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
+import com.gugucon.shopping.pay.dto.toss.response.TossPayFailResponse;
+import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
+import com.gugucon.shopping.pay.dto.toss.response.TossPayValidationResponse;
 import com.gugucon.shopping.pay.infrastructure.CustomerKeyGenerator;
 import com.gugucon.shopping.pay.infrastructure.OrderIdTranslator;
 import com.gugucon.shopping.pay.infrastructure.PayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
+import com.gugucon.shopping.point.domain.Point;
+import com.gugucon.shopping.point.repository.PointRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +40,7 @@ public class PayService {
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
     private final MemberRepository memberRepository;
+    private final PointRepository pointRepository;
     private final PayValidator payValidator;
     private final OrderIdTranslator orderIdTranslator;
     private final CustomerKeyGenerator customerKeyGenerator;
@@ -47,6 +53,7 @@ public class PayService {
                       final ProductRepository productRepository,
                       final CartItemRepository cartItemRepository,
                       final MemberRepository memberRepository,
+                      final PointRepository pointRepository,
                       final PayValidator payValidator,
                       final OrderIdTranslator orderIdTranslator,
                       final CustomerKeyGenerator customerKeyGenerator,
@@ -57,6 +64,7 @@ public class PayService {
         this.productRepository = productRepository;
         this.cartItemRepository = cartItemRepository;
         this.memberRepository = memberRepository;
+        this.pointRepository = pointRepository;
         this.payValidator = payValidator;
         this.orderIdTranslator = orderIdTranslator;
         this.customerKeyGenerator = customerKeyGenerator;
@@ -65,45 +73,66 @@ public class PayService {
     }
 
     @Transactional
-    public PayCreateResponse createPay(final PayCreateRequest payCreateRequest, final Long memberId) {
-        final Long orderId = payCreateRequest.getOrderId();
+    public PointPayResponse payByPoint(final PointPayRequest pointPayRequest, final Long memberId) {
+        final Long orderId = pointPayRequest.getOrderId();
+        final Order order = findUnPayedOrderBy(orderId, memberId);
+
+        final Point point = findPoint(memberId);
+        point.use(order.calculateTotalPrice());
+
+        payRepository.findByOrderId(orderId)
+                     .ifPresent(payRepository::delete);
+
+        cartItemRepository.deleteAllByMemberId(memberId);
+        order.pay();
+        return PointPayResponse.from(payRepository.save(Pay.from(order, PayType.POINT)));
+    }
+
+    private Point findPoint(final Long memberId) {
+        return pointRepository.findByMemberId(memberId)
+                              .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
+    }
+
+    @Transactional
+    public TossPayCreateResponse createTossPay(final TossPayCreateRequest tossPayCreateRequest, final Long memberId) {
+        final Long orderId = tossPayCreateRequest.getOrderId();
         final Order order = findUnPayedOrderBy(orderId, memberId);
         payRepository.findByOrderId(orderId)
                 .ifPresent(payRepository::delete);
 
-        return PayCreateResponse.from(payRepository.save(Pay.from(order)));
+        return TossPayCreateResponse.from(payRepository.save(Pay.from(order, PayType.NORMAL)));
     }
 
-    public PayInfoResponse readPayInfo(final Long payId, final Long memberId) {
+    public TossPayInfoResponse readPayInfo(final Long payId, final Long memberId) {
         final Pay pay = payRepository.findById(payId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PAY));
         final Order order = findUnPayedOrderBy(pay.getOrderId(), memberId);
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
 
-        return PayInfoResponse.from(orderIdTranslator.encode(order),
-                                    order,
-                                    pay,
-                                    member,
-                                    customerKeyGenerator.generate(member),
-                                    successUrl,
-                                    failUrl);
+        return TossPayInfoResponse.from(orderIdTranslator.encode(order),
+                                        order,
+                                        pay,
+                                        member,
+                                        customerKeyGenerator.generate(member),
+                                        successUrl,
+                                        failUrl);
     }
 
     @Transactional
-    public PayValidationResponse validatePay(final PayValidationRequest payValidationRequest, final Long memberId) {
-        final Long orderId = orderIdTranslator.decode(payValidationRequest.getOrderId());
+    public TossPayValidationResponse validatePay(final TossPayValidationRequest tossPayValidationRequest, final Long memberId) {
+        final Long orderId = orderIdTranslator.decode(tossPayValidationRequest.getOrderId());
         final Order order = findUnPayedOrderBy(orderId, memberId);
         final Pay pay = payRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PAY));
 
-        pay.validateMoney(Money.from(payValidationRequest.getAmount()));
+        pay.validateMoney(Money.from(tossPayValidationRequest.getAmount()));
         decreaseStock(order);
         order.pay();
-        payValidator.validatePayment(payValidationRequest);
+        payValidator.validatePayment(tossPayValidationRequest);
 
         cartItemRepository.deleteAllByMemberId(memberId);
-        return PayValidationResponse.from(orderId);
+        return TossPayValidationResponse.from(orderId);
     }
 
     private void decreaseStock(final Order order) {
@@ -122,8 +151,8 @@ public class PayService {
         return order;
     }
 
-    public PayFailResponse decodeOrderId(final PayFailRequest payFailRequest) {
-        final Long orderId = orderIdTranslator.decode(payFailRequest.getOrderId());
-        return PayFailResponse.from(orderId);
+    public TossPayFailResponse decodeOrderId(final TossPayFailRequest tossPayFailRequest) {
+        final Long orderId = orderIdTranslator.decode(tossPayFailRequest.getOrderId());
+        return TossPayFailResponse.from(orderId);
     }
 }

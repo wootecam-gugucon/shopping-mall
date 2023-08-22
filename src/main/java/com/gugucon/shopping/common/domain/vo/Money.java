@@ -33,6 +33,10 @@ public class Money {
         return new Money(value + other.value);
     }
 
+    public Money subtract(final Money other) {
+        return new Money(value - other.value);
+    }
+
     public Money multiply(final Quantity quantity) {
         return new Money(value * quantity.getValue());
     }
@@ -41,5 +45,13 @@ public class Money {
         if (value < 0) {
             throw new ShoppingException(ErrorCode.INVALID_MONEY);
         }
+    }
+
+    public boolean isNotPositive() {
+        return value <= 0;
+    }
+
+    public boolean isLessThan(final Money other) {
+        return value < other.value;
     }
 }
