@@ -3,6 +3,7 @@ package com.gugucon.shopping.point.controller;
 import com.gugucon.shopping.point.dto.request.PointChargeRequest;
 import com.gugucon.shopping.point.dto.response.PointResponse;
 import com.gugucon.shopping.point.service.PointService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,7 @@ public class PointController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public void charge(@RequestBody final PointChargeRequest pointChargeRequest,
+    public void charge(@RequestBody @Valid final PointChargeRequest pointChargeRequest,
                        @AuthenticationPrincipal final Long memberId) {
         pointService.charge(pointChargeRequest, memberId);
     }
