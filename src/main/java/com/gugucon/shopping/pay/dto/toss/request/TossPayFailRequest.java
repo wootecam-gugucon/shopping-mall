@@ -1,11 +1,11 @@
-package com.gugucon.shopping.pay.dto.request;
+package com.gugucon.shopping.pay.dto.toss.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public final class PayFailRequest {
+public final class TossPayFailRequest {
 
     private final String code;
     private final String message;

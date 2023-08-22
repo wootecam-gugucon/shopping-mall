@@ -1,13 +1,15 @@
 package com.gugucon.shopping.pay.infrastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.order.domain.entity.Order;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
 
 @DisplayName("OrderIdBase64Translator 단위테스트")
 class OrderIdBase64TranslatorTest {
@@ -47,11 +49,10 @@ class OrderIdBase64TranslatorTest {
         // given
         String notAvaliable = "not available";
 
-        // when
-        Exception exception = catchException(() -> orderIdTranslator.decode(notAvaliable));
-
-        // then
-        assertThat(exception).isInstanceOf(RuntimeException.class);
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                                                         () -> orderIdTranslator.decode(notAvaliable));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.UNKNOWN_ERROR);
     }
 
     @ParameterizedTest
