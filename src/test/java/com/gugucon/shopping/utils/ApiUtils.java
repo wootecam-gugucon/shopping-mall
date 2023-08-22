@@ -1,5 +1,9 @@
 package com.gugucon.shopping.utils;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
@@ -19,7 +23,11 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
 public class ApiUtils {
 
@@ -45,7 +53,7 @@ public class ApiUtils {
     }
 
     public static void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
+        final SignupRequest request = new SignupRequest(email, password, password, "testUser");
         ApiUtils.signup(request);
     }
 
@@ -114,7 +122,7 @@ public class ApiUtils {
     }
 
     public static OrderItemResponse getFirstOrderItem(final String accessToken, final Long orderId) {
-         return getOrderDetail(accessToken, orderId).getOrderItems().get(0);
+        return getOrderDetail(accessToken, orderId).getOrderItems().get(0);
     }
 
     public static Long createPayment(final String accessToken, final PayCreateRequest payCreateRequest) {
@@ -180,5 +188,19 @@ public class ApiUtils {
             .post("/api/v1/rate")
             .then()
             .extract();
+    }
+
+    public static Long buyProductWithSuccess(final RestTemplate restTemplate,
+                                       final String accessToken,
+                                       final Long productId) {
+        mockServerSuccess(restTemplate, 2);
+        return ApiUtils.buyProduct(accessToken, productId, 10);
+    }
+
+    public static void mockServerSuccess(final RestTemplate restTemplate, final int count) {
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.times(count), anything())
+            .andExpect(method(HttpMethod.POST))
+            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
     }
 }

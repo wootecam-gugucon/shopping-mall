@@ -1,15 +1,14 @@
 package com.gugucon.shopping.integration;
 
 import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
+import static com.gugucon.shopping.utils.ApiUtils.buyProductWithSuccess;
 import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
 import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -20,7 +19,6 @@ import com.gugucon.shopping.item.dto.request.RateCreateRequest;
 import com.gugucon.shopping.item.dto.response.RateResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
-import com.gugucon.shopping.utils.ApiUtils;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -31,11 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.ExpectedCount;
-import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 @IntegrationTest
@@ -56,7 +50,7 @@ class RateIntegrationTest {
     void rate() {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        final Long orderId = buyProductWithSuccess(accessToken, "good product");
+        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, insertProduct("good product"));
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         final short score = 3;
 
@@ -108,7 +102,7 @@ class RateIntegrationTest {
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         final String othersAccessToken = loginAfterSignUp("other_email@woowafriends.com", "test_password");
-        final Long orderId = buyProductWithSuccess(othersAccessToken, "good product");
+        final Long orderId = buyProductWithSuccess(restTemplate, othersAccessToken, insertProduct("good product"));
         final long othersOrderItemId = getFirstOrderItem(othersAccessToken, orderId).getId();
         final short score = 3;
 
@@ -136,7 +130,7 @@ class RateIntegrationTest {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
-        final Long orderId = buyProductWithSuccess(accessToken, "good product");
+        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, insertProduct("good product"));
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         final short score = 3;
         createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, score));
@@ -165,7 +159,7 @@ class RateIntegrationTest {
     void rate_notInvalidScore_status400(final short score) {
         // given
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        final Long orderId = buyProductWithSuccess(accessToken, "good product");
+        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, insertProduct("good product"));
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
 
         // when
@@ -272,20 +266,8 @@ class RateIntegrationTest {
         return product.getId();
     }
 
-    private void mockServerSuccess(int count) {
-        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-        server.expect(ExpectedCount.times(count), anything())
-            .andExpect(method(HttpMethod.POST))
-            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
-    }
-
-    private Long buyProductWithSuccess(String accessToken, String productName) {
-        mockServerSuccess(2);
-        return ApiUtils.buyProduct(accessToken, insertProduct(productName), 10);
-    }
-
     private double createRateToProduct(final Long productId, final int count) {
-        mockServerSuccess(count);
+        mockServerSuccess(restTemplate, count);
         double totalScore = 0;
         for (int i = 0; i < count; i++) {
             final String accessToken = loginAfterSignUp("test_email" + i + "@woowafriends.com", "test_password!");
