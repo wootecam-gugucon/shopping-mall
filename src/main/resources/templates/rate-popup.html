@@ -9,7 +9,7 @@
 <div>
   <input type="range" id="rate" name="rate" min="1" max="5" />
 </div>
-<button type="submit" onclick="rate(${product.id})">적용하기</button>
+<button type="submit" onclick="rate()">적용하기</button>
 </body>
 <script>
   const rate = () => {
@@ -24,9 +24,6 @@
     const score = document.getElementById("rate").value;
     const orderItemId = [[${orderItemId}]];
 
-    console.log(score);
-    console.log(orderItemId);
-
     fetch(`/api/v1/rate`, {
       method: 'POST',
       headers: {
@@ -35,9 +32,10 @@
       },
       body: JSON.stringify({"orderItemId": orderItemId, "score": score})
     }).then((response) => {
-      return response.json();
-    }).then((data) => {
-      console.log(data);
+      if (response.ok) {
+        return
+      }
+      response.json().then((data) => alert(data.message));
     }).catch((error) => {
       console.error(error);
     });
