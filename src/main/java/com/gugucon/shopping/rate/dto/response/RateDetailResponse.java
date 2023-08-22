@@ -1,6 +1,6 @@
-package com.gugucon.shopping.item.dto.response;
+package com.gugucon.shopping.rate.dto.response;
 
-import com.gugucon.shopping.item.domain.entity.Rate;
+import com.gugucon.shopping.rate.domain.entity.Rate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

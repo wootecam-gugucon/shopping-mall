@@ -1,16 +1,16 @@
-package com.gugucon.shopping.item.service;
+package com.gugucon.shopping.rate.service;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.item.domain.entity.Rate;
-import com.gugucon.shopping.item.dto.request.RateCreateRequest;
-import com.gugucon.shopping.item.dto.response.RateDetailResponse;
-import com.gugucon.shopping.item.dto.response.RateResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.item.repository.RateRepository;
 import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
+import com.gugucon.shopping.rate.domain.entity.Rate;
+import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
+import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
+import com.gugucon.shopping.rate.dto.response.RateResponse;
+import com.gugucon.shopping.rate.repository.RateRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

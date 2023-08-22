@@ -1,4 +1,4 @@
-package com.gugucon.shopping.item.domain.entity;
+package com.gugucon.shopping.rate.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.order.domain.entity.OrderItem;

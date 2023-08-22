@@ -6,7 +6,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
-import com.gugucon.shopping.item.dto.request.RateCreateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
@@ -20,6 +19,7 @@ import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayValidationResponse;
 import com.gugucon.shopping.point.dto.request.PointChargeRequest;
+import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
