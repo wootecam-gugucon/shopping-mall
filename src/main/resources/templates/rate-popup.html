@@ -39,10 +39,12 @@
       },
       body: JSON.stringify({"orderItemId": orderItemId, "score": score})
     }).then((response) => {
-      if (response.ok) {
-        return
+      if (!response.ok) {
+        response.json().then((data) => {
+          alert(data.message);
+        });
       }
-      response.json().then((data) => alert(data.message + "\n 뒤로 나가세요 ☠️!!!!!"));
+      window.history.back();
     }).catch((error) => {
       console.error(error);
     });
