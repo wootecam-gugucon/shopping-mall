@@ -22,8 +22,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: true
           tags: gunner6603/shopping-dev:latest
-          cache-from: type=gha # 여기서 gha 는 Guthub Actions 용 캐시를 의미합니다.
-          cache-to: type=gha,mode=max
