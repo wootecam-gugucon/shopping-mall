@@ -40,7 +40,7 @@ public enum ErrorCode {
     LACK_OF_STOCK(BAD_REQUEST, "재고가 부족합니다."),
     ALREADY_RATED(BAD_REQUEST, "이미 평가를 완료한 주문 상품입니다."),
     INVALID_RATE(BAD_REQUEST, "별점은 0이상 5이하의 정수여야 합니다."),
-    EMPTY_INPUT(BAD_REQUEST, "내용을 입력해주세요.");
+    EMPTY_INPUT(BAD_REQUEST, "내용을 입력해주세요."),;
 
     private final HttpStatus status;
     private final String message;
