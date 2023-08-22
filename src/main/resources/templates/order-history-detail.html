@@ -69,7 +69,6 @@
       let element = '<hr class="divide-line-gray mt-10" />';
       data.orderItems.forEach(orderItem => {
         const orderItemId = orderItem.id;
-        const rateLocation = '/rate/orderItem/' + orderItemId;
         element += `
                     <div class="shopping-container">
                       <div class="flex gap-15 mt-10">
@@ -84,31 +83,8 @@
                     <hr class="divide-line-thin mt-10"/>
                     `;
 
-        fetch(`/api/v1/rate/orderItem/${orderItemId}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${credentials}`,
-            'Content-Type': 'application/json'
-          }
-        }).then((response) => {
-              const rate = document.getElementById(`rate-${orderItemId}`);
-              if (response.ok) {
-                response.json().then(data => {
-                  console.log(data.score);
-                  rate.innerHTML += `
-                    <span className="highlight-text">내가 남긴 별점: ${data.score} / 5<span>
-                  `;
-                });
-              } else {
-                rate.innerHTML += `
-                  <a className="flex justify-between p-20 mt-20" href="${rateLocation}">
-                    <span className="highlight-text">별점 남기기</span>
-                  </a>`
-              }
-            }
-        );
+        fetchRate(credentials, orderItemId);
       });
-
       document.querySelector('.order-item-list').innerHTML = element;
       document.querySelector('.order-title').innerHTML = `주문 번호 : ${data.orderId}`;
       document.querySelector('.order-name').innerHTML = `주문 이름 : ${data.orderName}`;
@@ -120,6 +96,34 @@
       console.error(error);
     });
   });
+
+  const fetchRate = (credentials, orderItemId) => {
+    const rateLocation = '/rate/orderItem/' + orderItemId;
+
+    fetch(`/api/v1/rate/orderItem/${orderItemId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${credentials}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+          const rate = document.getElementById(`rate-${orderItemId}`);
+          if (response.ok) {
+            response.json().then(data => {
+              console.log(data.score);
+              rate.innerHTML += `
+                    <span className="highlight-text">내가 남긴 별점: ${data.score} / 5<span>
+                  `;
+            });
+          } else {
+            rate.innerHTML += `
+                  <a className="flex justify-between p-20 mt-20" href="${rateLocation}">
+                    <span className="highlight-text">별점 남기기</span>
+                  </a>`
+          }
+        }
+    );
+  }
 </script>
 </body>
 </html>
