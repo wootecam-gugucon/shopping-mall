@@ -72,24 +72,24 @@ public class PayService {
     }
 
     @Transactional
-    public PointPayResponse createPay(final PointPayRequest pointPayRequest, final Long memberId) {
+    public PointPayResponse createPointPay(final PointPayRequest pointPayRequest, final Long memberId) {
         final Long orderId = pointPayRequest.getOrderId();
         final Order order = findUnPayedOrderBy(orderId, memberId);
 
         final Point point = pointRepository.findByMemberId(memberId)
                                            .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
         point.use(order.calculateTotalPrice().getValue());
-        pointRepository.save(point);
 
         payRepository.findByOrderId(orderId)
                      .ifPresent(payRepository::delete);
 
         cartItemRepository.deleteAllByMemberId(memberId);
+        order.pay();
         return PointPayResponse.from(payRepository.save(Pay.from(order)));
     }
 
     @Transactional
-    public TossPayCreateResponse createPay(final TossPayCreateRequest tossPayCreateRequest, final Long memberId) {
+    public TossPayCreateResponse createTossPay(final TossPayCreateRequest tossPayCreateRequest, final Long memberId) {
         final Long orderId = tossPayCreateRequest.getOrderId();
         final Order order = findUnPayedOrderBy(orderId, memberId);
         payRepository.findByOrderId(orderId)

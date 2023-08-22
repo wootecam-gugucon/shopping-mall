@@ -26,14 +26,14 @@ public final class PayController {
     @ResponseStatus(HttpStatus.OK)
     public PointPayResponse createPayment(@RequestBody final PointPayRequest pointPayRequest,
                                           @AuthenticationPrincipal final Long memberId) {
-        return payService.createPay(pointPayRequest, memberId);
+        return payService.createPointPay(pointPayRequest, memberId);
     }
 
     @PutMapping("/toss")
     @ResponseStatus(HttpStatus.OK)
     public TossPayCreateResponse createPayment(@RequestBody final TossPayCreateRequest tossPayCreateRequest,
                                                @AuthenticationPrincipal final Long memberId) {
-        return payService.createPay(tossPayCreateRequest, memberId);
+        return payService.createTossPay(tossPayCreateRequest, memberId);
     }
 
 
