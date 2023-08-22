@@ -11,9 +11,11 @@
   <div class="root">
     <div th:replace="~{layouts/header :: header}"></div>
     <section class="form-container">
-      <span>포인트 잔액: <span id="totalPoint"></span></span>
       <form id="point-form" class="mt-40">
-        <label for="point">포인트</label>
+        <div class="my-20">
+          <span class="highlight-text">포인트 잔액: <span id="totalPoint"></span></span>
+        </div>
+        <label for="point">충전할 포인트</label>
         <input class="text-input mb-10" type="number" id="point" name="point" required>
 
         <button type="submit" class="primary-button-small form-submit-button">충전</button>
@@ -22,29 +24,8 @@
   </div>
 </body>
 <script th:src="@{/js/point.js}"></script>
+<script th:src="@{/js/point-form.js}"></script>
 <script th:inline="javascript">
-  document.addEventListener("DOMContentLoaded", function () {
-    const credentials = localStorage.getItem('accessToken');
-    if (!credentials) {
-      alert('사용자 정보가 없습니다.');
-      window.location.href = '/login';
-      return;
-    }
-
-    fetch(`/api/v1/point`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${credentials}`,
-        'Content-Type': 'application/json'
-      }
-    }).then((response) => {
-      return response.json();
-    }).then((data) => {
-      document.getElementById('totalPoint').innerText = data.point;
-    }).catch((error) => {
-      console.error(error);
-    });
-
-  });
+  document.addEventListener("DOMContentLoaded", () => getPointBalance("totalPoint"));
 </script>
 </html>
