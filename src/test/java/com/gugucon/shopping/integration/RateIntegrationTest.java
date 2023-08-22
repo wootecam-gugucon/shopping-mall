@@ -18,7 +18,6 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.RateCreateRequest;
 import com.gugucon.shopping.item.dto.response.RateResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -38,9 +37,6 @@ class RateIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
 
     @Autowired
     private RestTemplate restTemplate;
