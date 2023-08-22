@@ -9,6 +9,8 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,10 +39,14 @@ public final class Pay extends BaseTimeEntity {
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
 
-    public static Pay from(final Order order) {
+    @Enumerated(EnumType.STRING)
+    private PayType type;
+
+    public static Pay from(final Order order, final PayType payType) {
         return Pay.builder()
                 .orderId(order.getId())
                 .price(order.calculateTotalPrice())
+                .type(payType)
                 .build();
     }
 
@@ -49,4 +55,6 @@ public final class Pay extends BaseTimeEntity {
             throw new ShoppingException(ErrorCode.PAY_FAILED);
         }
     }
+
+    public enum PayType {POINT, NORMAL,}
 }

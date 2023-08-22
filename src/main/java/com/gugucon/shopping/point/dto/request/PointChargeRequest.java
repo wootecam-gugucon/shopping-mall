@@ -1,5 +1,6 @@
-package com.gugucon.shopping.pay.dto.request;
+package com.gugucon.shopping.point.dto.request;
 
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public final class PayCreateRequest {
+public class PointChargeRequest {
 
-    private Long orderId;
+    @Min(1)
+    private Long point;
 }

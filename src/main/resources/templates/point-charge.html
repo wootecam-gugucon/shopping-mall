@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+  <div class="root">
+    <div th:replace="~{layouts/header :: header}"></div>
+    <section class="form-container">
+      <form id="point-form" class="mt-40">
+        <div class="my-20">
+          <span class="highlight-text">포인트 잔액: <span id="totalPoint"></span></span>
+        </div>
+        <label for="point">충전할 포인트</label>
+        <input class="text-input mb-10" type="number" id="point" name="point" required>
+
+        <button type="submit" class="primary-button-small form-submit-button">충전</button>
+      </form>
+    </section>
+  </div>
+</body>
+<script th:src="@{/js/point.js}"></script>
+<script th:src="@{/js/point-form.js}"></script>
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", () => getPointBalance("totalPoint"));
+</script>
+</html>
