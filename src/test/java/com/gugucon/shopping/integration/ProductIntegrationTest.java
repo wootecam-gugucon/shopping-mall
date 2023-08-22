@@ -6,6 +6,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.utils.DomainUtils;
@@ -275,9 +276,57 @@ class ProductIntegrationTest {
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.EMPTY_INPUT);
     }
 
-    private void insertProduct(final String productName, final long price) {
+    @Test
+    @DisplayName("상품 상세 페이지를 반환한다")
+    void productDetail() {
+        // given
+        final String name = "맛있는 사과";
+        final long price = 3000;
+        final Long productId = insertProduct(name, price);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/api/v1/product/{productId}", productId)
+            .then().contentType(ContentType.JSON).log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final ProductDetailResponse result = response.as(ProductDetailResponse.class);
+        assertThat(result.getId()).isEqualTo(productId);
+        assertThat(result.getName()).isEqualTo(name);
+        assertThat(result.getDescription()).isEqualTo("test_description");
+        assertThat(result.getImageFileName()).isEqualTo("image_file_" + name);
+        assertThat(result.getPrice()).isEqualTo(price);
+    }
+
+    @Test
+    @DisplayName("상품 상세 페이지 조회 시, id 와 일치하는 상품이 없으면 404 를 반환한다")
+    void productDetail_notExistProductId_status404() {
+        // given
+        final Long notExistProductId = 100_000L;
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/api/v1/product/{productId}", notExistProductId)
+            .then().contentType(ContentType.JSON).log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_PRODUCT);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_PRODUCT.getMessage());
+    }
+
+    private Long insertProduct(final String productName, final long price) {
         final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         productRepository.save(product);
+        return product.getId();
     }
 
     private void insertAllProducts(final List<String> productNames) {

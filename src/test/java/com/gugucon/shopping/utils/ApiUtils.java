@@ -1,12 +1,19 @@
 package com.gugucon.shopping.utils;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
+import com.gugucon.shopping.item.dto.request.RateCreateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
+import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
+import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
@@ -14,10 +21,15 @@ import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayValidationResponse;
 import com.gugucon.shopping.point.dto.request.PointChargeRequest;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
 public class ApiUtils {
 
@@ -43,7 +55,7 @@ public class ApiUtils {
     }
 
     public static void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password,"testUser");
+        final SignupRequest request = new SignupRequest(email, password, password, "testUser");
         ApiUtils.signup(request);
     }
 
@@ -111,6 +123,21 @@ public class ApiUtils {
                 .jsonPath().getList(".", OrderHistoryResponse.class);
     }
 
+    public static OrderDetailResponse getOrderDetail(final String accessToken, final Long orderId) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/order/{orderId}", orderId)
+                .then().log().all()
+                .extract()
+                .as(OrderDetailResponse.class);
+    }
+
+    public static OrderItemResponse getFirstOrderItem(final String accessToken, final Long orderId) {
+        return getOrderDetail(accessToken, orderId).getOrderItems().get(0);
+    }
+
     public static Long createPayment(final String accessToken, final TossPayCreateRequest tossPayCreateRequest) {
         return RestAssured
             .given().log().all()
@@ -173,5 +200,31 @@ public class ApiUtils {
                 .when()
                 .put("/api/v1/point")
                 .then().log().all();
+    }
+
+    public static void createRateToOrderedItem(final String accessToken, final RateCreateRequest request) {
+        RestAssured
+            .given().log().all()
+            .auth().oauth2(accessToken)
+            .body(request)
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/api/v1/rate")
+            .then()
+            .extract();
+    }
+
+    public static Long buyProductWithSuccess(final RestTemplate restTemplate,
+                                             final String accessToken,
+                                             final Long productId) {
+        mockServerSuccess(restTemplate, 1);
+        return ApiUtils.buyProduct(accessToken, productId, 10);
+    }
+
+    public static void mockServerSuccess(final RestTemplate restTemplate, final int count) {
+        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+        server.expect(ExpectedCount.times(count), anything())
+            .andExpect(method(HttpMethod.POST))
+            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
     }
 }

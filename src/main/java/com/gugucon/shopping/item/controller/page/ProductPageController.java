@@ -2,6 +2,7 @@ package com.gugucon.shopping.item.controller.page;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class ProductPageController {
@@ -14,5 +15,10 @@ public class ProductPageController {
     @GetMapping("/search")
     public String searchProducts() {
         return "search";
+    }
+
+    @GetMapping("/product/{productId}")
+    public String productDetailPage(@PathVariable final String productId) {
+        return "product-detail";
     }
 }
