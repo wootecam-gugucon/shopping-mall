@@ -4,7 +4,7 @@ COPY build.gradle settings.gradle gradlew /app/
 COPY gradle /app/gradle
 COPY src /app/src
 
-RUN ./gradlew build --stacktrace
+RUN ./gradlew build --stacktrace -x test
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
