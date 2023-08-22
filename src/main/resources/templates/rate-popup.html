@@ -7,12 +7,19 @@
 <body>
 <span>별점을 남겨주세요</span>
 <div>
-  <input type="range" id="rate" name="rate" min="1" max="5" />
+  <input type="range" id="rate" name="rate" value="1" min="1" max="5" onchange="updateValue();"/>
+  <span id="result">1</span>
 </div>
-<button type="submit" onclick="rate()">적용하기</button>
+<button type="submit" onclick="createRate()">적용하기</button>
 </body>
 <script>
-  const rate = () => {
+  const rate = document.getElementById("rate");
+  const result = document.getElementById("result");
+  const updateValue = () => {
+    result.innerText = rate.value;
+  }
+
+  const createRate = () => {
 
     const credentials = localStorage.getItem('accessToken');
     if (!credentials) {
@@ -35,7 +42,7 @@
       if (response.ok) {
         return
       }
-      response.json().then((data) => alert(data.message));
+      response.json().then((data) => alert(data.message + "\n 뒤로 나가세요 ☠️!!!!!"));
     }).catch((error) => {
       console.error(error);
     });
