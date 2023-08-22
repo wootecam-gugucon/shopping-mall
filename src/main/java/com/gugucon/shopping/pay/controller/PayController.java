@@ -44,7 +44,7 @@ public final class PayController {
         return payService.readPayInfo(payId, memberId);
     }
 
-    @PostMapping("/validate")
+    @PostMapping("/toss/validate")
     @ResponseStatus(HttpStatus.OK)
     public TossPayValidationResponse validatePayment(@RequestBody final TossPayValidationRequest tossPayValidationRequest,
                                                      @AuthenticationPrincipal final Long memberId) {

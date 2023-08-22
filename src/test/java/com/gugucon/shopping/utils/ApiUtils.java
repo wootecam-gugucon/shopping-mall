@@ -131,7 +131,7 @@ public class ApiUtils {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(tossPayValidationRequest)
             .when()
-            .post("/api/v1/pay/validate")
+            .post("/api/v1/pay/toss/validate")
             .then().log().all()
             .extract()
             .as(TossPayValidationResponse.class)
