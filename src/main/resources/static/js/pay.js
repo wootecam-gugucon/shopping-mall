@@ -27,7 +27,7 @@ const tossPayPopUp = (orderId) => {
 }
 
 
-const pointPayPopUp = (orderId) => {
+const pointPay = (orderId) => {
 
     const credentials = localStorage.getItem('accessToken');
     if (!credentials) {
