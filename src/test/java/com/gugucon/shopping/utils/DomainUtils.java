@@ -8,6 +8,7 @@ import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
+import com.gugucon.shopping.order.domain.entity.OrderItem;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -80,5 +81,16 @@ public class DomainUtils {
                 .product(createProduct(100))
                 .quantity(Quantity.from(1))
                 .build();
+    }
+
+    public static OrderItem createOrderItem(final String name, final Long productId, final Quantity quantity) {
+        sequence++;
+        return OrderItem.builder()
+                .id(sequence)
+                .name(name)
+                .productId(productId)
+                .imageFileName("")
+                .quantity(quantity)
+                .price(Money.ZERO).build();
     }
 }

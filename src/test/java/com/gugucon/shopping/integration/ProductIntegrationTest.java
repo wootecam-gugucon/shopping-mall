@@ -6,6 +6,7 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
+import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
@@ -249,10 +250,11 @@ class ProductIntegrationTest {
         ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(가나다라마사과과_id));
         ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(맛있는사과_id));
 
-        final Long 사과_장바구니_id = ApiUtils.readCartItems(accessToken).get(0).getCartItemId();
-        final Long 사과는맛있어_장바구니_id = ApiUtils.readCartItems(accessToken).get(1).getCartItemId();
-        final Long 가나다라마사과과_장바구니_id = ApiUtils.readCartItems(accessToken).get(2).getCartItemId();
-        final Long 맛있는사과_장바구니_id = ApiUtils.readCartItems(accessToken).get(3).getCartItemId();
+        final List<CartItemResponse> cartItemResponses = ApiUtils.readCartItems(accessToken);
+        final Long 사과_장바구니_id = cartItemResponses.get(0).getCartItemId();
+        final Long 사과는맛있어_장바구니_id = cartItemResponses.get(1).getCartItemId();
+        final Long 가나다라마사과과_장바구니_id = cartItemResponses.get(2).getCartItemId();
+        final Long 맛있는사과_장바구니_id = cartItemResponses.get(3).getCartItemId();
 
         ApiUtils.updateCartItem(accessToken, 사과_장바구니_id, new CartItemUpdateRequest(10));
         ApiUtils.updateCartItem(accessToken, 사과는맛있어_장바구니_id, new CartItemUpdateRequest(9));

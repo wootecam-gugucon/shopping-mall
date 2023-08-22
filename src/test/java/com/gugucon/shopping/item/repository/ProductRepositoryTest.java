@@ -1,7 +1,6 @@
 package com.gugucon.shopping.item.repository;
 
 import com.gugucon.shopping.common.config.JpaConfig;
-import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.member.domain.entity.Member;
@@ -25,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
+import static com.gugucon.shopping.utils.DomainUtils.createOrderItem;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(JpaConfig.class)
@@ -65,40 +65,11 @@ class ProductRepositoryTest {
                 .status(Order.OrderStatus.PAYED).build();
         orderRepository.save(order);
 
-        final OrderItem 사과_주문상품 = OrderItem.builder()
-                .name("사과")
-                .productId(사과.getId())
-                .imageFileName("")
-                .quantity(Quantity.from(10))
-                .price(Money.ZERO).build();
-
-        final OrderItem 사과는맛있어_주문상품 = OrderItem.builder()
-                .name("사과는 맛있어")
-                .productId(사과는맛있어.getId())
-                .imageFileName("")
-                .quantity(Quantity.from(9))
-                .price(Money.ZERO).build();
-
-        final OrderItem 가나다라마사과과_주문상품 = OrderItem.builder()
-                .name("가나다라마사과과")
-                .productId(가나다라마사과과.getId())
-                .imageFileName("")
-                .quantity(Quantity.from(8))
-                .price(Money.ZERO).build();
-
-        final OrderItem 맛있는사과_주문상품 = OrderItem.builder()
-                .name("맛있는 사과")
-                .productId(맛있는사과.getId())
-                .imageFileName("")
-                .quantity(Quantity.from(7))
-                .price(Money.ZERO).build();
-
-        final OrderItem 가나다라마바사_주문상품 = OrderItem.builder()
-                .name("가나다라마바사")
-                .productId(가나다라마바사.getId())
-                .imageFileName("")
-                .quantity(Quantity.from(10))
-                .price(Money.ZERO).build();
+        final OrderItem 사과_주문상품 = createOrderItem("사과", 사과.getId(), Quantity.from(10));
+        final OrderItem 사과는맛있어_주문상품 = createOrderItem("사과는 맛있어", 사과는맛있어.getId(), Quantity.from(9));
+        final OrderItem 가나다라마사과과_주문상품 = createOrderItem("가나다라마사과과", 가나다라마사과과.getId(), Quantity.from(8));
+        final OrderItem 맛있는사과_주문상품 = createOrderItem("맛있는 사과", 맛있는사과.getId(), Quantity.from(7));
+        final OrderItem 가나다라마바사_주문상품 = createOrderItem("가나다라마바사", 가나다라마바사.getId(), Quantity.from(10));
 
         final List<OrderItem> orderItems = List.of(
                 사과_주문상품, 맛있는사과_주문상품, 사과는맛있어_주문상품, 가나다라마사과과_주문상품, 가나다라마바사_주문상품

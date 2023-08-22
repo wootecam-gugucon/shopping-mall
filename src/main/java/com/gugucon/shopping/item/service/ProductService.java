@@ -7,7 +7,6 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,7 +32,7 @@ public class ProductService {
     }
 
     public PagedResponse<ProductResponse> searchProducts(final String keyword, final Pageable pageable) {
-        validateNotBlack(keyword);
+        validateNotBlank(keyword);
         if (pageable.getSort().equals(SORT_BY_ORDER_COUNT)) {
             return searchProductsSortByOrderCount(keyword, pageable);
         }
@@ -47,7 +48,7 @@ public class ProductService {
         }
     }
 
-    private void validateNotBlack(final String keyword) {
+    private void validateNotBlank(final String keyword) {
         if (keyword.isBlank()) {
             throw new ShoppingException(ErrorCode.EMPTY_INPUT);
         }
@@ -61,9 +62,8 @@ public class ProductService {
     }
 
     private Pageable createPageable(final Pageable pageable) {
-        final Pageable newPageable = Pageable.ofSize(pageable.getPageSize());
-        newPageable.withPage(pageable.getPageNumber());
-        return newPageable;
+        return Pageable.ofSize(pageable.getPageSize())
+                .withPage(pageable.getPageNumber());
     }
 
     private PagedResponse<ProductResponse> convertToPage(final Page<Product> products) {
