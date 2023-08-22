@@ -174,8 +174,8 @@ class RateIntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_RATE);
-        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_RATE.getMessage());
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_SCORE);
+        assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_SCORE.getMessage());
     }
 
     @Test

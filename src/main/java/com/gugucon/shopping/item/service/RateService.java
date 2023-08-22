@@ -68,7 +68,7 @@ public class RateService {
 
     private void validateScoreRange(final short rate) {
         if (rate < MIN_SCORE || rate > MAX_SCORE) {
-            throw new ShoppingException(ErrorCode.INVALID_RATE);
+            throw new ShoppingException(ErrorCode.INVALID_SCORE);
         }
     }
 
