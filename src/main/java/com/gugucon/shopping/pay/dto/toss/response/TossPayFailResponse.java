@@ -12,7 +12,7 @@ public class TossPayFailResponse {
 
     private Long orderId;
 
-    public static TossPayFailResponse from(Long orderId) {
+    public static TossPayFailResponse from(final Long orderId) {
         return new TossPayFailResponse(orderId);
     }
 }
