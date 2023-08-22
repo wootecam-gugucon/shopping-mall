@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS order_items
     `quantity`         int                   NOT NULL DEFAULT 1,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL,
-    foreign key (order_id) references orders (id)
+    foreign key (order_id) references orders (id),
+    foreign key (product_id) references products (id)
 );
 
 CREATE TABLE IF NOT EXISTS products
@@ -88,3 +89,5 @@ CREATE TABLE IF NOT EXISTS rates
     foreign key (member_id) references members (id),
     foreign key (order_item_id) references order_items (id)
 );
+
+create index idx_1 on order_items (product_id, quantity);
