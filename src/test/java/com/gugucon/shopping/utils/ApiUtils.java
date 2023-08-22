@@ -6,6 +6,7 @@ import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
+import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
@@ -97,6 +98,17 @@ public class ApiUtils {
             .then().log().all()
             .extract();
         return Long.parseLong(response.header("Location").split("/")[2]);
+    }
+
+    public static List<OrderHistoryResponse> getOrderHistory(final String accessToken) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/order-history")
+                .then().log().all()
+                .extract()
+                .jsonPath().getList(".", OrderHistoryResponse.class);
     }
 
     public static Long createPayment(final String accessToken, final TossPayCreateRequest tossPayCreateRequest) {

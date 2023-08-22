@@ -1,6 +1,7 @@
 package com.gugucon.shopping.integration;
 
 import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
+import static com.gugucon.shopping.utils.ApiUtils.getOrderHistory;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
@@ -15,13 +16,16 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
+import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.dto.point.request.PointPayRequest;
 import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
+import com.gugucon.shopping.utils.ApiUtils;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +38,6 @@ class PointPayIntegrationTest {
 
     @Autowired
     ProductRepository productRepository;
-
-    @Autowired
-    OrderRepository orderRepository;
 
     @Test
     @DisplayName("포인트로 주문하면 결제 정보를 생성한다.")
@@ -64,10 +65,10 @@ class PointPayIntegrationTest {
         assertThat(pointPayResponse.getOrderId()).isEqualTo(orderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(readCartItems(accessToken)).isEmpty();
-        assertThat(orderRepository.findById(orderId)).isPresent()
-                                                     .get()
-                                                     .extracting(Order::getStatus)
-                                                     .isEqualTo(OrderStatus.PAYED);
+        final List<OrderHistoryResponse> orderHistoryResponses = getOrderHistory(accessToken);
+        assertThat(orderHistoryResponses).hasSize(1);
+        assertThat(orderHistoryResponses).extracting(OrderHistoryResponse::getOrderId)
+                                         .containsExactly(orderId);
     }
 
     @Test
