@@ -1,4 +1,4 @@
-FROM gradle:jdk17-alpine AS builder
+FROM gradle:jdk17-jammy AS builder
 WORKDIR /app
 COPY build.gradle settings.gradle gradlew /app/
 COPY gradle /app/gradle
