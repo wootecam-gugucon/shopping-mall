@@ -1,4 +1,4 @@
-package com.gugucon.shopping.item.controller.page;
+package com.gugucon.shopping.rate.controller.page;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

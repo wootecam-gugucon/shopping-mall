@@ -1,6 +1,6 @@
-package com.gugucon.shopping.item.repository;
+package com.gugucon.shopping.rate.repository;
 
-import com.gugucon.shopping.item.domain.entity.Rate;
+import com.gugucon.shopping.rate.domain.entity.Rate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,9 +1,9 @@
-package com.gugucon.shopping.item.controller.api;
+package com.gugucon.shopping.rate.controller.api;
 
-import com.gugucon.shopping.item.dto.request.RateCreateRequest;
-import com.gugucon.shopping.item.dto.response.RateDetailResponse;
-import com.gugucon.shopping.item.dto.response.RateResponse;
-import com.gugucon.shopping.item.service.RateService;
+import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
+import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
+import com.gugucon.shopping.rate.dto.response.RateResponse;
+import com.gugucon.shopping.rate.service.RateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

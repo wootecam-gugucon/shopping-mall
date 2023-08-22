@@ -1,4 +1,4 @@
-package com.gugucon.shopping.item.dto.response;
+package com.gugucon.shopping.rate.dto.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -6,10 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RateResponse {
+@AllArgsConstructor
+public class RateCreateRequest {
 
-    private int rateCount;
-    private double averageRate;
+    private long orderItemId;
+
+    private short score;
 }
