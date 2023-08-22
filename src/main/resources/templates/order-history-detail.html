@@ -78,7 +78,7 @@
                           <span class="shopping-name">${orderItem.productName}</span> <!-- 상품 이름 -->
                           <span class="shopping-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span> <!-- 상품 가격 및 수량 -->
                         </div>
-                        <div id="rate"></div>
+                        <div id="rate-${orderItemId}"></div>
                       </div>
                     </div>
                     <hr class="divide-line-thin mt-10"/>
@@ -91,12 +91,12 @@
             'Content-Type': 'application/json'
           }
         }).then((response) => {
-              const rate = document.getElementById("rate");
+              const rate = document.getElementById(`rate-${orderItemId}`);
               if (response.ok) {
                 response.json().then(data => {
                   console.log(data.score);
                   rate.innerHTML += `
-                    <span className="highlight-text">내가 남긴 별점: ${data.score} / 5.0<span>
+                    <span className="highlight-text">내가 남긴 별점: ${data.score} / 5<span>
                   `;
                 });
               } else {
