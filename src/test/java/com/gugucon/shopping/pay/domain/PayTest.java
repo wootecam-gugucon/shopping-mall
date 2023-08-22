@@ -2,9 +2,11 @@ package com.gugucon.shopping.pay.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gugucon.shopping.common.domain.vo.Money;
+import com.gugucon.shopping.common.exception.ErrorCode;
+import com.gugucon.shopping.common.exception.ShoppingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -42,10 +44,10 @@ class PayTest {
                 .price(Money.from(1000L))
                 .build();
 
-        // when
-        Exception exception = catchException(() -> pay.validateMoney(Money.from(500L)));
-
-        // then
-        assertThat(exception).isInstanceOf(RuntimeException.class);
+        // when & then
+        final Money money = Money.from(500L);
+        final ShoppingException exception = assertThrows(ShoppingException.class,
+                                                         () -> pay.validateMoney(money));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.PAY_FAILED);
     }
 }
