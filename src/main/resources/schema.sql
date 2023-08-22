@@ -65,3 +65,15 @@ CREATE TABLE IF NOT EXISTS pays
     `last_modified_at` datetime              NOT NULL,
     foreign key (order_id) references orders (id)
 );
+
+CREATE TABLE IF NOT EXISTS rates
+(
+    `id`               bigint auto_increment NOT NULL primary key,
+    `member_id`        bigint                NOT NULL,
+    `order_item_id`    bigint                NOT NULL,
+    `score`            smallint              NOT NULL,
+    `created_at`       datetime              NOT NULL,
+    `last_modified_at` datetime              NOT NULL,
+    foreign key (member_id) references members (id),
+    foreign key (order_item_id) references order_items (id)
+);
