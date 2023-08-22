@@ -72,7 +72,7 @@ public class PayService {
     }
 
     @Transactional
-    public PointPayResponse createPointPay(final PointPayRequest pointPayRequest, final Long memberId) {
+    public PointPayResponse payByPoint(final PointPayRequest pointPayRequest, final Long memberId) {
         final Long orderId = pointPayRequest.getOrderId();
         final Order order = findUnPayedOrderBy(orderId, memberId);
 

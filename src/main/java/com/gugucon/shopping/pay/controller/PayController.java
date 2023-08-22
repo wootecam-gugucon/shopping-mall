@@ -26,7 +26,7 @@ public final class PayController {
     @ResponseStatus(HttpStatus.OK)
     public PointPayResponse createPayment(@RequestBody final PointPayRequest pointPayRequest,
                                           @AuthenticationPrincipal final Long memberId) {
-        return payService.createPointPay(pointPayRequest, memberId);
+        return payService.payByPoint(pointPayRequest, memberId);
     }
 
     @PutMapping("/toss")
