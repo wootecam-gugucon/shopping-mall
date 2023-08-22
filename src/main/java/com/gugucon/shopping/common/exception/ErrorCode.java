@@ -42,6 +42,7 @@ public enum ErrorCode {
     INVALID_RATE(NOT_FOUND, "존재하지 않는 주문 평가 정보입니다."),
     POINT_CHARGE_NOT_POSITIVE(BAD_REQUEST, "포인트 충전 값은 0보다 커야 합니다."),
     POINT_NOT_ENOUGH(BAD_REQUEST, "포인트가 부족합니다."),
+    INVALID_SORT(BAD_REQUEST, "잘못된 정렬 기준입니다."),
     INVALID_SCORE(BAD_REQUEST, "별점은 0이상 5이하의 정수여야 합니다."),
     EMPTY_INPUT(BAD_REQUEST, "내용을 입력해주세요.");
 
