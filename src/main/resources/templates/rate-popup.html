@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>별점 남기기</title>
+</head>
+<body>
+<span>별점을 남겨주세요</span>
+<div>
+  <input type="range" id="rate" name="rate" min="1" max="5" />
+</div>
+<button type="submit" onclick="rate(${product.id})">적용하기</button>
+</body>
+<script>
+  const rate = () => {
+
+    const credentials = localStorage.getItem('accessToken');
+    if (!credentials) {
+      alert('사용자 정보가 없습니다.');
+      window.location.href = '/login';
+      return;
+    }
+
+    const score = document.getElementById("rate").value;
+    const orderItemId = [[${orderItemId}]];
+
+    console.log(score);
+    console.log(orderItemId);
+
+    fetch(`/api/v1/rate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${credentials}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({"orderItemId": orderItemId, "score": score})
+    }).then((response) => {
+      return response.json();
+    }).then((data) => {
+      console.log(data);
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+</script>
+</html>
