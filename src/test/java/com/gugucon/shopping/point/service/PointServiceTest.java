@@ -47,9 +47,9 @@ class PointServiceTest {
         final Long memberId = memberRepository.save(member).getId();
 
         // when
-        Optional<Point> before = pointRepository.findByMemberId(memberId);
+        final Optional<Point> before = pointRepository.findByMemberId(memberId);
         pointService.charge(pointChargeRequest, memberId);
-        Optional<Point> after = pointRepository.findByMemberId(memberId);
+        final Optional<Point> after = pointRepository.findByMemberId(memberId);
 
         // then
         assertThat(before).isEmpty();
@@ -73,7 +73,7 @@ class PointServiceTest {
 
         // when
         pointService.charge(pointChargeRequest, memberId);
-        Optional<Point> after = pointRepository.findByMemberId(memberId);
+        final Optional<Point> after = pointRepository.findByMemberId(memberId);
 
         // then
         assertThat(after).isPresent()

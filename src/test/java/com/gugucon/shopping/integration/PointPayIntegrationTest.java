@@ -37,7 +37,7 @@ import org.springframework.http.MediaType;
 class PointPayIntegrationTest {
 
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     @Test
     @DisplayName("포인트로 주문하면 결제 정보를 생성한다.")
