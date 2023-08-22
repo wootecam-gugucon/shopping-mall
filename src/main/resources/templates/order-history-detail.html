@@ -68,7 +68,8 @@
         }).then((data) => {
             let element = '<hr class="divide-line-gray mt-10" />';
             data.orderItems.forEach(orderItem => {
-                console.log(orderItem.imageFileName);
+                const orderItemId = orderItem.id;
+                const rateLocation = '/rate/orderItem/' + orderItemId;
                 element += `
                     <div class="shopping-container">
                       <div class="flex gap-15 mt-10">
@@ -77,9 +78,10 @@
                           <span class="shopping-name">${orderItem.productName}</span> <!-- 상품 이름 -->
                           <span class="shopping-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span> <!-- 상품 가격 및 수량 -->
                         </div>
-                        <button class="flex justify-between p-20 mt-20" onclick="location.href='/rate/orderItem/{orderItem}'">
+
+                        <a class="flex justify-between p-20 mt-20" href="${rateLocation}">
                           <span class="highlight-text">별점 남기기</span>
-                        </button>
+                        </a>
                       </div>
                     </div>
                     <hr class="divide-line-thin mt-10"/>
