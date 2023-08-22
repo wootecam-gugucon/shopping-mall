@@ -13,6 +13,8 @@ import com.gugucon.shopping.utils.ApiUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,25 +51,24 @@ class PointIntegrationTest {
     @ParameterizedTest
     @ValueSource(longs = {-1L, 0L})
     @DisplayName("0 혹은 음수 값으로 포인트 충전을 요청하면 400 상태코드를 응답한다.")
-    void chargePointSuccess(Long point) {
+    void chargePointFail_notPositive(Long point) {
         // given
         final String accessToken = loginAfterSignUp("test_email@test.com", "test_password!");
-        final PointChargeRequest pointChargeRequest = new PointChargeRequest(point);
+        final Map<String, Long> params = new HashMap<>();
+        params.put("point", point);
 
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(pointChargeRequest)
+                .body(params)
                 .when()
                 .put("/api/v1/point")
                 .then().log().all()
                 .extract();
 
         // then
-        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 

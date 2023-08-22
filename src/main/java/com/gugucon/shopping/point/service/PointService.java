@@ -1,5 +1,6 @@
 package com.gugucon.shopping.point.service;
 
+import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.point.domain.Point;
 import com.gugucon.shopping.point.dto.request.PointChargeRequest;
 import com.gugucon.shopping.point.dto.response.PointResponse;
@@ -19,7 +20,7 @@ public class PointService {
     public void charge(final PointChargeRequest pointChargeRequest, final Long memberId) {
         final Point point = pointRepository.findByMemberId(memberId)
                                            .orElseGet(() -> pointRepository.save(Point.from(memberId)));
-        point.charge(pointChargeRequest.getPoint());
+        point.charge(Money.from(pointChargeRequest.getPoint()));
     }
 
     public PointResponse getCurrentPoint(final Long memberId) {

@@ -32,34 +32,36 @@ public class Point extends BaseTimeEntity {
 
     private Long memberId;
 
-    private Long point;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "point"))
+    private Money point;
 
     public static Point from(final Long memberId) {
         return Point.builder()
                     .memberId(memberId)
-                    .point(0L)
+                    .point(Money.ZERO)
                     .build();
     }
 
 
-    public void charge(final Long chargePoint) {
+    public void charge(final Money chargePoint) {
         validatePointPositive(chargePoint);
-        point += chargePoint;
+        point = point.add(chargePoint);
     }
 
-    private void validatePointPositive(final Long chargePoint) {
-        if (chargePoint <= 0) {
+    private void validatePointPositive(final Money chargePoint) {
+        if (chargePoint.isNotPositive()) {
             throw new ShoppingException(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
         }
     }
 
-    public void use(final Long usePoint) {
+    public void use(final Money usePoint) {
         validatePointEnough(usePoint);
-        point -= usePoint;
+        point = point.subtract(usePoint);
     }
 
-    private void validatePointEnough(final Long usePoint) {
-        if (point < usePoint) {
+    private void validatePointEnough(final Money usePoint) {
+        if (point.isLessThan(usePoint)) {
             throw new ShoppingException(ErrorCode.POINT_NOT_ENOUGH);
         }
     }

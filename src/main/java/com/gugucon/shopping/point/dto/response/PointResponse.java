@@ -14,6 +14,6 @@ public class PointResponse {
     private Long point;
 
     public static PointResponse from(final Point point) {
-        return new PointResponse(point.getPoint());
+        return new PointResponse(point.getPoint().getValue());
     }
 }

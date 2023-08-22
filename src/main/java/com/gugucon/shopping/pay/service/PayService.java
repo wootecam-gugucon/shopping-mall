@@ -79,7 +79,7 @@ public class PayService {
 
         final Point point = pointRepository.findByMemberId(memberId)
                                            .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
-        point.use(order.calculateTotalPrice().getValue());
+        point.use(order.calculateTotalPrice());
 
         payRepository.findByOrderId(orderId)
                      .ifPresent(payRepository::delete);

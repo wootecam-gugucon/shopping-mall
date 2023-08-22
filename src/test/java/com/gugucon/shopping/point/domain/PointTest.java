@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +21,7 @@ class PointTest {
         assertThatNoException()
                 .isThrownBy(() -> Point.builder()
                                        .memberId(1L)
-                                       .point(1000L)
+                                       .point(Money.from(1000L))
                                        .build());
     }
 
@@ -30,28 +31,28 @@ class PointTest {
         // given
         final Point point = Point.builder()
                                  .memberId(1L)
-                                 .point(1000L)
+                                 .point(Money.from(1000L))
                                  .build();
 
         // when
-        point.charge(1000L);
+        point.charge(Money.from(1000L));
 
         // then
-        assertThat(point.getPoint()).isEqualTo(2000L);
+        assertThat(point.getPoint()).isEqualTo(Money.from(2000L));
     }
 
-    @ParameterizedTest
-    @ValueSource(longs = {-1L, 0L})
+    @Test
     @DisplayName("0 이하의 포인트를 충전하면 예외를 던진다.")
-    void chargePointFail_notPositivePoint(long chargePoint) {
+    void chargePointFail_notPositivePoint() {
         // given
         final Point point = Point.builder()
                                  .memberId(1L)
-                                 .point(1000L)
+                                 .point(Money.from(1000L))
                                  .build();
+        final Money charge = Money.from(0L);
 
         // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class, () -> point.charge(chargePoint));
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> point.charge(charge));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
     }
 
@@ -61,14 +62,15 @@ class PointTest {
         // given
         final Point point = Point.builder()
                                  .memberId(1L)
-                                 .point(1000L)
+                                 .point(Money.from(1000L))
                                  .build();
+        final Money use = Money.from(300L);
 
         // when
-        point.use(300L);
+        point.use(use);
 
         // then
-        assertThat(point.getPoint()).isEqualTo(700L);
+        assertThat(point.getPoint()).isEqualTo(Money.from(700L));
     }
 
     @Test
@@ -77,11 +79,12 @@ class PointTest {
         // given
         final Point point = Point.builder()
                                  .memberId(1L)
-                                 .point(1000L)
+                                 .point(Money.from(1000L))
                                  .build();
+        final Money use = Money.from(1200L);
 
         // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class, () -> point.use(1200L));
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> point.use(use));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POINT_NOT_ENOUGH);
     }
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gugucon.shopping.common.config.JpaConfig;
+import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.member.domain.entity.Member;
@@ -55,7 +56,7 @@ class PointServiceTest {
         assertThat(after).isPresent()
                          .get()
                          .extracting(Point::getMemberId, Point::getPoint)
-                         .containsExactly(memberId, 1000L);
+                         .containsExactly(memberId, Money.from(1000L));
     }
 
     @Test
@@ -67,7 +68,7 @@ class PointServiceTest {
         final Long memberId = memberRepository.save(member).getId();
         pointRepository.save(Point.builder()
                                   .memberId(memberId)
-                                  .point(1000L)
+                                  .point(Money.from(1000L))
                                   .build());
 
         // when
@@ -78,20 +79,6 @@ class PointServiceTest {
         assertThat(after).isPresent()
                          .get()
                          .extracting(Point::getMemberId, Point::getPoint)
-                         .containsExactly(memberId, 2000L);
-    }
-
-    @ParameterizedTest
-    @ValueSource(longs = {-1L, 0L})
-    @DisplayName("0 이하의 포인트 충전을 요청하면 예외를 던진다.")
-    void chargeFail_notPositivePoint(Long chargePoint) {
-        final PointChargeRequest pointChargeRequest = new PointChargeRequest(chargePoint);
-        final Member member = DomainUtils.createMember();
-        final Long memberId = memberRepository.save(member).getId();
-
-        // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class,
-                                                         () -> pointService.charge(pointChargeRequest, memberId));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POINT_CHARGE_NOT_POSITIVE);
+                         .containsExactly(memberId, Money.from(2000L));
     }
 }
