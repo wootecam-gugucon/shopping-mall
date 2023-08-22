@@ -5,6 +5,7 @@ import static com.gugucon.shopping.utils.ApiUtils.createPayment;
 import static com.gugucon.shopping.utils.ApiUtils.getPaymentInfo;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static com.gugucon.shopping.utils.ApiUtils.validatePayment;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,10 +127,7 @@ class PayIntegrationTest {
         final Long payId = createPayment(accessToken, new PayCreateRequest(orderId));
         final PayInfoResponse payInfoResponse = getPaymentInfo(accessToken, payId);
 
-        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-        server.expect(ExpectedCount.once(), anything())
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+        mockServerSuccess(restTemplate, 1);
 
         final PayValidationRequest payValidationRequest = new PayValidationRequest("mockPaymentKey",
                                                                                    payInfoResponse.getEncodedOrderId(),
