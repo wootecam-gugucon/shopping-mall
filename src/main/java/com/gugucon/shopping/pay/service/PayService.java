@@ -20,6 +20,7 @@ import com.gugucon.shopping.pay.infrastructure.PayValidator;
 import com.gugucon.shopping.pay.repository.PayRepository;
 import com.gugucon.shopping.point.domain.Point;
 import com.gugucon.shopping.point.repository.PointRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,10 +71,7 @@ public class PayService {
         final Point point = findPoint(memberId);
         point.use(order.calculateTotalPrice());
 
-        cartItemRepository.deleteAllByMemberId(memberId);
-        order.pay();
-
-        return PayResponse.from(payRepository.save(Pay.from(order)));
+        return completePay(memberId, order);
     }
 
     private Point findPoint(final Long memberId) {
@@ -100,11 +98,14 @@ public class PayService {
         final Order order = findUnPayedOrderBy(orderId, memberId);
 
         order.validateMoney(tossPayRequest.getAmount());
-        order.pay();
-
         payValidator.validatePayment(tossPayRequest);
 
+        return completePay(memberId, order);
+    }
+
+    private PayResponse completePay(final Long memberId, final Order order) {
         cartItemRepository.deleteAllByMemberId(memberId);
+        order.pay();
         return PayResponse.from(payRepository.save(Pay.from(order)));
     }
 
