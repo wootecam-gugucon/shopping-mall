@@ -61,8 +61,8 @@ class ProductRepositoryTest {
         final Member persistMember = memberRepository.save(member);
 
         final Order order = Order.builder()
-                .memberId(persistMember.getId())
-                .status(Order.OrderStatus.PAYED).build();
+                                 .memberId(persistMember.getId())
+                                 .status(Order.OrderStatus.COMPLETED).build();
         orderRepository.save(order);
 
         final OrderItem 사과_주문상품 = createOrderItem("사과", 사과.getId(), Quantity.from(10));

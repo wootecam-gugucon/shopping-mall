@@ -45,7 +45,7 @@ public class OrderService {
 
     public List<OrderHistoryResponse> getOrderHistory(final Long memberId) {
         final List<Order> orders = orderRepository.findAllByMemberIdAndStatusWithOrderItems(memberId,
-                                                                                            Order.OrderStatus.PAYED,
+                                                                                            Order.OrderStatus.COMPLETED,
                                                                                             Sort.by(Direction.DESC,
                                                                                                     "id"));
         return orders.stream()

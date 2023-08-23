@@ -11,6 +11,7 @@ import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
+import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,85 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("Order 단위 테스트")
 class OrderTest {
+
+    @Test
+    @DisplayName("생성되면 CREATED 상태가 된다")
+    void status_created() {
+        // given
+        final Long memberId = createMember().getId();
+        final CartItem cartItem1 = CartItem.builder()
+                                           .id(1L)
+                                           .memberId(memberId)
+                                           .product(createProduct("치킨", 10000))
+                                           .quantity(Quantity.from(5))
+                                           .build();
+        final CartItem cartItem2 = CartItem.builder()
+                                           .id(2L)
+                                           .memberId(memberId)
+                                           .product(createProduct("피자", 20000))
+                                           .quantity(Quantity.from(4))
+                                           .build();
+
+        // when
+        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CREATED);
+    }
+
+    @Test
+    @DisplayName("결제 요청을 보내면 PENDING 상태가 된다")
+    void status_pending() {
+        // given
+        final Long memberId = createMember().getId();
+        final CartItem cartItem1 = CartItem.builder()
+                                           .id(1L)
+                                           .memberId(memberId)
+                                           .product(createProduct("치킨", 10000))
+                                           .quantity(Quantity.from(5))
+                                           .build();
+        final CartItem cartItem2 = CartItem.builder()
+                                           .id(2L)
+                                           .memberId(memberId)
+                                           .product(createProduct("피자", 20000))
+                                           .quantity(Quantity.from(4))
+                                           .build();
+
+        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
+
+        // when
+        order.order();
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("결제가 완료되면 COMPLETED 상태가 된다")
+    void status_completed() {
+        // given
+        final Long memberId = createMember().getId();
+        final CartItem cartItem1 = CartItem.builder()
+                                           .id(1L)
+                                           .memberId(memberId)
+                                           .product(createProduct("치킨", 10000))
+                                           .quantity(Quantity.from(5))
+                                           .build();
+        final CartItem cartItem2 = CartItem.builder()
+                                           .id(2L)
+                                           .memberId(memberId)
+                                           .product(createProduct("피자", 20000))
+                                           .quantity(Quantity.from(4))
+                                           .build();
+
+        final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
+
+        // when
+        order.pay();
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
 
     @Test
     @DisplayName("총 주문 금액을 계산한다.")

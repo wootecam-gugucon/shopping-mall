@@ -56,7 +56,7 @@ public class Order extends BaseTimeEntity {
     private OrderStatus status;
 
     public static Order from(final Long memberId, final List<CartItem> cartItems) {
-        final Order order = new Order(null, memberId, OrderStatus.ORDERED);
+        final Order order = new Order(null, memberId, OrderStatus.CREATED);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -112,8 +112,12 @@ public class Order extends BaseTimeEntity {
     }
 
     public void pay() {
-        this.status = OrderStatus.PAYED;
+        this.status = OrderStatus.COMPLETED;
     }
 
-    public enum OrderStatus {ORDERED, PAYED}
+    public void order() {
+        this.status = OrderStatus.PENDING;
+    }
+
+    public enum OrderStatus {ORDERED, CREATED, COMPLETED, PENDING}
 }
