@@ -1,6 +1,6 @@
 package com.gugucon.shopping.pay.controller;
 
-import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayFailRequest;
 import com.gugucon.shopping.pay.dto.request.TossPayRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

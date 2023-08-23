@@ -16,7 +16,7 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.pay.dto.request.PointPayRequest;
-import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
+import com.gugucon.shopping.pay.dto.response.PayResponse;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -57,8 +57,8 @@ class PointPayIntegrationTest {
                 .extract();
 
         // then
-        final PointPayResponse pointPayResponse = response.as(PointPayResponse.class);
-        assertThat(pointPayResponse.getOrderId()).isEqualTo(orderId);
+        final PayResponse payResponse = response.as(PayResponse.class);
+        assertThat(payResponse.getOrderId()).isEqualTo(orderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(readCartItems(accessToken)).isEmpty();
         final List<OrderHistoryResponse> orderHistoryResponses = getOrderHistory(accessToken);

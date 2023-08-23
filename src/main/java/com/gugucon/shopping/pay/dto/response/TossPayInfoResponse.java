@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.dto.toss.response;
+package com.gugucon.shopping.pay.dto.response;
 
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.order.domain.entity.Order;

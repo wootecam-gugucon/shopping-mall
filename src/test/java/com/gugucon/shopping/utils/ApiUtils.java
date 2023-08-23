@@ -17,7 +17,7 @@ import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.order.dto.response.OrderPayResponse;
 import com.gugucon.shopping.pay.dto.request.TossPayRequest;
 import com.gugucon.shopping.pay.dto.response.PayResponse;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
+import com.gugucon.shopping.pay.dto.response.TossPayInfoResponse;
 import com.gugucon.shopping.point.dto.request.PointChargeRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import io.restassured.RestAssured;

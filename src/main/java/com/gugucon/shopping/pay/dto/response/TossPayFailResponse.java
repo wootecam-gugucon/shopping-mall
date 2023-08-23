@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.dto.toss.response;
+package com.gugucon.shopping.pay.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

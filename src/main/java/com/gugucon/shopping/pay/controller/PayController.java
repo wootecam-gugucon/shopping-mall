@@ -2,10 +2,10 @@ package com.gugucon.shopping.pay.controller;
 
 import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.pay.dto.response.PayResponse;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayFailRequest;
 import com.gugucon.shopping.pay.dto.request.TossPayRequest;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayFailResponse;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
+import com.gugucon.shopping.pay.dto.response.TossPayFailResponse;
+import com.gugucon.shopping.pay.dto.response.TossPayInfoResponse;
 import com.gugucon.shopping.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
