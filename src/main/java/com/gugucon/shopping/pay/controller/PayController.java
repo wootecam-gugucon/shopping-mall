@@ -19,7 +19,7 @@ public final class PayController {
 
     private final PayService payService;
 
-    @PutMapping("/point")
+    @PostMapping("/point")
     @ResponseStatus(HttpStatus.OK)
     public PayResponse payByPoint(@RequestBody final PointPayRequest pointPayRequest,
                                   @AuthenticationPrincipal final Long memberId) {

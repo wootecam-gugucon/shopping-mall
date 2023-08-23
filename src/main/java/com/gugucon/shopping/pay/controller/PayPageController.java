@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class PayPageController {
 
 
-    @GetMapping("/{payId}")
-    public String payPage(@PathVariable final Long payId) {
+    @GetMapping("/{orderId}")
+    public String payPage(@PathVariable final Long orderId) {
         return "pay";
     }
 

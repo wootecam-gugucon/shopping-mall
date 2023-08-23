@@ -52,7 +52,7 @@ class PointPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(pointPayRequest)
                 .when()
-                .put("/api/v1/pay/point")
+                .post("/api/v1/pay/point")
                 .then().log().all()
                 .extract();
 
@@ -84,7 +84,7 @@ class PointPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(pointPayRequest)
                 .when()
-                .put("/api/v1/pay/point")
+                .post("/api/v1/pay/point")
                 .then().log().all()
                 .extract();
 
