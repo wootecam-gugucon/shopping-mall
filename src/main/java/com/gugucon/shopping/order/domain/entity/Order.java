@@ -55,8 +55,12 @@ public class Order extends BaseTimeEntity {
     @NotNull
     private OrderStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private PayType type;
+
     public static Order from(final Long memberId, final List<CartItem> cartItems) {
-        final Order order = new Order(null, memberId, OrderStatus.CREATED);
+        final Order order = new Order(null, memberId, OrderStatus.CREATED, PayType.NONE);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -120,4 +124,6 @@ public class Order extends BaseTimeEntity {
     }
 
     public enum OrderStatus {ORDERED, CREATED, COMPLETED, PENDING}
+
+    public enum PayType {POINT, TOSS, NONE}
 }

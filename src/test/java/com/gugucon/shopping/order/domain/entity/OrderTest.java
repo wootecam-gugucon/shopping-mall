@@ -12,6 +12,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
+import com.gugucon.shopping.order.domain.entity.Order.PayType;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +44,7 @@ class OrderTest {
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatus.CREATED);
+        assertThat(order.getType()).isEqualTo(PayType.NONE);
     }
 
     @Test

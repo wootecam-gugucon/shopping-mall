@@ -16,8 +16,10 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
+import com.gugucon.shopping.utils.ApiUtils;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -210,6 +212,56 @@ class OrderIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    @DisplayName("결제를 요청한다.")
+    void requestPay() {
+        /* given */
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        addProductToCart(accessToken, "testProduct");
+        Long orderId = placeOrder(accessToken);
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new OrderPayRequest(orderId))
+                .when()
+                .put("/api/v1/order")
+                .then()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("결제를 요청했을 때 재고가 없으면 400 상태를 반환한다.")
+    void requestPay_invalidStock_status400() {
+        /* given */
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        Long productId = insertProduct("testProduct", 1000L);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+        Long orderId = placeOrder(accessToken);
+        changeProductStock(productId, 0);
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new OrderPayRequest(orderId))
+                .when()
+                .put("/api/v1/order")
+                .then()
+                .extract();
+
+        /* then */
+        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.STOCK_NOT_ENOUGH);
     }
 
     private List<String> toNames(final List<CartItemResponse> cartItemResponses) {

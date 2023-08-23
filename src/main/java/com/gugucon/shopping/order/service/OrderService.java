@@ -3,8 +3,11 @@ package com.gugucon.shopping.order.service;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
+import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.dto.response.OrderResponse;
@@ -24,6 +27,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public OrderResponse order(final Long memberId) {
@@ -57,5 +61,22 @@ public class OrderService {
         if (cartItems.isEmpty()) {
             throw new ShoppingException(ErrorCode.EMPTY_CART);
         }
+    }
+
+    @Transactional
+    public void requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
+        final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
+                                           .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+        order.order();
+        decreaseStock(order);
+    }
+
+    private void decreaseStock(final Order order) {
+        order.getOrderItems().forEach(orderItem -> {
+            final Product product = productRepository.findById(orderItem.getProductId())
+                                                     .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+            product.validateStockIsNotLessThan(orderItem.getQuantity());
+            product.decreaseStockBy(orderItem.getQuantity());
+        });
     }
 }
