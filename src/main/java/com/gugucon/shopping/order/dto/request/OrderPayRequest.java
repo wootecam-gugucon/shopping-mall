@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class OrderPayRequest {
 
     private Long orderId;
+    private String payType;
 }

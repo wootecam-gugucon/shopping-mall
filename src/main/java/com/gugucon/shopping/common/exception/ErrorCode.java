@@ -44,7 +44,8 @@ public enum ErrorCode {
     POINT_NOT_ENOUGH(BAD_REQUEST, "포인트가 부족합니다."),
     INVALID_SORT(BAD_REQUEST, "잘못된 정렬 기준입니다."),
     INVALID_SCORE(BAD_REQUEST, "별점은 0이상 5이하의 정수여야 합니다."),
-    EMPTY_INPUT(BAD_REQUEST, "내용을 입력해주세요.");
+    EMPTY_INPUT(BAD_REQUEST, "내용을 입력해주세요."),
+    INVALID_PAY_TYPE(BAD_REQUEST, "지원하지 않는 결제 형식입니다.");
 
     private final HttpStatus status;
     private final String message;

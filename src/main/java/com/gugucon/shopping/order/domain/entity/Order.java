@@ -5,6 +5,7 @@ import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
+import com.gugucon.shopping.order.domain.PayType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -119,11 +120,10 @@ public class Order extends BaseTimeEntity {
         this.status = OrderStatus.COMPLETED;
     }
 
-    public void order() {
+    public void order(PayType type) {
         this.status = OrderStatus.PENDING;
+        this.type = type;
     }
 
     public enum OrderStatus {ORDERED, CREATED, COMPLETED, PENDING}
-
-    public enum PayType {POINT, TOSS, NONE}
 }

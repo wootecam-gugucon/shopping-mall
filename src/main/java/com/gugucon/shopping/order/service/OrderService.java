@@ -6,6 +6,7 @@ import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
@@ -67,7 +68,7 @@ public class OrderService {
     public void requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
         final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
                                            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
-        order.order();
+        order.order(PayType.from(orderPayRequest.getPayType()));
         decreaseStock(order);
     }
 
