@@ -2,7 +2,7 @@ package com.gugucon.shopping.pay.infrastructure;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationRequest;
 import com.gugucon.shopping.pay.infrastructure.dto.TossValidationResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +34,10 @@ public final class TossPayValidator implements PayValidator {
     }
 
     @Override
-    public void validatePayment(final TossPayValidationRequest tossPayValidationRequest) {
-        final TossValidationRequest tossValidationRequest = TossValidationRequest.of(tossPayValidationRequest);
+    public void validatePayment(final TossPayRequest tossPayRequest) {
+        final TossValidationRequest tossValidationRequest = TossValidationRequest.of(tossPayRequest);
         final HttpEntity<TossValidationRequest> request = new HttpEntity<>(tossValidationRequest, httpHeaders);
-        log.info("toss validation request sent for orderId: {}", tossPayValidationRequest.getOrderId());
+        log.info("toss validation request sent for orderId: {}", tossPayRequest.getOrderId());
         final ResponseEntity<TossValidationResponse> response = restTemplate.postForEntity(VALIDATE_URL,
                                                                                            request,
                                                                                            TossValidationResponse.class);

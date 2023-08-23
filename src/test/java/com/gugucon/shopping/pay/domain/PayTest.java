@@ -1,12 +1,8 @@
 package com.gugucon.shopping.pay.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.gugucon.shopping.common.domain.vo.Money;
-import com.gugucon.shopping.common.exception.ErrorCode;
-import com.gugucon.shopping.common.exception.ShoppingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,34 +16,5 @@ class PayTest {
                 .orderId(1L)
                 .price(Money.from(1000L))
                 .build());
-    }
-
-    @Test
-    @DisplayName("금액이 같은지 확인한다")
-    void validateMoneySuccess_PriceSame() {
-        // given
-        Pay pay = Pay.builder()
-                .orderId(1L)
-                .price(Money.from(1000L))
-                .build();
-
-        // when & then
-        assertThatNoException().isThrownBy(() -> pay.validateMoney(Money.from(1000L)));
-    }
-
-    @Test
-    @DisplayName("금액이 같은지 확인하고 다르면 예외를 던진다")
-    void validateMoneyFail_PriceDifferent() {
-        // given
-        Pay pay = Pay.builder()
-                .orderId(1L)
-                .price(Money.from(1000L))
-                .build();
-
-        // when & then
-        final Money money = Money.from(500L);
-        final ShoppingException exception = assertThrows(ShoppingException.class,
-                                                         () -> pay.validateMoney(money));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.PAY_FAILED);
     }
 }

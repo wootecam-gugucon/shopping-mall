@@ -8,6 +8,7 @@ import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.repository.MemberRepository;
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
@@ -62,7 +63,9 @@ class ProductRepositoryTest {
 
         final Order order = Order.builder()
                                  .memberId(persistMember.getId())
-                                 .status(Order.OrderStatus.COMPLETED).build();
+                                 .status(Order.OrderStatus.COMPLETED)
+                                 .payType(PayType.NONE)
+                                 .build();
         orderRepository.save(order);
 
         final OrderItem 사과_주문상품 = createOrderItem("사과", 사과.getId(), Quantity.from(10));

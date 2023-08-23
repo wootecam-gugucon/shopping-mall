@@ -63,7 +63,6 @@ CREATE TABLE IF NOT EXISTS pays
     `id`               bigint auto_increment NOT NULL primary key,
     `order_id`         bigint                NOT NULL,
     `price`            bigint                NOT NULL,
-    `type`             varchar(255)          NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL,
     foreign key (order_id) references orders (id)

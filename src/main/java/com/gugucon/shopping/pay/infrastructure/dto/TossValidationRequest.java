@@ -1,6 +1,6 @@
 package com.gugucon.shopping.pay.infrastructure.dto;
 
-import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,9 +12,9 @@ public final class TossValidationRequest {
     private final String orderId;
     private final Long amount;
 
-    public static TossValidationRequest of(final TossPayValidationRequest tossPayValidationRequest) {
-        return new TossValidationRequest(tossPayValidationRequest.getPaymentKey(),
-                                         tossPayValidationRequest.getOrderId(),
-                                         tossPayValidationRequest.getAmount());
+    public static TossValidationRequest of(final TossPayRequest tossPayRequest) {
+        return new TossValidationRequest(tossPayRequest.getPaymentKey(),
+                                         tossPayRequest.getOrderId(),
+                                         tossPayRequest.getAmount());
     }
 }

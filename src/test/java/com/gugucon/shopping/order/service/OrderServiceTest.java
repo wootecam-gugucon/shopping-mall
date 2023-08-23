@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import java.util.List;
@@ -55,6 +56,7 @@ class OrderServiceTest {
                          .id(1L)
                          .memberId(memberId)
                          .status(CREATED)
+                         .payType(PayType.NONE)
                          .build())
                 .when(orderRepository).save(any());
 

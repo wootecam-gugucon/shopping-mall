@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.dto.point.request;
+package com.gugucon.shopping.pay.dto.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

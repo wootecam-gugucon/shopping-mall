@@ -125,5 +125,11 @@ public class Order extends BaseTimeEntity {
         this.payType = type;
     }
 
+    public void validateMoney(final Long amount) {
+        if (calculateTotalPrice().isNotSame(amount)) {
+            throw new ShoppingException(ErrorCode.PAY_FAILED);
+        }
+    }
+
     public enum OrderStatus {CREATED, COMPLETED, PENDING}
 }

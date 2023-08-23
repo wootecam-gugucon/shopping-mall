@@ -1,6 +1,5 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
 import static com.gugucon.shopping.utils.ApiUtils.getPaymentInfo;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
@@ -20,11 +19,11 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
+import com.gugucon.shopping.pay.dto.response.PayResponse;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayRequest;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayFailResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayValidationResponse;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -101,25 +100,25 @@ class TossPayIntegrationTest {
 
         mockServerSuccess(restTemplate, 1);
 
-        final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
-                                                                                               tossPayInfoResponse.getEncodedOrderId(),
-                                                                                               tossPayInfoResponse.getPrice(),
-                                                                                               "mockPaymentType");
+        final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
+                                                                 tossPayInfoResponse.getEncodedOrderId(),
+                                                                 tossPayInfoResponse.getPrice(),
+                                                                 "mockPaymentType");
 
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(tossPayValidationRequest)
+                .body(tossPayRequest)
                 .when()
                 .post("/api/v1/pay/toss")
                 .then().log().all()
                 .extract();
 
         // then
-        final TossPayValidationResponse tossPayValidationResponse = response.as(TossPayValidationResponse.class);
-        assertThat(tossPayValidationResponse.getOrderId()).isEqualTo(orderId);
+        final PayResponse payResponse = response.as(PayResponse.class);
+        assertThat(payResponse.getOrderId()).isEqualTo(orderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -133,10 +132,10 @@ class TossPayIntegrationTest {
         final Long orderId = placeOrder(accessToken);
         putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
-        final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
-                                                                                               tossPayInfoResponse.getEncodedOrderId(),
-                                                                                               tossPayInfoResponse.getPrice(),
-                                                                                               "mockPaymentType");
+        final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
+                                                                 tossPayInfoResponse.getEncodedOrderId(),
+                                                                 tossPayInfoResponse.getPrice(),
+                                                                 "mockPaymentType");
 
         final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
         server.expect(ExpectedCount.once(), anything())
@@ -148,7 +147,7 @@ class TossPayIntegrationTest {
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(tossPayValidationRequest)
+                .body(tossPayRequest)
                 .when()
                 .post("/api/v1/pay/toss")
                 .then().log().all()
@@ -161,49 +160,6 @@ class TossPayIntegrationTest {
     }
 
     @Test
-    @DisplayName("재고가 부족하면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
-    void validatePaymentFail_stockNotEnough() {
-        // given
-        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        final int totalStock = 10;
-
-        Long productId = insertProduct("testProduct");
-        insertCartItem(accessToken, new CartItemInsertRequest(productId));
-        final Long orderId = placeOrder(accessToken);
-
-        final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
-        server.expect(ExpectedCount.twice(), anything())
-            .andExpect(method(HttpMethod.POST))
-            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
-
-        final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
-        buyProduct(otherAccessToken, productId, totalStock);
-
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
-        final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
-                                                                                               tossPayInfoResponse.getEncodedOrderId(),
-                                                                                               tossPayInfoResponse.getPrice(),
-                                                                                               "mockPaymentType");
-
-        // when
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(tossPayValidationRequest)
-                .when()
-                .post("/api/v1/pay/toss")
-                .then().log().all()
-                .extract();
-
-        // then
-        final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.STOCK_NOT_ENOUGH);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    @Test
     @DisplayName("이미 결제가 완료되었으면 결제 검증을 요청했을 때 400 상태코드를 반환한다.")
     void validatePaymentFail_payedOrder() {
         // given
@@ -213,24 +169,24 @@ class TossPayIntegrationTest {
         final Long orderId = placeOrder(accessToken);
         putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
-        final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
-                                                                                               tossPayInfoResponse.getEncodedOrderId(),
-                                                                                               tossPayInfoResponse.getPrice(),
-                                                                                               "mockPaymentType");
+        final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
+                                                                 tossPayInfoResponse.getEncodedOrderId(),
+                                                                 tossPayInfoResponse.getPrice(),
+                                                                 "mockPaymentType");
 
         final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
         server.expect(ExpectedCount.twice(), anything())
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
 
-        validatePayment(accessToken, tossPayValidationRequest);
+        validatePayment(accessToken, tossPayRequest);
 
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(tossPayValidationRequest)
+                .body(tossPayRequest)
                 .when()
                 .post("/api/v1/pay/toss")
                 .then().log().all()
@@ -252,10 +208,10 @@ class TossPayIntegrationTest {
         final Long orderId = placeOrder(accessToken);
         putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
-        final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
-                                                                                               tossPayInfoResponse.getEncodedOrderId(),
-                                                                                               tossPayInfoResponse.getPrice(),
-                                                                                               "mockPaymentType");
+        final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
+                                                                 tossPayInfoResponse.getEncodedOrderId(),
+                                                                 tossPayInfoResponse.getPrice(),
+                                                                 "mockPaymentType");
 
         final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
         server.expect(ExpectedCount.twice(), anything())
@@ -269,7 +225,7 @@ class TossPayIntegrationTest {
                 .given().log().all()
                 .auth().oauth2(otherAccessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(tossPayValidationRequest)
+                .body(tossPayRequest)
                 .when()
                 .post("/api/v1/pay/toss")
                 .then().log().all()
