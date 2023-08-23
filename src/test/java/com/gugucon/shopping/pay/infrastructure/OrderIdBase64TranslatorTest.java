@@ -23,20 +23,9 @@ class OrderIdBase64TranslatorTest {
         // given
         Long orderId = 1_000_000L;
 
-        final Order order = new Order() {
-            @Override
-            public Long getId() {
-                return orderId;
-            }
-
-            @Override
-            public String createOrderName() {
-                return orderName;
-            }
-        };
 
         // when
-        String encodedString = orderIdTranslator.encode(order);
+        String encodedString = orderIdTranslator.encode(orderId, orderName);
         Long decodeId = orderIdTranslator.decode(encodedString);
 
         // then
@@ -62,20 +51,8 @@ class OrderIdBase64TranslatorTest {
         // given
         Long orderId = 1L;
 
-        final Order order = new Order() {
-            @Override
-            public Long getId() {
-                return orderId;
-            }
-
-            @Override
-            public String createOrderName() {
-                return orderName;
-            }
-        };
-
         // when
-        String encodedString = orderIdTranslator.encode(order);
+        String encodedString = orderIdTranslator.encode(orderId, orderName);
 
         // then
         assertThat(encodedString).hasSizeBetween(6, 64);
