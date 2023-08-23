@@ -44,7 +44,7 @@ class OrderTest {
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatus.CREATED);
-        assertThat(order.getType()).isEqualTo(PayType.NONE);
+        assertThat(order.getPayType()).isEqualTo(PayType.NONE);
     }
 
     @Test

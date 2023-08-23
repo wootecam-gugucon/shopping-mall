@@ -58,7 +58,7 @@ public class Order extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private PayType type;
+    private PayType payType;
 
     public static Order from(final Long memberId, final List<CartItem> cartItems) {
         final Order order = new Order(null, memberId, OrderStatus.CREATED, PayType.NONE);
@@ -122,7 +122,7 @@ public class Order extends BaseTimeEntity {
 
     public void order(PayType type) {
         this.status = OrderStatus.PENDING;
-        this.type = type;
+        this.payType = type;
     }
 
     public enum OrderStatus {ORDERED, CREATED, COMPLETED, PENDING}
