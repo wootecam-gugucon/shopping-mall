@@ -1,12 +1,12 @@
 package com.gugucon.shopping.integration;
 
 import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
-import static com.gugucon.shopping.utils.ApiUtils.createPayment;
 import static com.gugucon.shopping.utils.ApiUtils.getPaymentInfo;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.putOrder;
 import static com.gugucon.shopping.utils.ApiUtils.validatePayment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
@@ -19,10 +19,9 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayFailResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayValidationResponse;
@@ -58,33 +57,6 @@ class TossPayIntegrationTest {
     ProductRepository productRepository;
 
     @Test
-    @DisplayName("주문에 대한 결제 정보를 생성한다.")
-    void createPayment_() {
-        // given
-        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        addProductToCart(accessToken, "testProduct");
-
-        final Long orderId = placeOrder(accessToken);
-        final TossPayCreateRequest tossPayCreateRequest = new TossPayCreateRequest(orderId);
-
-        // when
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .auth().oauth2(accessToken)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(tossPayCreateRequest)
-                .when()
-                .put("/api/v1/pay/toss")
-                .then().log().all()
-                .extract();
-
-        // then
-        final TossPayCreateResponse tossPayCreateResponse = response.as(TossPayCreateResponse.class);
-        assertThat(tossPayCreateResponse.getPayId()).isNotNull();
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    @Test
     @DisplayName("결제 정보를 조회한다.")
     void getPaymentInfo_() {
         // given
@@ -93,14 +65,14 @@ class TossPayIntegrationTest {
 
         addProductToCart(accessToken, "치킨");
         final Long orderId = placeOrder(accessToken);
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
 
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .when()
-                .get("/api/v1/pay/{payId}", payId)
+                .get("/api/v1/pay/toss?orderId=" + orderId)
                 .then().log().all()
                 .extract();
 
@@ -124,8 +96,8 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, payId);
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
 
         mockServerSuccess(restTemplate, 1);
 
@@ -141,7 +113,7 @@ class TossPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(tossPayValidationRequest)
                 .when()
-                .post("/api/v1/pay/toss/validate")
+                .post("/api/v1/pay/toss")
                 .then().log().all()
                 .extract();
 
@@ -159,8 +131,8 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, payId);
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
                                                                                                tossPayInfoResponse.getEncodedOrderId(),
                                                                                                tossPayInfoResponse.getPrice(),
@@ -178,7 +150,7 @@ class TossPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(tossPayValidationRequest)
                 .when()
-                .post("/api/v1/pay/toss/validate")
+                .post("/api/v1/pay/toss")
                 .then().log().all()
                 .extract();
 
@@ -207,8 +179,8 @@ class TossPayIntegrationTest {
         final String otherAccessToken = loginAfterSignUp("other_test_email@woowafriends.com", "test_password!");
         buyProduct(otherAccessToken, productId, totalStock);
 
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, payId);
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
                                                                                                tossPayInfoResponse.getEncodedOrderId(),
                                                                                                tossPayInfoResponse.getPrice(),
@@ -221,7 +193,7 @@ class TossPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(tossPayValidationRequest)
                 .when()
-                .post("/api/v1/pay/toss/validate")
+                .post("/api/v1/pay/toss")
                 .then().log().all()
                 .extract();
 
@@ -239,8 +211,8 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, payId);
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
                                                                                                tossPayInfoResponse.getEncodedOrderId(),
                                                                                                tossPayInfoResponse.getPrice(),
@@ -260,7 +232,7 @@ class TossPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(tossPayValidationRequest)
                 .when()
-                .post("/api/v1/pay/toss/validate")
+                .post("/api/v1/pay/toss")
                 .then().log().all()
                 .extract();
 
@@ -278,8 +250,8 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, payId);
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
                                                                                                tossPayInfoResponse.getEncodedOrderId(),
                                                                                                tossPayInfoResponse.getPrice(),
@@ -299,7 +271,7 @@ class TossPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(tossPayValidationRequest)
                 .when()
-                .post("/api/v1/pay/toss/validate")
+                .post("/api/v1/pay/toss")
                 .then().log().all()
                 .extract();
 
@@ -317,8 +289,8 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, payId);
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayFailRequest tossPayFailRequest = new TossPayFailRequest("PAY_PROCESS_CANCELED",
                                                                              "사용자에 의해 결제가 취소되었습니다.",
                                                                              tossPayInfoResponse.getEncodedOrderId());

@@ -2,6 +2,7 @@ package com.gugucon.shopping.order.controller.api;
 
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
+import com.gugucon.shopping.order.dto.response.OrderPayResponse;
 import com.gugucon.shopping.order.dto.response.OrderResponse;
 import com.gugucon.shopping.order.service.OrderService;
 import java.net.URI;
@@ -40,7 +41,8 @@ public class OrderController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public void requestPay(@RequestBody final OrderPayRequest orderPayRequest, @AuthenticationPrincipal final Long memberId) {
-        orderService.requestPay(orderPayRequest, memberId);
+    public OrderPayResponse requestPay(@RequestBody final OrderPayRequest orderPayRequest,
+                                       @AuthenticationPrincipal final Long memberId) {
+        return orderService.requestPay(orderPayRequest, memberId);
     }
 }

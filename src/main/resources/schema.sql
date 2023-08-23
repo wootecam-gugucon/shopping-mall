@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS orders
     `id`               bigint auto_increment NOT NULL primary key,
     `member_id`        bigint                NOT NULL,
     `status`           varchar(255)          NOT NULL,
-    `type`             varchar(255)          NOT NULL,
+    `pay_type`         varchar(255)          NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL,
     foreign key (member_id) references members (id)

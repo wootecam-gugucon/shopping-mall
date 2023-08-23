@@ -10,9 +10,11 @@ import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
+import com.gugucon.shopping.order.dto.response.OrderPayResponse;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
 import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
 import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
@@ -138,20 +140,6 @@ public class ApiUtils {
         return getOrderDetail(accessToken, orderId).getOrderItems().get(0);
     }
 
-    public static Long createPayment(final String accessToken, final TossPayCreateRequest tossPayCreateRequest) {
-        return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(tossPayCreateRequest)
-            .when()
-            .put("/api/v1/pay/toss")
-            .then().log().all()
-            .extract()
-            .as(TossPayCreateResponse.class)
-            .getPayId();
-    }
-
     public static TossPayInfoResponse getPaymentInfo(final String accessToken, final Long payId) {
         return RestAssured
             .given().log().all()
@@ -161,6 +149,19 @@ public class ApiUtils {
             .then().log().all()
             .extract()
             .as(TossPayInfoResponse.class);
+    }
+
+    public static OrderPayResponse putOrder(final String accessToken, final OrderPayRequest orderPayRequest) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(orderPayRequest)
+                .when()
+                .put("/api/v1/order")
+                .then()
+                .extract()
+                .as(OrderPayResponse.class);
     }
 
     public static Long validatePayment(final String accessToken, final TossPayValidationRequest tossPayValidationRequest) {
@@ -182,8 +183,8 @@ public class ApiUtils {
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         updateCartItem(accessToken, cartItemResponses.get(0).getCartItemId(), new CartItemUpdateRequest(quantity));
         final Long orderId = placeOrder(accessToken);
-        final Long payId = createPayment(accessToken, new TossPayCreateRequest(orderId));
-        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, payId);
+        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayValidationRequest tossPayValidationRequest = new TossPayValidationRequest("mockPaymentKey",
                                                                                                tossPayInfoResponse.getEncodedOrderId(),
                                                                                                tossPayInfoResponse.getPrice(),

@@ -1,13 +1,13 @@
 package com.gugucon.shopping.order.service;
 
-import com.gugucon.shopping.common.domain.vo.Quantity;
-import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.ORDERED;
+import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.CREATED;
 import static com.gugucon.shopping.utils.DomainUtils.createMember;
 import static com.gugucon.shopping.utils.DomainUtils.createProduct;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
@@ -54,7 +54,7 @@ class OrderServiceTest {
         doReturn(Order.builder()
                          .id(1L)
                          .memberId(memberId)
-                         .status(ORDERED)
+                         .status(CREATED)
                          .build())
                 .when(orderRepository).save(any());
 

@@ -111,7 +111,7 @@ public class Order extends BaseTimeEntity {
     }
 
     public void validateUnPayed() {
-        if (status != OrderStatus.ORDERED) {
+        if (status == OrderStatus.COMPLETED) {
             throw new ShoppingException(ErrorCode.PAYED_ORDER);
         }
     }
@@ -125,5 +125,5 @@ public class Order extends BaseTimeEntity {
         this.payType = type;
     }
 
-    public enum OrderStatus {ORDERED, CREATED, COMPLETED, PENDING}
+    public enum OrderStatus {CREATED, COMPLETED, PENDING}
 }

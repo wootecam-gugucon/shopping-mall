@@ -29,22 +29,14 @@ public final class PayController {
         return payService.payByPoint(pointPayRequest, memberId);
     }
 
-    @PutMapping("/toss")
+    @GetMapping("/toss")
     @ResponseStatus(HttpStatus.OK)
-    public TossPayCreateResponse createPayment(@RequestBody final TossPayCreateRequest tossPayCreateRequest,
-                                               @AuthenticationPrincipal final Long memberId) {
-        return payService.createTossPay(tossPayCreateRequest, memberId);
-    }
-
-
-    @GetMapping("/{payId}")
-    @ResponseStatus(HttpStatus.OK)
-    public TossPayInfoResponse getPaymentInfo(@PathVariable final Long payId,
+    public TossPayInfoResponse getPaymentInfo(@RequestParam final Long orderId,
                                               @AuthenticationPrincipal final Long memberId) {
-        return payService.readPayInfo(payId, memberId);
+        return payService.readPayInfo(orderId, memberId);
     }
 
-    @PostMapping("/toss/validate")
+    @PostMapping("/toss")
     @ResponseStatus(HttpStatus.OK)
     public TossPayValidationResponse validatePayment(@RequestBody final TossPayValidationRequest tossPayValidationRequest,
                                                      @AuthenticationPrincipal final Long memberId) {

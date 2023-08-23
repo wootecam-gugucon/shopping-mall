@@ -11,6 +11,7 @@ import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
+import com.gugucon.shopping.order.dto.response.OrderPayResponse;
 import com.gugucon.shopping.order.dto.response.OrderResponse;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -65,11 +66,12 @@ public class OrderService {
     }
 
     @Transactional
-    public void requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
+    public OrderPayResponse requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
         final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
                                            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         order.order(PayType.from(orderPayRequest.getPayType()));
         decreaseStock(order);
+        return OrderPayResponse.from(order);
     }
 
     private void decreaseStock(final Order order) {
