@@ -93,6 +93,7 @@ class OrderTest {
                                            .build();
 
         final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
+        order.order(PayType.TOSS);
 
         // when
         order.pay();
@@ -150,16 +151,29 @@ class OrderTest {
     }
 
     @Test
-    @DisplayName("결제된 주문이면 예외가 발생한다.")
-    void validateUnPayed() {
+    @DisplayName("대기중인 주문이면 예외가 발생한다.")
+    void validateCreated() {
         // given
         final Long memberId = createMember().getId();
         final Order order = Order.from(memberId, Collections.emptyList());
+        order.order(PayType.TOSS);
+
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> order.order(PayType.POINT));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
+    }
+
+    @Test
+    @DisplayName("완료된 주문이면 예외가 발생한다.")
+    void validatePending() {
+        // given
+        final Long memberId = createMember().getId();
+        final Order order = Order.from(memberId, Collections.emptyList());
+        order.order(PayType.TOSS);
         order.pay();
 
         // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class,
-                                                         () -> order.validateUnPayed());
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.PAYED_ORDER);
+        final ShoppingException exception = assertThrows(ShoppingException.class, order::pay);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
     }
 }

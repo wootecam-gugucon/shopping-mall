@@ -5,6 +5,7 @@ import static com.gugucon.shopping.utils.ApiUtils.getOrderHistory;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.putOrder;
 import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,6 +15,8 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.order.domain.PayType;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.pay.dto.response.PayResponse;
@@ -43,6 +46,7 @@ class PointPayIntegrationTest {
         chargePoint(accessToken, 2000L);
         addProductToCart(accessToken, "testProduct", 1000L);
         final Long orderId = placeOrder(accessToken);
+        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
         final PointPayRequest pointPayRequest = new PointPayRequest(orderId);
 
         // when

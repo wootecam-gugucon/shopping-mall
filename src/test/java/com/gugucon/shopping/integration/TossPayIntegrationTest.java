@@ -194,7 +194,7 @@ class TossPayIntegrationTest {
 
         // then
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.PAYED_ORDER);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 

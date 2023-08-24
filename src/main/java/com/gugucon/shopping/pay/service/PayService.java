@@ -39,21 +39,21 @@ public class PayService {
     @Transactional
     public PayResponse payByPoint(final PointPayRequest pointPayRequest, final Long memberId) {
         final Long orderId = pointPayRequest.getOrderId();
-        final Order order = findUnPayedOrderBy(orderId, memberId);
+        final Order order = findOrderBy(orderId, memberId);
 
-        final Point point = findPoint(memberId);
+        final Point point = findPointBy(memberId);
         point.use(order.calculateTotalPrice());
 
         return completePay(memberId, order);
     }
 
-    private Point findPoint(final Long memberId) {
+    private Point findPointBy(final Long memberId) {
         return pointRepository.findByMemberId(memberId)
                               .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
     }
 
     public TossPayInfoResponse getTossInfo(final Long orderId, final Long memberId) {
-        final Order order = findUnPayedOrderBy(orderId, memberId);
+        final Order order = findOrderBy(orderId, memberId);
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
 
@@ -68,7 +68,7 @@ public class PayService {
     @Transactional
     public PayResponse payByToss(final TossPayRequest tossPayRequest, final Long memberId) {
         final Long orderId = tossPayProvider.decodeOrderId(tossPayRequest.getOrderId());
-        final Order order = findUnPayedOrderBy(orderId, memberId);
+        final Order order = findOrderBy(orderId, memberId);
 
         order.validateMoney(tossPayRequest.getAmount());
         tossPayProvider.validatePayment(tossPayRequest);
@@ -82,11 +82,9 @@ public class PayService {
         return PayResponse.from(payRepository.save(Pay.from(order)));
     }
 
-    private Order findUnPayedOrderBy(final Long orderId, final Long memberId) {
-        final Order order = orderRepository.findByIdAndMemberId(orderId, memberId)
-                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
-        order.validateUnPayed();
-        return order;
+    private Order findOrderBy(final Long orderId, final Long memberId) {
+        return orderRepository.findByIdAndMemberId(orderId, memberId)
+                              .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
     }
 
     public TossPayFailResponse decodeOrderId(final TossPayFailRequest tossPayFailRequest) {
