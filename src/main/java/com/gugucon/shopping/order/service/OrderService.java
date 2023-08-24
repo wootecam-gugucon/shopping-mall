@@ -93,8 +93,8 @@ public class OrderService {
 
     private void decreaseStock(final Order order) {
         order.getOrderItems().forEach(orderItem -> {
-            final Product product = productRepository.findById(orderItem.getProductId())
-                    .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+            final Product product = productRepository.findByIdWithExclusiveLock(orderItem.getProductId())
+                                                     .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
             product.validateStockIsNotLessThan(orderItem.getQuantity());
             product.decreaseStockBy(orderItem.getQuantity());
         });
