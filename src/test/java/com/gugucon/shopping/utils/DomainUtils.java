@@ -83,6 +83,14 @@ public class DomainUtils {
                 .build();
     }
 
+    public static CartItem createCartItemWithoutId(final Long memberId, final Product product) {
+        return CartItem.builder()
+                .memberId(memberId)
+                .product(product)
+                .quantity(Quantity.from(1))
+                .build();
+    }
+
     public static OrderItem createOrderItem(final String name, final Long productId, final Quantity quantity) {
         sequence++;
         return OrderItem.builder()
