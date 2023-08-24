@@ -33,14 +33,9 @@ public final class Pay extends BaseTimeEntity {
 
     private Long orderId;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "price"))
-    private Money price;
-
     public static Pay from(final Order order) {
         return Pay.builder()
                 .orderId(order.getId())
-                .price(order.calculateTotalPrice())
                 .build();
     }
 }

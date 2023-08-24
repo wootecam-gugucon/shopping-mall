@@ -14,7 +14,6 @@ class PayTest {
     void create() {
         assertThatNoException().isThrownBy(() -> Pay.builder()
                 .orderId(1L)
-                .price(Money.from(1000L))
                 .build());
     }
 }

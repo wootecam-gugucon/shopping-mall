@@ -131,5 +131,5 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    public enum OrderStatus {CREATED, COMPLETED, PENDING}
+    public enum OrderStatus {CREATED, COMPLETED, PENDING, CANCELED}
 }

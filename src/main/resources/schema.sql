@@ -13,10 +13,9 @@ CREATE TABLE IF NOT EXISTS orders
     `id`               bigint auto_increment NOT NULL primary key,
     `member_id`        bigint                NOT NULL,
     `status`           varchar(255)          NOT NULL,
-    `pay_type`         varchar(255)          NOT NULL,
+    `pay_type`         varchar(255)          NULL,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL,
-    foreign key (member_id) references members (id)
+    `last_modified_at` datetime              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS products
@@ -24,7 +23,7 @@ CREATE TABLE IF NOT EXISTS products
     `id`               bigint auto_increment NOT NULL primary key,
     `name`             varchar(255)          NOT NULL,
     `price`            bigint                NOT NULL,
-    `image_file_name`  varchar(255)          NOT NULL unique,
+    `image_file_name`  varchar(255)          NOT NULL,
     `stock`            int                   NOT NULL,
     `description`      text                  NOT NULL,
     `created_at`       datetime              NOT NULL,
@@ -41,9 +40,7 @@ CREATE TABLE IF NOT EXISTS order_items
     `image_file_name`  varchar(255)          NOT NULL,
     `quantity`         int                   NOT NULL DEFAULT 1,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL,
-    foreign key (order_id) references orders (id),
-    foreign key (product_id) references products (id)
+    `last_modified_at` datetime              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS cart_items
@@ -53,19 +50,15 @@ CREATE TABLE IF NOT EXISTS cart_items
     `product_id`       bigint                NOT NULL,
     `quantity`         int                   NOT NULL DEFAULT 1,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL,
-    foreign key (product_id) references products (id),
-    foreign key (member_id) references members (id)
+    `last_modified_at` datetime              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS pays
 (
     `id`               bigint auto_increment NOT NULL primary key,
     `order_id`         bigint                NOT NULL,
-    `price`            bigint                NOT NULL,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL,
-    foreign key (order_id) references orders (id)
+    `last_modified_at` datetime              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS points
@@ -74,8 +67,7 @@ CREATE TABLE IF NOT EXISTS points
     `member_id`        bigint                NOT NULL,
     `point`            bigint                NOT NULL,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL,
-    foreign key (member_id) references members (id)
+    `last_modified_at` datetime              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS rates
@@ -85,9 +77,17 @@ CREATE TABLE IF NOT EXISTS rates
     `order_item_id`    bigint                NOT NULL,
     `score`            smallint              NOT NULL,
     `created_at`       datetime              NOT NULL,
-    `last_modified_at` datetime              NOT NULL,
-    foreign key (member_id) references members (id),
-    foreign key (order_item_id) references order_items (id)
+    `last_modified_at` datetime              NOT NULL
 );
+
+create index idx_member_orders on orders (member_id);
+create index idx_order_order_items on order_items (order_id);
+create index idx_product_order_items on order_items (product_id);
+create index idx_member_cart_items on cart_items (member_id);
+create index idx_product_cart_items on cart_items (product_id);
+create index idx_order_pays on pays (order_id);
+create index idx_member_points on points (member_id);
+create index idx_member_rates on rates (member_id);
+create index idx_order_item_rates on rates (order_item_id);
 
 create index idx_1 on order_items (product_id, quantity);
