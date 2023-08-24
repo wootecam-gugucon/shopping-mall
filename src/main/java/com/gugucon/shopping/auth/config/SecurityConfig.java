@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/**"))
             )
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/login/token"),
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/login"),
                                  new AntPathRequestMatcher("/api/v1/signup"),
                                  new AntPathRequestMatcher("/api/v1/product/**"),
                                  new AntPathRequestMatcher("/api/v1/rate/product/**"))

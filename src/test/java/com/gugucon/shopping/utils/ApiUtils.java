@@ -38,7 +38,7 @@ public class ApiUtils {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(loginRequest)
-            .when().post("/api/v1/login/token")
+            .when().post("/api/v1/login")
             .then().log().all()
             .extract()
             .as(LoginResponse.class)

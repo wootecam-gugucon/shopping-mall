@@ -15,7 +15,7 @@ public class LoginController {
 
     private final MemberService memberService;
 
-    @PostMapping("/token")
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public LoginResponse login(@RequestBody @Valid final LoginRequest loginRequest) {
         return memberService.login(loginRequest);
