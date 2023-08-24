@@ -27,8 +27,8 @@ public class MemberService {
     private final JwtProvider jwtProvider;
 
     public LoginResponse login(final LoginRequest loginRequest) {
-        final Member member = memberRepository.findByEmail(Email.from(loginRequest.getEmail()))
-                .orElseThrow(() -> new ShoppingException(ErrorCode.EMAIL_NOT_REGISTERED));
+        Member member = memberRepository.findByEmail(Email.from(loginRequest.getEmail()))
+            .orElseThrow(() -> new ShoppingException(ErrorCode.EMAIL_NOT_REGISTERED));
         validatePassword(loginRequest, member);
 
         final String accessToken = jwtProvider.generateToken(String.valueOf(member.getId()));
@@ -66,7 +66,7 @@ public class MemberService {
 
     private boolean isEmailExist(final Email email) {
         return memberRepository.findByEmail(email)
-                .isPresent();
+                               .isPresent();
     }
 
     private void validatePasswordChecked(final String password, final String passwordCheck) {
