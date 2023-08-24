@@ -2,8 +2,6 @@ package com.gugucon.shopping.pay.infrastructure;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.order.domain.entity.Order;
-
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Base64.Decoder;
@@ -23,10 +21,10 @@ public final class OrderIdBase64Translator implements OrderIdTranslator {
     }
 
     @Override
-    public String encode(final Order order) {
+    public String encode(final Long orderId, final String orderName) {
         final String joined = String.join(DELIMITER,
-                                          String.valueOf(order.getId()),
-                                          order.createOrderName(),
+                                          String.valueOf(orderId),
+                                          orderName,
                                           String.valueOf(LocalDateTime.now()));
         final String encoded = encoder.encodeToString(joined.getBytes());
         return limitLength(encoded);

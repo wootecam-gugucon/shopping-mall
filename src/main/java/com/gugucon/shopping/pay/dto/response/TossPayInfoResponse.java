@@ -1,8 +1,7 @@
-package com.gugucon.shopping.pay.dto.toss.response;
+package com.gugucon.shopping.pay.dto.response;
 
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.order.domain.entity.Order;
-import com.gugucon.shopping.pay.domain.Pay;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,14 +21,13 @@ public final class TossPayInfoResponse {
 
     public static TossPayInfoResponse from(final String encodedOrderId,
                                            final Order order,
-                                           final Pay pay,
                                            final Member member,
                                            final String customerKey,
                                            final String successUrl,
                                            final String failUrl) {
         return new TossPayInfoResponse(encodedOrderId,
                                        order.createOrderName(),
-                                       pay.getPrice().getValue(),
+                                       order.calculateTotalPrice().getValue(),
                                        member.getEmail().getValue(),
                                        member.getNickname().getValue(),
                                        customerKey,

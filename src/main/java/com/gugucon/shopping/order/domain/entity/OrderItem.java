@@ -74,7 +74,7 @@ public class OrderItem extends BaseTimeEntity {
 
     private static void validateQuantity(final CartItem cartItem) {
         if (!cartItem.isAvailableQuantity()) {
-            throw new ShoppingException(ErrorCode.LACK_OF_STOCK);
+            throw new ShoppingException(ErrorCode.STOCK_NOT_ENOUGH);
         }
     }
 

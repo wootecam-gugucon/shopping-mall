@@ -1,7 +1,7 @@
 package com.gugucon.shopping.pay.controller;
 
-import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayFailRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class PayPageController {
 
 
-    @GetMapping("/{payId}")
-    public String payPage(@PathVariable final Long payId) {
+    @GetMapping("/{orderId}")
+    public String payPage(@PathVariable final Long orderId) {
         return "pay";
     }
 
 
     @GetMapping("/loading-popup")
-    public String getLoadingPagePopUp(@ModelAttribute final TossPayValidationRequest tossPayValidationRequest) {
+    public String getLoadingPagePopUp(@ModelAttribute final TossPayRequest tossPayRequest) {
         return "pay-loading-popup";
     }
 

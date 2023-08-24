@@ -46,7 +46,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     const productId = [[${productId}]];
 
-    fetch(`/api/v1/product/${productId}`, {
+    fetch(`/api/v1/products/${productId}`, {
       method: 'GET',
     }).then((response) => {
       if (response.ok) {

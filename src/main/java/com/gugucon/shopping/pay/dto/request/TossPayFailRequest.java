@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.dto.toss.request;
+package com.gugucon.shopping.pay.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

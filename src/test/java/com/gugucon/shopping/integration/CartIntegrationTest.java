@@ -196,7 +196,7 @@ class CartIntegrationTest {
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
+                .when().patch("/api/v1/cart/items/{cartItemId}", cartItemId)
                 .then().log().all()
                 .extract();
 
@@ -223,7 +223,7 @@ class CartIntegrationTest {
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
+                .when().patch("/api/v1/cart/items/{cartItemId}", cartItemId)
                 .then().log().all()
                 .extract();
 
@@ -250,7 +250,7 @@ class CartIntegrationTest {
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
+                .when().patch("/api/v1/cart/items/{cartItemId}", cartItemId)
                 .then().log().all()
                 .extract();
 
@@ -279,7 +279,7 @@ class CartIntegrationTest {
                 .auth().oauth2(otherAccessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
+                .when().patch("/api/v1/cart/items/{cartItemId}", cartItemId)
                 .then().log().all()
                 .extract();
 
@@ -306,7 +306,7 @@ class CartIntegrationTest {
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", cartItemId)
+                .when().patch("/api/v1/cart/items/{cartItemId}", cartItemId)
                 .then().log().all()
                 .extract();
 
@@ -331,7 +331,7 @@ class CartIntegrationTest {
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(cartItemUpdateRequest)
-                .when().put("/api/v1/cart/items/{cartItemId}/quantity", invalidCartItemId)
+                .when().patch("/api/v1/cart/items/{cartItemId}", invalidCartItemId)
                 .then().log().all()
                 .extract();
 

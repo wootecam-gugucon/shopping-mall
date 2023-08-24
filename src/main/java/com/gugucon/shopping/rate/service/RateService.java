@@ -74,7 +74,7 @@ public class RateService {
     }
 
     private OrderItem searchOrderItem(final Long memberId, final Long orderItemId) {
-        return orderItemRepository.findByOrderIdAndMemberIdAndOrderStatus(memberId, orderItemId, OrderStatus.PAYED)
+        return orderItemRepository.findByOrderIdAndMemberIdAndOrderStatus(memberId, orderItemId, OrderStatus.COMPLETED)
             .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER_ITEM));
     }
 

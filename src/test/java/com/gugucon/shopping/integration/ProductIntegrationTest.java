@@ -44,7 +44,7 @@ class ProductIntegrationTest {
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/api/v1/product")
+                .when().get("/api/v1/products")
                 .then().log().all()
                 .extract();
 
@@ -75,7 +75,7 @@ class ProductIntegrationTest {
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/api/v1/product?page=0&size=1")
+                .when().get("/api/v1/products?page=0&size=1")
                 .then().log().all()
                 .extract();
 
@@ -103,7 +103,7 @@ class ProductIntegrationTest {
         /* when */
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/api/v1/product")
+                .when().get("/api/v1/products")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -138,7 +138,7 @@ class ProductIntegrationTest {
                 .given().log().all()
                 .queryParam("keyword", keyword)
                 .queryParam("sort", "createdAt,desc")
-                .when().get("/api/v1/product/search")
+                .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -176,7 +176,7 @@ class ProductIntegrationTest {
                 .given().log().all()
                 .queryParam("keyword", keyword)
                 .queryParam("sort", "price,desc")
-                .when().get("/api/v1/product/search")
+                .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -214,7 +214,7 @@ class ProductIntegrationTest {
                 .given().log().all()
                 .queryParam("keyword", keyword)
                 .queryParam("sort", "price,asc")
-                .when().get("/api/v1/product/search")
+                .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -271,7 +271,7 @@ class ProductIntegrationTest {
                 .given().log().all()
                 .queryParam("keyword", keyword)
                 .queryParam("sort", "orderCount,desc")
-                .when().get("/api/v1/product/search")
+                .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -307,7 +307,7 @@ class ProductIntegrationTest {
                 .given().log().all()
                 .queryParam("keyword", "")
                 .queryParam("sort", "createdAt,desc")
-                .when().get("/api/v1/product/search")
+                .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -331,7 +331,7 @@ class ProductIntegrationTest {
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/api/v1/product/search")
+                .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -359,7 +359,7 @@ class ProductIntegrationTest {
                 .given().log().all()
                 .queryParam("keyword", keyword)
                 .queryParam("sort", "invalidSort,desc")
-                .when().get("/api/v1/product/search")
+                .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -380,7 +380,7 @@ class ProductIntegrationTest {
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/api/v1/product/{productId}", productId)
+                .when().get("/api/v1/products/{productId}", productId)
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
@@ -404,7 +404,7 @@ class ProductIntegrationTest {
         // when
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().get("/api/v1/product/{productId}", notExistProductId)
+                .when().get("/api/v1/products/{productId}", notExistProductId)
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
 
