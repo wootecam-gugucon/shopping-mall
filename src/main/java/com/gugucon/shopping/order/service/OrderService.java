@@ -69,7 +69,7 @@ public class OrderService {
     public OrderPayResponse requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
         final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
                                            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
-        order.order(PayType.from(orderPayRequest.getPayType()));
+        order.startPay(PayType.from(orderPayRequest.getPayType()));
         decreaseStock(order);
         return OrderPayResponse.from(order);
     }

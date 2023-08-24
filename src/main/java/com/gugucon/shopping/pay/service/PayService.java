@@ -78,7 +78,7 @@ public class PayService {
 
     private PayResponse completePay(final Long memberId, final Order order) {
         cartItemRepository.deleteAllByMemberId(memberId);
-        order.pay();
+        order.completePay();
         return PayResponse.from(payRepository.save(Pay.from(order)));
     }
 

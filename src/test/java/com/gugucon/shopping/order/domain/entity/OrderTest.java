@@ -68,7 +68,7 @@ class OrderTest {
         final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
 
         // when
-        order.order(PayType.POINT);
+        order.startPay(PayType.POINT);
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatus.PAYING);
@@ -93,10 +93,10 @@ class OrderTest {
                                            .build();
 
         final Order order = Order.from(memberId, List.of(cartItem1, cartItem2));
-        order.order(PayType.TOSS);
+        order.startPay(PayType.TOSS);
 
         // when
-        order.pay();
+        order.completePay();
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -156,10 +156,10 @@ class OrderTest {
         // given
         final Long memberId = createMember().getId();
         final Order order = Order.from(memberId, Collections.emptyList());
-        order.order(PayType.TOSS);
+        order.startPay(PayType.TOSS);
 
         // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class, () -> order.order(PayType.POINT));
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> order.startPay(PayType.POINT));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
     }
 
@@ -169,11 +169,11 @@ class OrderTest {
         // given
         final Long memberId = createMember().getId();
         final Order order = Order.from(memberId, Collections.emptyList());
-        order.order(PayType.TOSS);
-        order.pay();
+        order.startPay(PayType.TOSS);
+        order.completePay();
 
         // when & then
-        final ShoppingException exception = assertThrows(ShoppingException.class, order::pay);
+        final ShoppingException exception = assertThrows(ShoppingException.class, order::completePay);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
     }
 }
