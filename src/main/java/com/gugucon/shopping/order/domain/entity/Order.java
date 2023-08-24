@@ -133,8 +133,8 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    public void validateMoney(final Long amount) {
-        if (calculateTotalPrice().isNotSame(amount)) {
+    public void validateMoney(final Money money) {
+        if (calculateTotalPrice().isNotSame(money)) {
             throw new ShoppingException(ErrorCode.PAY_FAILED);
         }
     }

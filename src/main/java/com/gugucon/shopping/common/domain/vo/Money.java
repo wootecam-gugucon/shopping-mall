@@ -55,7 +55,7 @@ public class Money {
         return value < other.value;
     }
 
-    public boolean isNotSame(final Long amount) {
-        return !value.equals(amount);
+    public boolean isNotSame(final Money other) {
+        return !value.equals(other.value);
     }
 }

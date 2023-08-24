@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.dto.response;
 
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,9 +13,9 @@ import lombok.NoArgsConstructor;
 public class OrderPayResponse {
 
     private Long orderId;
-    private String payType;
+    private PayType payType;
 
     public static OrderPayResponse from(final Order order) {
-        return new OrderPayResponse(order.getId(), order.getPayType().toString());
+        return new OrderPayResponse(order.getId(), order.getPayType());
     }
 }
