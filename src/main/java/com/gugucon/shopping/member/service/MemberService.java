@@ -5,6 +5,7 @@ import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.common.utils.JwtProvider;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
@@ -26,8 +27,8 @@ public class MemberService {
     private final JwtProvider jwtProvider;
 
     public LoginResponse login(final LoginRequest loginRequest) {
-        Member member = memberRepository.findByEmail(Email.from(loginRequest.getEmail()))
-            .orElseThrow(() -> new ShoppingException(ErrorCode.EMAIL_NOT_REGISTERED));
+        final Member member = memberRepository.findByEmail(Email.from(loginRequest.getEmail()))
+                .orElseThrow(() -> new ShoppingException(ErrorCode.EMAIL_NOT_REGISTERED));
         validatePassword(loginRequest, member);
 
         final String accessToken = jwtProvider.generateToken(String.valueOf(member.getId()));
@@ -47,22 +48,24 @@ public class MemberService {
         final Password password = Password.of(signupRequest.getPassword(), passwordEncoder);
         final Nickname nickname = Nickname.from(signupRequest.getNickname());
         final Member member = Member.builder()
-                                    .email(email)
-                                    .password(password)
-                                    .nickname(nickname)
-                                    .build();
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .gender(Gender.valueOf(signupRequest.getGender()))
+                .birthDate(signupRequest.getBirthDate())
+                .build();
         memberRepository.save(member);
     }
 
     private void validateEmailNotExist(final Email email) {
-         if (isEmailExist(email)) {
-             throw new ShoppingException(ErrorCode.EMAIL_ALREADY_EXIST);
-         }
+        if (isEmailExist(email)) {
+            throw new ShoppingException(ErrorCode.EMAIL_ALREADY_EXIST);
+        }
     }
 
     private boolean isEmailExist(final Email email) {
         return memberRepository.findByEmail(email)
-                               .isPresent();
+                .isPresent();
     }
 
     private void validatePasswordChecked(final String password, final String passwordCheck) {

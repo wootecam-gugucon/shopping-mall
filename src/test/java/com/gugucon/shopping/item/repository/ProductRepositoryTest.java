@@ -5,6 +5,7 @@ import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.repository.MemberRepository;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.gugucon.shopping.utils.DomainUtils.createOrderItem;
@@ -49,7 +51,7 @@ class ProductRepositoryTest {
     @DisplayName("해당 키워드를 이름에 포함하는 product를 주문이 많은 순으로 조회한다.")
     void findAllByNameSortByOrderCountDesc() {
         // given
-        final Product 사과 = insertProduct("사과", 2500);// O
+        final Product 사과 = insertProduct("사과", 2500);   // O
         final Product 맛있는사과 = insertProduct("맛있는 사과", 3000);    // O
         final Product 사과는맛있어 = insertProduct("사과는 맛있어", 1000);    // O
         final Product 가나다라마사과과 = insertProduct("가나다라마사과과", 4000);    // O
@@ -58,14 +60,17 @@ class ProductRepositoryTest {
         final Member member = Member.builder()
                 .email(Email.from("test@email.com"))
                 .password(Password.of("password", new BCryptPasswordEncoder()))
-                .nickname(Nickname.from("nickname")).build();
+                .nickname(Nickname.from("nickname"))
+                .gender(Gender.FEMALE)
+                .birthDate(LocalDate.now())
+                .build();
         final Member persistMember = memberRepository.save(member);
 
         final Order order = Order.builder()
-                                 .memberId(persistMember.getId())
-                                 .status(Order.OrderStatus.COMPLETED)
-                                 .payType(PayType.NONE)
-                                 .build();
+                .memberId(persistMember.getId())
+                .status(Order.OrderStatus.COMPLETED)
+                .payType(PayType.NONE)
+                .build();
         orderRepository.save(order);
 
         final OrderItem 사과_주문상품 = createOrderItem("사과", 사과.getId(), Quantity.from(10));

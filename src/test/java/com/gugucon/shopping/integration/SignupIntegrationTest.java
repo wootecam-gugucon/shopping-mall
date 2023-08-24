@@ -1,7 +1,5 @@
 package com.gugucon.shopping.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -18,6 +16,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 @IntegrationTest
 @DisplayName("회원 가입 기능 통합 테스트")
 class SignupIntegrationTest {
@@ -26,10 +28,13 @@ class SignupIntegrationTest {
     @DisplayName("회원 가입한다.")
     void signup() {
         /* given */
-        final String email = "test_email@test.com";
-        final String password = "test_password!";
-        final String nickname = "김동주";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email("test_email@test.com")
+                .password("test_password!").passwordCheck("test_password!")
+                .nickname("김동주")
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -48,10 +53,13 @@ class SignupIntegrationTest {
     @DisplayName("이미 존재하는 이메일이면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_existEmail() {
         /* given */
-        final String email = "test_email@test.com";
-        final String password = "test_password!";
-        final String nickname = "김동주";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email("test_email@test.com")
+                .password("test_password!").passwordCheck("test_password!")
+                .nickname("김동주")
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
         ApiUtils.signup(signupRequest);
 
         /* when */
@@ -73,11 +81,16 @@ class SignupIntegrationTest {
     @DisplayName("비밀번호와 비밀번호 확인이 다르면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_differentPassword() {
         /* given */
-        final String email = "test_email@test.com";
         final String password = "test_password!";
         final String passwordCheck = "not_same_password";
-        final String nickname = "김동주";
-        final SignupRequest signupRequest = new SignupRequest(email, password, passwordCheck, nickname);
+
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email("test_email@test.com")
+                .password(password).passwordCheck(passwordCheck)
+                .nickname("김동주")
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -99,9 +112,13 @@ class SignupIntegrationTest {
     @DisplayName("이메일 형식이 올바르지 않으면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_invalidEmail(final String email) {
         /* given */
-        final String password = "test_password!";
-        final String nickname = "김동주";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email(email)
+                .password("test_password!").passwordCheck("test_password!")
+                .nickname("김동주")
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -123,9 +140,13 @@ class SignupIntegrationTest {
     @DisplayName("비밀번호 형식이 올바르지 않으면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_invalidPassword(final String password) {
         /* given */
-        final String email = "test_email@test.com";
-        final String nickname = "김동주";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email("test_email@test.com")
+                .password(password).passwordCheck(password)
+                .nickname("김동주")
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -147,9 +168,13 @@ class SignupIntegrationTest {
     @DisplayName("이메일 정보가 없으면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_withoutEmail(final String email) {
         /* given */
-        final String password = "test_password!";
-        final String nickname = "김동주";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email(email)
+                .password("test_password!").passwordCheck("test_password!")
+                .nickname("김동주")
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -171,9 +196,13 @@ class SignupIntegrationTest {
     @DisplayName("비밀번호 정보가 없으면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_withoutPassword(final String password) {
         /* given */
-        final String email = "test_email@test.com";
-        final String nickname = "김동주";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email("test_email@test.com")
+                .password(password).passwordCheck(password)
+                .nickname("김동주")
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
@@ -195,9 +224,13 @@ class SignupIntegrationTest {
     @DisplayName("닉네임 정보가 없으면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_withoutNickname(final String nickname) {
         /* given */
-        final String email = "test_email@test.com";
-        final String password = "test_password!";
-        final SignupRequest signupRequest = new SignupRequest(email, password, password, nickname);
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email("test_email@test.com")
+                .password("test_password!").passwordCheck("test_password!")
+                .nickname(nickname)
+                .gender("MALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured

@@ -2,21 +2,16 @@ package com.gugucon.shopping.member.domain.entity;
 
 import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "members")
@@ -41,6 +36,14 @@ public class Member extends BaseTimeEntity {
     @Embedded
     @Valid
     private Nickname nickname;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Column
+    @NotNull
+    private LocalDate birthDate;
 
     public boolean matchPassword(final String rawPassword, final PasswordEncoder passwordEncoder) {
         return this.password.hasValue(rawPassword, passwordEncoder);

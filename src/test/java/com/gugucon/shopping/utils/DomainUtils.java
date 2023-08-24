@@ -6,11 +6,14 @@ import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDate;
 
 public class DomainUtils {
 
@@ -70,6 +73,8 @@ public class DomainUtils {
                 .email(Email.from("test_email" + sequence + "@gmail.com"))
                 .password(Password.of("test_password", passwordEncoder))
                 .nickname(Nickname.from("test_nickname_" + sequence))
+                .gender(Gender.FEMALE)
+                .birthDate(LocalDate.now())
                 .build();
     }
 

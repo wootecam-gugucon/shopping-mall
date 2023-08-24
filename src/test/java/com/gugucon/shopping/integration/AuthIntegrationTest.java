@@ -1,8 +1,5 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -15,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static org.assertj.core.api.Assertions.assertThat;
+
 @IntegrationTest
 @DisplayName("jwt 토큰 인증 기능 통합 테스트")
 class AuthIntegrationTest {
@@ -23,7 +23,7 @@ class AuthIntegrationTest {
     @DisplayName("jwt 토큰 인증에 성공한다")
     void authenticate() {
         // given
-        String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
 
         // when
         final ExtractableResponse<Response> response = RestAssured
