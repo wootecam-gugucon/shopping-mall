@@ -4,6 +4,7 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
@@ -24,6 +25,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public OrderResponse order(final Long memberId) {
@@ -51,6 +53,14 @@ public class OrderService {
         return orders.stream()
                 .map(OrderHistoryResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public void cancelOrder(final Order order) {
+        order.getOrderItems()
+                .forEach(orderItem -> productRepository.increaseStockByIdAndValue(orderItem.getProductId(),
+                                                                                  orderItem.getQuantity().getValue()));
+        order.cancel();
     }
 
     private void validateNotEmpty(final List<CartItem> cartItems) {
