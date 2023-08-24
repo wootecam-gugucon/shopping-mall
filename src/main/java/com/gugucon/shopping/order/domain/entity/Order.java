@@ -5,6 +5,7 @@ import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
+import com.gugucon.shopping.order.domain.PayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -42,8 +43,12 @@ public class Order extends BaseTimeEntity {
     @NotNull
     private OrderStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private PayType payType;
+
     public static Order from(final Long memberId, final List<CartItem> cartItems) {
-        final Order order = new Order(null, memberId, OrderStatus.ORDERED);
+        final Order order = new Order(null, memberId, OrderStatus.CREATED, PayType.NONE);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
@@ -92,19 +97,38 @@ public class Order extends BaseTimeEntity {
                 .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
     }
 
-    public void validateUnPayed() {
-        if (status != OrderStatus.ORDERED) {
-            throw new ShoppingException(ErrorCode.PAYED_ORDER);
+    public void completePay() {
+        validatePaying();
+        this.status = OrderStatus.COMPLETED;
+    }
+
+    private void validatePaying() {
+        if (status != OrderStatus.PAYING) {
+            throw new ShoppingException(ErrorCode.INVALID_ORDER_STATUS);
         }
     }
 
-    public void pay() {
-        this.status = OrderStatus.PAYED;
+    public void startPay(final PayType type) {
+        validateCreated();
+        this.status = OrderStatus.PAYING;
+        this.payType = type;
+    }
+
+    private void validateCreated() {
+        if (status != OrderStatus.CREATED) {
+            throw new ShoppingException(ErrorCode.INVALID_ORDER_STATUS);
+        }
+    }
+
+    public void validateMoney(final Money money) {
+        if (calculateTotalPrice().isNotSame(money)) {
+            throw new ShoppingException(ErrorCode.PAY_FAILED);
+        }
     }
 
     public void cancel() {
-        this.status = OrderStatus.CANCELLED;
+        this.status = OrderStatus.CANCELED;
     }
 
-    public enum OrderStatus {ORDERED, PAYED, CANCELLED, COMPLETED}
+    public enum OrderStatus {CREATED, PAYING, COMPLETED, CANCELED}
 }

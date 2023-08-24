@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.ORDERED;
+import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.CREATED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -104,7 +104,7 @@ class OrderCancelServiceExecutionTest {
         // then
         final Order 취소된_주문 = orderRepository.findById(persistOrder.getId()).get();
         final Product 재고가_늘어난_사과 = productRepository.findById(사과.getId()).get();
-        assertThat(취소된_주문.getStatus()).isEqualTo(Order.OrderStatus.CANCELLED);
+        assertThat(취소된_주문.getStatus()).isEqualTo(Order.OrderStatus.CANCELED);
         assertThat(재고가_늘어난_사과.getStock()).isEqualTo(beforeStock.increaseBy(orderQuantity));
     }
 
@@ -144,7 +144,7 @@ class OrderCancelServiceExecutionTest {
         // then
         final Order 취소되지_않은_주문 = orderRepository.findById(persistOrder.getId()).get();
         final Product 재고가_그대로인_사과 = productRepository.findById(사과.getId()).get();
-        assertThat(취소되지_않은_주문.getStatus()).isEqualTo(ORDERED);
+        assertThat(취소되지_않은_주문.getStatus()).isEqualTo(CREATED);
         assertThat(재고가_그대로인_사과.getStock()).isEqualTo(beforeStock);
     }
 
@@ -184,7 +184,7 @@ class OrderCancelServiceExecutionTest {
         // then
         final Order 취소되지_않은_주문 = orderRepository.findById(persistOrder.getId()).get();
         final Product 재고가_그대로인_사과 = productRepository.findById(사과.getId()).get();
-        assertThat(취소되지_않은_주문.getStatus()).isEqualTo(ORDERED);
+        assertThat(취소되지_않은_주문.getStatus()).isEqualTo(CREATED);
         assertThat(재고가_그대로인_사과.getStock()).isEqualTo(beforeStock);
     }
 

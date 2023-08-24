@@ -21,7 +21,7 @@
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
         /*<![CDATA[*/
-        const payId = [[${payId}]];
+        const orderId = [[${orderId}]];
         /*]]>*/
 
         const credentials = localStorage.getItem('accessToken');
@@ -30,7 +30,7 @@
             window.location.href = '/login';
         }
 
-        fetch(`/api/v1/pay/${payId}`, {
+        fetch(`/api/v1/pay/toss?orderId=${orderId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${credentials}`,

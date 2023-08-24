@@ -1,14 +1,11 @@
 package com.gugucon.shopping.pay.controller;
 
-import com.gugucon.shopping.pay.dto.point.request.PointPayRequest;
-import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayCreateRequest;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayFailRequest;
-import com.gugucon.shopping.pay.dto.toss.request.TossPayValidationRequest;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayCreateResponse;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayFailResponse;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayInfoResponse;
-import com.gugucon.shopping.pay.dto.toss.response.TossPayValidationResponse;
+import com.gugucon.shopping.pay.dto.request.PointPayRequest;
+import com.gugucon.shopping.pay.dto.response.PayResponse;
+import com.gugucon.shopping.pay.dto.request.TossPayFailRequest;
+import com.gugucon.shopping.pay.dto.request.TossPayRequest;
+import com.gugucon.shopping.pay.dto.response.TossPayFailResponse;
+import com.gugucon.shopping.pay.dto.response.TossPayInfoResponse;
 import com.gugucon.shopping.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,33 +19,25 @@ public final class PayController {
 
     private final PayService payService;
 
-    @PutMapping("/point")
+    @PostMapping("/point")
     @ResponseStatus(HttpStatus.OK)
-    public PointPayResponse createPayment(@RequestBody final PointPayRequest pointPayRequest,
-                                          @AuthenticationPrincipal final Long memberId) {
+    public PayResponse payByPoint(@RequestBody final PointPayRequest pointPayRequest,
+                                  @AuthenticationPrincipal final Long memberId) {
         return payService.payByPoint(pointPayRequest, memberId);
     }
 
-    @PutMapping("/toss")
+    @GetMapping("/toss")
     @ResponseStatus(HttpStatus.OK)
-    public TossPayCreateResponse createPayment(@RequestBody final TossPayCreateRequest tossPayCreateRequest,
-                                               @AuthenticationPrincipal final Long memberId) {
-        return payService.createTossPay(tossPayCreateRequest, memberId);
-    }
-
-
-    @GetMapping("/{payId}")
-    @ResponseStatus(HttpStatus.OK)
-    public TossPayInfoResponse getPaymentInfo(@PathVariable final Long payId,
+    public TossPayInfoResponse getPaymentInfo(@RequestParam final Long orderId,
                                               @AuthenticationPrincipal final Long memberId) {
-        return payService.readPayInfo(payId, memberId);
+        return payService.getTossInfo(orderId, memberId);
     }
 
-    @PostMapping("/toss/validate")
+    @PostMapping("/toss")
     @ResponseStatus(HttpStatus.OK)
-    public TossPayValidationResponse validatePayment(@RequestBody final TossPayValidationRequest tossPayValidationRequest,
-                                                     @AuthenticationPrincipal final Long memberId) {
-        return payService.validatePay(tossPayValidationRequest, memberId);
+    public PayResponse payByToss(@RequestBody final TossPayRequest tossPayRequest,
+                                 @AuthenticationPrincipal final Long memberId) {
+        return payService.payByToss(tossPayRequest, memberId);
     }
 
     @PostMapping("/fail")

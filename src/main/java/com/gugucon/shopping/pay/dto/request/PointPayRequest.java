@@ -1,4 +1,4 @@
-package com.gugucon.shopping.pay.dto.toss.request;
+package com.gugucon.shopping.pay.dto.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public final class TossPayCreateRequest {
+public class PointPayRequest {
 
     private Long orderId;
 }

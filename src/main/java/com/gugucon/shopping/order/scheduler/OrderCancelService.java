@@ -3,7 +3,6 @@ package com.gugucon.shopping.order.scheduler;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.order.service.OrderService;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.CANCELLED;
+import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.CANCELED;
 import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.COMPLETED;
 
 @Component
@@ -26,7 +25,6 @@ public class OrderCancelService {
 
     private final OrderService orderService;
     private final OrderRepository orderRepository;
-    private final EntityManager em;
     private LocalDateTime lastScanTime;
 
     @Transactional
@@ -39,7 +37,7 @@ public class OrderCancelService {
             return;
         }
         final List<Order> incompleteOrders = orderRepository.findAllByStatusNotInAndLastModifiedAtBetweenWithOrderItems(
-                List.of(CANCELLED, COMPLETED),
+                List.of(CANCELED, COMPLETED),
                 scanStartTime,
                 scanEndTime);
         log.info("number of incomplete orders={}", incompleteOrders.size());

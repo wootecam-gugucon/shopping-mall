@@ -5,6 +5,7 @@ import static com.gugucon.shopping.utils.ApiUtils.getOrderHistory;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.putOrder;
 import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,13 +15,11 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.order.domain.entity.Order;
-import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
+import com.gugucon.shopping.order.domain.PayType;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
-import com.gugucon.shopping.order.repository.OrderRepository;
-import com.gugucon.shopping.pay.dto.point.request.PointPayRequest;
-import com.gugucon.shopping.pay.dto.point.response.PointPayResponse;
-import com.gugucon.shopping.utils.ApiUtils;
+import com.gugucon.shopping.pay.dto.request.PointPayRequest;
+import com.gugucon.shopping.pay.dto.response.PayResponse;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -47,6 +46,7 @@ class PointPayIntegrationTest {
         chargePoint(accessToken, 2000L);
         addProductToCart(accessToken, "testProduct", 1000L);
         final Long orderId = placeOrder(accessToken);
+        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
         final PointPayRequest pointPayRequest = new PointPayRequest(orderId);
 
         // when
@@ -56,13 +56,13 @@ class PointPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(pointPayRequest)
                 .when()
-                .put("/api/v1/pay/point")
+                .post("/api/v1/pay/point")
                 .then().log().all()
                 .extract();
 
         // then
-        final PointPayResponse pointPayResponse = response.as(PointPayResponse.class);
-        assertThat(pointPayResponse.getOrderId()).isEqualTo(orderId);
+        final PayResponse payResponse = response.as(PayResponse.class);
+        assertThat(payResponse.getOrderId()).isEqualTo(orderId);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(readCartItems(accessToken)).isEmpty();
         final List<OrderHistoryResponse> orderHistoryResponses = getOrderHistory(accessToken);
@@ -88,7 +88,7 @@ class PointPayIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(pointPayRequest)
                 .when()
-                .put("/api/v1/pay/point")
+                .post("/api/v1/pay/point")
                 .then().log().all()
                 .extract();
 

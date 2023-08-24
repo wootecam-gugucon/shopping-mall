@@ -54,4 +54,8 @@ public class Money {
     public boolean isLessThan(final Money other) {
         return value < other.value;
     }
+
+    public boolean isNotSame(final Money other) {
+        return !value.equals(other.value);
+    }
 }

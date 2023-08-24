@@ -19,8 +19,8 @@ class DefaultCustomerKeyGeneratorTest {
         final Member member = DomainUtils.createMember();
 
         // when
-        final String keyA = customerKeyGenerator.generate(member);
-        final String keyB = customerKeyGenerator.generate(member);
+        final String keyA = customerKeyGenerator.generate(member.getId());
+        final String keyB = customerKeyGenerator.generate(member.getId());
 
         // then
         assertThat(keyA).isEqualTo(keyB);
