@@ -11,11 +11,10 @@ import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
 import com.gugucon.shopping.rate.repository.RateRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -51,11 +50,17 @@ public class RateService {
         return new RateResponse(rates.size(), roundDownAverage(averageRate));
     }
 
+    public RateDetailResponse getRateDetail(final Long memberId, final Long orderItemId) {
+        final Rate rate = rateRepository.findByMemberIdAndOrderItemId(memberId, orderItemId)
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_RATE));
+        return RateDetailResponse.from(rate);
+    }
+
     private double calculateAverageRate(final List<Rate> rates) {
         return rates.stream()
-            .mapToInt(Rate::getScore)
-            .average()
-            .orElse(0.0);
+                .mapToInt(Rate::getScore)
+                .average()
+                .orElse(0.0);
     }
 
     private double roundDownAverage(final double average) {
@@ -63,8 +68,9 @@ public class RateService {
     }
 
     private void validateProduct(final Long productId) {
-        productRepository.findById(productId)
-            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
+        if (!productRepository.existsById(productId)) {
+            throw new ShoppingException(ErrorCode.INVALID_PRODUCT);
+        }
     }
 
     private void validateScoreRange(final short rate) {
@@ -75,19 +81,13 @@ public class RateService {
 
     private OrderItem searchOrderItem(final Long memberId, final Long orderItemId) {
         return orderItemRepository.findByOrderIdAndMemberIdAndOrderStatus(memberId, orderItemId, OrderStatus.COMPLETED)
-            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER_ITEM));
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER_ITEM));
     }
 
     private void validateDuplicateRate(final Long orderItemId) {
         rateRepository.findByOrderItemId(orderItemId)
-            .ifPresent(rate -> {
-                throw new ShoppingException(ErrorCode.ALREADY_RATED);
-            });
-    }
-
-    public RateDetailResponse getRateDetail(final Long memberId, final Long orderItemId) {
-        final Rate rate = rateRepository.findByMemberIdAndOrderItemId(memberId, orderItemId)
-            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_RATE));
-        return RateDetailResponse.from(rate);
+                .ifPresent(rate -> {
+                    throw new ShoppingException(ErrorCode.ALREADY_RATED);
+                });
     }
 }
