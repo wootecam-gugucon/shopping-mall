@@ -52,6 +52,6 @@ class OrderItemTest {
 
         // when & then
         final ShoppingException exception = assertThrows(ShoppingException.class, () -> OrderItem.from(cartItem));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.LACK_OF_STOCK);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.STOCK_NOT_ENOUGH);
     }
 }

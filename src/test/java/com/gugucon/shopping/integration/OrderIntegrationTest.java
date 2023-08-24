@@ -134,7 +134,7 @@ class OrderIntegrationTest {
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.LACK_OF_STOCK);
+        assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.STOCK_NOT_ENOUGH);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
