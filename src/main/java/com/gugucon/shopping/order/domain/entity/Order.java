@@ -116,14 +116,14 @@ public class Order extends BaseTimeEntity {
     }
 
     private void validatePending() {
-        if (status != OrderStatus.PENDING) {
+        if (status != OrderStatus.PAYING) {
             throw new ShoppingException(ErrorCode.INVALID_ORDER_STATUS);
         }
     }
 
     public void order(PayType type) {
         validateCreated();
-        this.status = OrderStatus.PENDING;
+        this.status = OrderStatus.PAYING;
         this.payType = type;
     }
 
@@ -139,5 +139,5 @@ public class Order extends BaseTimeEntity {
         }
     }
 
-    public enum OrderStatus {CREATED, COMPLETED, PENDING, CANCELED}
+    public enum OrderStatus {CREATED, COMPLETED, PAYING, CANCELED}
 }

@@ -71,7 +71,7 @@ class OrderTest {
         order.order(PayType.POINT);
 
         // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING);
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PAYING);
     }
 
     @Test
