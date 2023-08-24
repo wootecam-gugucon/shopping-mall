@@ -1,21 +1,13 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
-import static com.gugucon.shopping.utils.ApiUtils.buyProductWithSuccess;
-import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
-import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
-import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
-import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
-import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
-import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.member.domain.vo.Gender;
+import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
@@ -24,13 +16,20 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDate;
+
+import static com.gugucon.shopping.utils.ApiUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("별점 기능 통합 테스트")
@@ -312,6 +311,108 @@ class RateIntegrationTest {
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
         assertThat(errorResponse.getErrorCode()).isEqualTo(ErrorCode.INVALID_RATE);
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_RATE.getMessage());
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"MALE,2000-01-01,3.0", "MALE,1994-01-01,2.0", "FEMALE,2010-01-01,3.0"})
+    @DisplayName("해당 물품의 주문자들 중 현재 접속한 사용자와 같은 나이대와 성별을 가진 주문자들의 평균 별점 정보를 가져온다")
+    void getCustomRate(final String gender, final String birthDateString, final String expectedRateString) {
+        // given
+        final LocalDate birthDate = LocalDate.parse(birthDateString);
+        final double expectedRate = Double.parseDouble(expectedRateString);
+        final String accessToken = loginAfterSignUp("test_email@email.com", "test1234");
+
+        int sequence = 0;
+        // 10대
+        final String 십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
+        final String 십대_여자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
+        final String 십대_여자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
+        final String 십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2008));
+
+        // 20대 초반
+        final String 이십대_초반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2002));
+        final String 이십대_초반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2002));
+
+        // 20대 중반
+        final String 이십대_중반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2000));
+        final String 이십대_중반_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2000));
+        final String 이십대_중반_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2000));
+        final String 이십대_중반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2000));
+
+        // 20대 후반
+        final String 이십대_후반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 1996));
+        final String 이십대_후반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1996));
+
+        // 30대
+        final String 삼십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1992));
+        final String 삼십대_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1992));
+        final String 삼십대_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1992));
+        final String 삼십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 1992));
+
+        // 40대 이상
+        final String 사십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 1960));
+        final String 사십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1960));
+
+        final Long productId = insertProduct("product");
+
+        rate(십대_여자_1_토큰, productId, 2);
+        rate(십대_여자_2_토큰, productId, 5);
+        rate(십대_여자_3_토큰, productId, 2);
+        rate(십대_남자_1_토큰, productId, 1);
+        rate(이십대_초반_여자_1_토큰, productId, 4);
+        rate(이십대_초반_남자_1_토큰, productId, 4);
+        rate(이십대_중반_남자_1_토큰, productId, 1);
+        rate(이십대_중반_남자_2_토큰, productId, 5);
+        rate(이십대_중반_남자_3_토큰, productId, 3);
+        rate(이십대_중반_여자_1_토큰, productId, 1);
+        rate(이십대_후반_여자_1_토큰, productId, 5);
+        rate(이십대_후반_남자_1_토큰, productId, 2);
+        rate(삼십대_남자_1_토큰, productId, 2);
+        rate(삼십대_남자_2_토큰, productId, 2);
+        rate(삼십대_남자_3_토큰, productId, 2);
+        rate(삼십대_여자_1_토큰, productId, 4);
+        rate(사십대_여자_1_토큰, productId, 1);
+        rate(사십대_남자_1_토큰, productId, 2);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when().get("/api/v1/rate/product/{productId}/custom", productId)
+                .then()
+                .contentType(ContentType.JSON)
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final RateResponse rateResponse = response.as(RateResponse.class);
+        assertThat(rateResponse.getRateCount()).isEqualTo(3);
+        assertThat(rateResponse.getAverageRate()).isCloseTo(expectedRate, Percentage.withPercentage(99.9));
+    }
+
+    private void rate(final String accessToken, final Long productId, final int score) {
+        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, productId);
+        final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
+        createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, (short) score));
+    }
+
+    private void chargePoints(final String ...tokens) {
+        for (final String token : tokens) {
+            chargePoint(token, 100_000L);
+        }
+    }
+
+    private SignupRequest createSignupRequest(final int sequence,
+                                              final Gender gender,
+                                              final int birthYear) {
+        return SignupRequest.builder()
+                .email("email@".concat(String.valueOf(sequence)).concat(".com"))
+                .password("password").passwordCheck("password")
+                .nickname("nickname")
+                .gender(gender.toString())
+                .birthDate(LocalDate.of(birthYear, 1, 1))
+                .build();
     }
 
     private Long insertProduct(final String productName) {
