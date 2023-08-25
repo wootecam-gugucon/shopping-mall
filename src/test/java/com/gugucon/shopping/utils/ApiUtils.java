@@ -129,7 +129,7 @@ public class ApiUtils {
                 .get("/api/v1/order-history")
                 .then().log().all()
                 .extract()
-                .jsonPath().getList(".", OrderHistoryResponse.class);
+                .jsonPath().getList("contents", OrderHistoryResponse.class);
     }
 
     public static OrderDetailResponse getOrderDetail(final String accessToken, final Long orderId) {
