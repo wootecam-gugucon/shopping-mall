@@ -1,11 +1,9 @@
 name: 도커 이미지 빌드 후 도커 허브에 배포
 
-# on:
-#   push:
-#     branches:
-#       - main
 on:
-  push 
+  push:
+    branches:
+      - main
 
 jobs:
   docker:
