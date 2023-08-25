@@ -20,6 +20,8 @@ const selectSortKey = (sortKey) => {
         button = buttons[2];
     } else if(sortKey === "orderCount,desc") {
         button = buttons[3];
+    } else if (sortKey === "rate,desc") {
+        button = buttons[4];
     } else {
         console.error("Invalid Sort: ".concat(sortKey));
         return;

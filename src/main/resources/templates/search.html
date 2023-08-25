@@ -35,6 +35,10 @@
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
             th:with="value='orderCount,desc'"
             name="sort-select-button">주문 많은순</button>
+    <button type="button"
+            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
+            th:with="value='rate,desc'"
+            name="sort-select-button">별점 높은순</button>
   </div>
   <section class="product-container">
     <div class="product-list">

@@ -22,6 +22,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "order by sum(oi.quantity.value) desc ")
     Page<Product> findAllByNameSortByOrderCountDesc(@Param("keyword") final String keyword, final Pageable pageable);
 
+    @Query("select p from Product p " +
+            "left join OrderItem oi on oi.productId = p.id " +
+            "left join Rate r on r.orderItem.id = oi.id " +
+            "where p.name like %:keyword% " +
+            "group by p.id " +
+            "order by avg(r.score) desc ")
+    Page<Product> findAllByNameSortByRateDesc(@Param("keyword") final String keyword, final Pageable pageable);
+
     @Query("UPDATE Product p " +
             "SET p.stock.value = p.stock.value + :value " +
             "WHERE p.id = :id")

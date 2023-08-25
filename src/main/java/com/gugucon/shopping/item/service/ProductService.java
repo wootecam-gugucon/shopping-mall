@@ -22,7 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private static final Sort SORT_BY_ORDER_COUNT = Sort.by(Sort.Direction.DESC, "orderCount");
+    private static final Sort SORT_BY_RATE = SortKey.RATE.getSort();
+    private static final Sort SORT_BY_ORDER_COUNT = SortKey.ORDER_COUNT.getSort();
 
     private final ProductRepository productRepository;
 
@@ -36,6 +37,9 @@ public class ProductService {
         validateSort(sort);
         validateNotBlank(keyword);
 
+        if (sort.equals(SORT_BY_RATE)) {
+            return searchProductsSortByRate(keyword, pageable);
+        }
         if (sort.equals(SORT_BY_ORDER_COUNT)) {
             return searchProductsSortByOrderCount(keyword, pageable);
         }
@@ -63,6 +67,13 @@ public class ProductService {
                                                                           final Pageable pageable) {
         final Pageable newPageable = createPageable(pageable);
         final Page<Product> products = productRepository.findAllByNameSortByOrderCountDesc(keyword, newPageable);
+        return convertToPage(products);
+    }
+
+    private PagedResponse<ProductResponse> searchProductsSortByRate(final String keyword,
+                                                                    final Pageable pageable) {
+        final Pageable newPageable = createPageable(pageable);
+        final Page<Product> products = productRepository.findAllByNameSortByRateDesc(keyword, newPageable);
         return convertToPage(products);
     }
 
