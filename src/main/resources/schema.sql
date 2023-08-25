@@ -75,7 +75,6 @@ CREATE TABLE IF NOT EXISTS points
 CREATE TABLE IF NOT EXISTS rates
 (
     `id`               bigint auto_increment NOT NULL primary key,
-    `member_id`        bigint                NOT NULL,
     `order_item_id`    bigint                NOT NULL,
     `score`            smallint              NOT NULL,
     `created_at`       datetime              NOT NULL,
@@ -89,7 +88,6 @@ create index idx_member_cart_items on cart_items (member_id);
 create index idx_product_cart_items on cart_items (product_id);
 create index idx_order_pays on pays (order_id);
 create index idx_member_points on points (member_id);
-create index idx_member_rates on rates (member_id);
 create index idx_order_item_rates on rates (order_item_id);
 
 create index idx_1 on order_items (product_id, quantity);
