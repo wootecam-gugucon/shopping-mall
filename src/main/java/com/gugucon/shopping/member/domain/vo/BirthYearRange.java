@@ -33,7 +33,6 @@ public enum BirthYearRange {
     }
 
     public LocalDate getEndDate() {
-        return LocalDate.of(LocalDate.now().getYear() - firstAge + 1, 12, 31)
-                        .plusDays(1);
+        return LocalDate.of(LocalDate.now().getYear() - firstAge + 1, 12, 31);
     }
 }
