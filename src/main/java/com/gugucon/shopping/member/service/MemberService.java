@@ -47,11 +47,12 @@ public class MemberService {
         validateEmailNotExist(email);
         final Password password = Password.of(signupRequest.getPassword(), passwordEncoder);
         final Nickname nickname = Nickname.from(signupRequest.getNickname());
+        final Gender gender = Gender.from(signupRequest.getGender());
         final Member member = Member.builder()
                 .email(email)
                 .password(password)
                 .nickname(nickname)
-                .gender(Gender.valueOf(signupRequest.getGender()))
+                .gender(gender)
                 .birthDate(signupRequest.getBirthDate())
                 .build();
         memberRepository.save(member);
