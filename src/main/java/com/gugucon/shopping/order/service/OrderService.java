@@ -50,9 +50,10 @@ public class OrderService {
     }
 
     public PagedResponse<OrderHistoryResponse> getOrderHistory(final Pageable pageable, final Long memberId) {
-        final Page<Order> orders = orderRepository.findAllByMemberIdAndStatusWithOrderItems(memberId,
-                                                                                            Order.OrderStatus.COMPLETED,
-                                                                                            pageable);
+        final Page<Order> orders = orderRepository.findAllByMemberIdAndStatus(memberId,
+                                                                              Order.OrderStatus.COMPLETED,
+                                                                              pageable);
+
         return convertToPage(orders);
     }
 
