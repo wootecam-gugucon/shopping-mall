@@ -10,6 +10,9 @@ import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
+import com.gugucon.shopping.order.dto.response.OrderItemResponse;
+import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.utils.ApiUtils;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
@@ -25,7 +28,10 @@ import org.springframework.http.HttpStatus;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.gugucon.shopping.utils.ApiUtils.buyAllProductsByPoint;
+import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
@@ -262,7 +268,7 @@ class ProductIntegrationTest {
         ApiUtils.updateCartItem(accessToken, 가나다라마사과과_장바구니_id, new CartItemUpdateRequest(8));
         ApiUtils.updateCartItem(accessToken, 맛있는사과_장바구니_id, new CartItemUpdateRequest(7));
 
-        ApiUtils.placeOrder(accessToken);
+        placeOrder(accessToken);
 
         final String keyword = "사과";
 
@@ -289,6 +295,53 @@ class ProductIntegrationTest {
                 "가나다라마사과과",
                 "맛있는 사과"
         );
+    }
+
+    @Test
+    @DisplayName("검색어로 검색한 결과를 별점이 높은 순으로 정렬하여 반환한다")
+    void searchProducts_sortByRateDesc() {
+        // given
+        final Long 사과_id = insertProduct("사과", 2500);// O
+        final Long 맛있는사과_id = insertProduct("맛있는 사과", 3000);    // O
+        final Long 사과는맛있어_id = insertProduct("사과는 맛있어", 1000);    // O
+        final Long 가나다라마사과과_id = insertProduct("가나다라마사과과", 4000);    // O
+        final Long 가나다라마바사_id = insertProduct("가나다라마바사", 2000);    // X
+        final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
+        final List<Long> productIds = List.of(사과_id, 맛있는사과_id, 사과는맛있어_id, 가나다라마사과과_id);
+
+        final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
+        final OrderDetailResponse orderDetailResponse = buyAllProductsByPoint(accessToken, productIds, 17000L);
+        final List<OrderItemResponse> orderItemResponses = orderDetailResponse.getOrderItems();
+        final Long 사과_주문_id = orderItemResponses.get(0).getId();
+        final Long 맛있는사과_주문_id = orderItemResponses.get(1).getId();
+        final Long 사과는맛있어_주문_id = orderItemResponses.get(2).getId();
+        final Long 가나다라마사과과_주문_id = orderItemResponses.get(3).getId();
+
+        createRateToOrderedItem(accessToken, new RateCreateRequest(사과_주문_id, (short) 1));
+        createRateToOrderedItem(accessToken, new RateCreateRequest(사과는맛있어_주문_id, (short) 2));
+        createRateToOrderedItem(accessToken, new RateCreateRequest(가나다라마사과과_주문_id, (short) 3));
+        createRateToOrderedItem(accessToken, new RateCreateRequest(맛있는사과_주문_id, (short) 4));
+
+        final String keyword = "사과";
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("keyword", keyword)
+                .queryParam("sort", "rate,desc")
+                .when().get("/api/v1/products/search")
+                .then().contentType(ContentType.JSON).log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final List<String> names = response.body()
+                                           .jsonPath()
+                                           .getList("contents", ProductResponse.class)
+                                           .stream().map(ProductResponse::getName).toList();
+
+        assertThat(names).containsExactly("맛있는 사과", "가나다라마사과과", "사과는 맛있어", "사과");
     }
 
     @Test

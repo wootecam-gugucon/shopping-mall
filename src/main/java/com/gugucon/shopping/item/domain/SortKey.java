@@ -1,12 +1,11 @@
 package com.gugucon.shopping.item.domain;
 
-import lombok.Getter;
-import org.springframework.data.domain.Sort;
-
-import java.util.Arrays;
-
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
+
+import java.util.Arrays;
+import lombok.Getter;
+import org.springframework.data.domain.Sort;
 
 @Getter
 public enum SortKey {
@@ -14,7 +13,8 @@ public enum SortKey {
     ORDER_COUNT(DESC, "orderCount"),
     CREATED_AT(DESC, "createdAt"),
     PRICE_DESC(DESC, "price"),
-    PRICE_ASC(ASC, "price");
+    PRICE_ASC(ASC, "price"),
+    RATE(DESC, "rate");
 
     private final Sort sort;
 

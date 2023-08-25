@@ -11,6 +11,7 @@ import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.order.dto.response.OrderPayResponse;
+import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.pay.dto.request.TossPayRequest;
 import com.gugucon.shopping.pay.dto.response.PayResponse;
 import com.gugucon.shopping.pay.dto.response.TossPayInfoResponse;
@@ -211,14 +212,13 @@ public class ApiUtils {
 
     public static void createRateToOrderedItem(final String accessToken, final RateCreateRequest request) {
         RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(request)
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .body(request)
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/rate")
+                .then();
     }
 
     public static Long buyProductWithSuccess(final RestTemplate restTemplate,
@@ -233,5 +233,25 @@ public class ApiUtils {
         server.expect(ExpectedCount.times(count), anything())
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+    }
+
+    public static PayResponse payOrderByPoint(final String accessToken, final PointPayRequest pointPayRequest) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(pointPayRequest)
+                .when().post("/api/v1/pay/point")
+                .then().log().all()
+                .extract().as(PayResponse.class);
+    }
+
+    public static OrderDetailResponse buyAllProductsByPoint(final String accessToken, final List<Long> productIds, final Long point) {
+        chargePoint(accessToken, point);
+        productIds.forEach(productId -> insertCartItem(accessToken, new CartItemInsertRequest(productId)));
+        Long orderId = placeOrder(accessToken);
+        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
+        payOrderByPoint(accessToken, new PointPayRequest(orderId));
+        return getOrderDetail(accessToken, orderId);
     }
 }
