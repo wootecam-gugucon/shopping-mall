@@ -298,7 +298,7 @@ class ProductIntegrationTest {
     }
 
     @Test
-    @DisplayName("검색어로 검색한 결과를 주문이 많은 순으로 정렬하여 반환한다")
+    @DisplayName("검색어로 검색한 결과를 별점이 높은 순으로 정렬하여 반환한다")
     void searchProducts_sortByRateDesc() {
         // given
         final Long 사과_id = insertProduct("사과", 2500);// O
