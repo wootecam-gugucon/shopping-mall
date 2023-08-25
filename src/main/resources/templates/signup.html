@@ -13,19 +13,34 @@
 
   <section class="form-container">
     <form id="signup-form" class="mt-40">
-      <label for="email">Email</label>
+      <label for="email">이메일</label>
       <input class="text-input mb-10" type="text" id="email" name="email" required>
 
-      <label for="password">Password</label>
+      <label for="password">비밀번호</label>
       <input class="text-input mb-10" type="password" id="password" name="password" required>
 
-      <label for="passwordCheck">Check Password</label>
+      <label for="passwordCheck">비밀번호 확인</label>
       <input class="text-input mb-10" type="password" id="passwordCheck" name="passwordCheck" required>
 
-      <label for="nickname">Nickname</label>
+      <label for="nickname">닉네임</label>
       <input class="text-input mb-10" type="text" id="nickname" name="nickname" required>
 
-      <button type="submit" class="primary-button-small form-submit-button">Sign up</button>
+      <fieldset>
+        <legend>성별을 선택해주세요</legend>
+        <div>
+          <input type="radio" id="male" name="gender" value="male" checked />
+          <label for="male">남자</label>
+        </div>
+        <div>
+          <input type="radio" id="female" name="gender" value="female" />
+          <label for="female">여자</label>
+        </div>
+      </fieldset>
+
+      <label for="birthDate">생년월일</label>
+      <input class="text-input mb-10" type="date" id="birthDate" name="birthDate" required>
+
+      <button type="submit" class="primary-button-small form-submit-button">회원가입</button>
     </form>
   </section>
 </div>

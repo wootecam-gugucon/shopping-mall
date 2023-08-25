@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.controller.api;
 
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.service.OrderService;
 import java.util.List;
@@ -20,7 +21,7 @@ public class OrderHistoryController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderHistoryResponse> getOrderHistory(@AuthenticationPrincipal final Long memberId) {
-        return orderService.getOrderHistory(memberId);
+    public List<OrderHistoryResponse> getOrderHistory(@AuthenticationPrincipal final MemberPrincipal principal) {
+        return orderService.getOrderHistory(principal.getId());
     }
 }

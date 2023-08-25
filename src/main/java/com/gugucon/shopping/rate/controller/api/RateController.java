@@ -1,5 +1,6 @@
 package com.gugucon.shopping.rate.controller.api;
 
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
@@ -25,16 +26,16 @@ public class RateController {
 
     @PostMapping
     public ResponseEntity<Void> createRate(@RequestBody final RateCreateRequest request,
-                                           @AuthenticationPrincipal final Long memberId) {
-        rateService.createRate(memberId, request);
+                                           @AuthenticationPrincipal final MemberPrincipal principal) {
+        rateService.createRate(principal.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/orderItem/{orderItemId}")
     @ResponseStatus(HttpStatus.OK)
     public RateDetailResponse getRateDetail(@PathVariable final long orderItemId,
-                                            @AuthenticationPrincipal final Long memberId) {
-        return rateService.getRateDetail(memberId, orderItemId);
+                                            @AuthenticationPrincipal final MemberPrincipal principal) {
+        return rateService.getRateDetail(principal.getId(), orderItemId);
     }
 
     @GetMapping("/product/{productId}")

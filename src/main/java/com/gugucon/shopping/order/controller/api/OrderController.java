@@ -1,5 +1,6 @@
 package com.gugucon.shopping.order.controller.api;
 
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderPayResponse;
@@ -27,22 +28,22 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Void> order(@AuthenticationPrincipal final Long memberId) {
-        final OrderResponse orderResponse = orderService.order(memberId);
+    public ResponseEntity<Void> order(@AuthenticationPrincipal final MemberPrincipal principal) {
+        final OrderResponse orderResponse = orderService.order(principal.getId());
         return ResponseEntity.created(URI.create("/order/" + orderResponse.getOrderId())).build();
     }
 
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
     public OrderDetailResponse getOrderDetail(@PathVariable final Long orderId,
-                                              @AuthenticationPrincipal final Long memberId) {
-        return orderService.getOrderDetail(orderId, memberId);
+                                              @AuthenticationPrincipal final MemberPrincipal principal) {
+        return orderService.getOrderDetail(orderId, principal.getId());
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public OrderPayResponse requestPay(@RequestBody final OrderPayRequest orderPayRequest,
-                                       @AuthenticationPrincipal final Long memberId) {
-        return orderService.requestPay(orderPayRequest, memberId);
+                                       @AuthenticationPrincipal final MemberPrincipal principal) {
+        return orderService.requestPay(orderPayRequest, principal.getId());
     }
 }

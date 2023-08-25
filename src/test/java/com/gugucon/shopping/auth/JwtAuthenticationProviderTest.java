@@ -5,14 +5,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.auth.security.JwtAuthenticationProvider;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Email;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.repository.MemberRepository;
+import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,17 +70,19 @@ class JwtAuthenticationProviderTest {
         when(passwordEncoder.encode("password")).thenReturn("password");
 
         final String jwtToken = "validJwtToken";
-        final String principal = "12";
+        final Long memberId = 12L;
         final Member member = Member.builder()
-                                    .id(Long.valueOf(principal))
+                                    .id(memberId)
                                     .email(Email.from("email@test.com"))
+                                    .gender(Gender.FEMALE)
+                                    .birthDate(LocalDate.of(1999, 7, 18))
                                     .password(Password.of("password", passwordEncoder))
                                     .nickname(Nickname.from("nickname"))
                                     .build();
         final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwtToken);
 
         when(jwtProvider.validate(jwtToken)).thenReturn(true);
-        when(jwtProvider.parseToken(jwtToken)).thenReturn(principal);
+        when(jwtProvider.parseToken(jwtToken)).thenReturn(String.valueOf(memberId));
         when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // when
@@ -86,7 +91,12 @@ class JwtAuthenticationProviderTest {
         // then
         assertThat(result).isInstanceOf(JwtAuthenticationToken.class);
         assertThat(result.isAuthenticated()).isTrue();
-        assertThat(result.getPrincipal()).isEqualTo(Long.valueOf(principal));
+
+        final MemberPrincipal principal = (MemberPrincipal) result.getPrincipal();
+        assertThat(principal.getBirthDate()).isEqualTo(member.getBirthDate());
+        assertThat(principal.getGender()).isEqualTo(member.getGender());
+        assertThat(principal.getNickname()).isEqualTo(member.getNickname());
+        assertThat(principal.getEmail()).isEqualTo(member.getEmail());
     }
 
     @Test

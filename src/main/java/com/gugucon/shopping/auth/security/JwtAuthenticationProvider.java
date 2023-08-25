@@ -1,8 +1,10 @@
 package com.gugucon.shopping.auth.security;
 
 import com.gugucon.shopping.auth.domain.vo.JwtAuthenticationToken;
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.utils.JwtProvider;
+import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +26,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         final String jwtToken = ((JwtAuthenticationToken) authentication).getJwtToken();
         validateToken(jwtToken);
-        final Long principal = Long.valueOf(jwtProvider.parseToken(jwtToken));
-        validatePrincipal(principal);
+        final Long memberId = Long.valueOf(jwtProvider.parseToken(jwtToken));
+        final MemberPrincipal principal = getPrincipal(memberId);
         return new JwtAuthenticationToken(principal, "", new ArrayList<>());
     }
 
@@ -40,8 +42,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         }
     }
 
-    private void validatePrincipal(final Long principal) {
-        memberRepository.findById(principal)
+    private MemberPrincipal getPrincipal(final Long principal) {
+        final Member member = memberRepository.findById(principal)
             .orElseThrow(() -> new UsernameNotFoundException(ErrorCode.EMAIL_NOT_REGISTERED.getMessage()));
+        return MemberPrincipal.from(member);
     }
 }

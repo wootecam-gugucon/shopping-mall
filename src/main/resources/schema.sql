@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS members
     `email`            varchar(255)          NOT NULL unique,
     `password`         varchar(255)          NOT NULL,
     `nickname`         varchar(255)          NOT NULL,
+    `gender`           varchar(255)          NOT NULL,
+    `birth_date`       date                  NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL
 );
