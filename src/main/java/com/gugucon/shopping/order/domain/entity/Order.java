@@ -130,5 +130,9 @@ public class Order extends BaseTimeEntity {
         this.status = OrderStatus.CANCELED;
     }
 
+    public boolean isCreated() {
+        return this.status == OrderStatus.CREATED;
+    }
+
     public enum OrderStatus {CREATED, PAYING, COMPLETED, CANCELED}
 }

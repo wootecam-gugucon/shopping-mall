@@ -28,9 +28,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o " +
             "JOIN FETCH o.orderItems " +
-            "WHERE o.status NOT IN :statuses AND (o.lastModifiedAt BETWEEN :start AND :end)")
+            "WHERE o.status IN :statuses AND (o.lastModifiedAt BETWEEN :start AND :end)")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<Order> findAllByStatusNotInAndLastModifiedAtBetweenWithOrderItems(
+    List<Order> findAllByStatusInAndLastModifiedAtBetweenWithOrderItems(
             @Param("statuses") List<OrderStatus> statuses,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);

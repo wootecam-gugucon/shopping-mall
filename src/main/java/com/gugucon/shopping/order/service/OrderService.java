@@ -6,7 +6,6 @@ import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
@@ -62,10 +61,15 @@ public class OrderService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void cancelOrder(final Order order) {
+    public void cancelPayingOrder(final Order order) {
         order.getOrderItems()
                 .forEach(orderItem -> productRepository.increaseStockByIdAndValue(orderItem.getProductId(),
                                                                                   orderItem.getQuantity().getValue()));
+        order.cancel();
+    }
+
+    @Transactional
+    public void cancelCreatedOrder(final Order order) {
         order.cancel();
     }
 
@@ -78,7 +82,7 @@ public class OrderService {
     @Transactional
     public OrderPayResponse requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
         final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
-                                           .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
         order.startPay(PayType.from(orderPayRequest.getPayType()));
         decreaseStock(order);
         return OrderPayResponse.from(order);
@@ -87,7 +91,7 @@ public class OrderService {
     private void decreaseStock(final Order order) {
         order.getOrderItems().forEach(orderItem -> {
             final Product product = productRepository.findById(orderItem.getProductId())
-                                                     .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+                    .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
             product.validateStockIsNotLessThan(orderItem.getQuantity());
             product.decreaseStockBy(orderItem.getQuantity());
         });
