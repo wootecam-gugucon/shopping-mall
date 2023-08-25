@@ -95,6 +95,8 @@ class JwtAuthenticationProviderTest {
         final MemberPrincipal principal = (MemberPrincipal) result.getPrincipal();
         assertThat(principal.getBirthDate()).isEqualTo(member.getBirthDate());
         assertThat(principal.getGender()).isEqualTo(member.getGender());
+        assertThat(principal.getNickname()).isEqualTo(member.getNickname());
+        assertThat(principal.getEmail()).isEqualTo(member.getEmail());
     }
 
     @Test
