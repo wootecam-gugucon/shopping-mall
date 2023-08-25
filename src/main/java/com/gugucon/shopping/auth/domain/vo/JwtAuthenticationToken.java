@@ -4,12 +4,10 @@ import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import java.util.Collection;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 @Getter
-@ToString
 @EqualsAndHashCode(callSuper = false)
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
