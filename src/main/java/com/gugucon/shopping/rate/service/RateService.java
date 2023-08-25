@@ -1,8 +1,10 @@
 package com.gugucon.shopping.rate.service;
 
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
@@ -11,10 +13,12 @@ import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
 import com.gugucon.shopping.rate.repository.RateRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.OptionalDouble;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,6 +27,7 @@ public class RateService {
 
     private static final short MIN_SCORE = 1;
     private static final short MAX_SCORE = 5;
+    private static final double ZERO_RATE = 0.0;
 
     private final RateRepository rateRepository;
     private final ProductRepository productRepository;
@@ -36,17 +41,18 @@ public class RateService {
         validateDuplicateRate(orderItem.getId());
 
         final Rate rate = Rate.builder()
-            .orderItem(orderItem)
-            .score(request.getScore())
-            .build();
+                .orderItem(orderItem)
+                .score(request.getScore())
+                .build();
 
         rateRepository.save(rate);
     }
 
     public RateResponse getRates(final Long productId) {
         validateProduct(productId);
-        final List<Rate> rates = rateRepository.findByProductId(productId);
-        final double averageRate = calculateAverageRate(rates);
+        final List<Integer> rates = rateRepository.findScoresByProductId(productId);
+        final double averageRate = calculateAverageOf(rates)
+                .orElse(ZERO_RATE);
         return new RateResponse(rates.size(), roundDownAverage(averageRate));
     }
 
@@ -56,11 +62,21 @@ public class RateService {
         return RateDetailResponse.from(rate);
     }
 
-    private double calculateAverageRate(final List<Rate> rates) {
+    public RateResponse getCustomRate(final Long productId, final MemberPrincipal principal) {
+        final BirthYearRange birthYearRange = BirthYearRange.from(principal.getBirthDate());
+        final List<Integer> rates = rateRepository.findScoresByMemberGenderAndMemberBirthYear(productId,
+                                                                                              principal.getGender(),
+                                                                                              birthYearRange.getStartDate(),
+                                                                                              birthYearRange.getEndDate());
+        final double averageRate = calculateAverageOf(rates)
+                .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+        return new RateResponse(rates.size(), averageRate);
+    }
+
+    private OptionalDouble calculateAverageOf(final List<Integer> rates) {
         return rates.stream()
-                .mapToInt(Rate::getScore)
-                .average()
-                .orElse(0.0);
+                .mapToInt(rate -> rate)
+                .average();
     }
 
     private double roundDownAverage(final double average) {

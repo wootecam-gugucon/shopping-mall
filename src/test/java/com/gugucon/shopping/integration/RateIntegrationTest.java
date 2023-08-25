@@ -316,13 +316,11 @@ class RateIntegrationTest {
     @ParameterizedTest
     @CsvSource(value = {"MALE,2000-01-01,3.0", "MALE,1994-01-01,2.0", "FEMALE,2010-01-01,3.0"})
     @DisplayName("해당 물품의 주문자들 중 현재 접속한 사용자와 같은 나이대와 성별을 가진 주문자들의 평균 별점 정보를 가져온다")
-    void getCustomRate(final String gender, final String birthDateString, final String expectedRateString) {
+    void getCustomRate(final Gender gender, final LocalDate birthDate, final double expectedRate) {
         // given
-        final LocalDate birthDate = LocalDate.parse(birthDateString);
-        final double expectedRate = Double.parseDouble(expectedRateString);
-        final String accessToken = loginAfterSignUp("test_email@email.com", "test1234");
-
         int sequence = 0;
+        final String accessToken = loginAfterSignUp(createSignupRequest(sequence++, gender, birthDate.getYear()));
+
         // 10대
         final String 십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
         final String 십대_여자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
@@ -395,12 +393,6 @@ class RateIntegrationTest {
         final Long orderId = buyProductWithSuccess(restTemplate, accessToken, productId);
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, (short) score));
-    }
-
-    private void chargePoints(final String ...tokens) {
-        for (final String token : tokens) {
-            chargePoint(token, 100_000L);
-        }
     }
 
     private SignupRequest createSignupRequest(final int sequence,
