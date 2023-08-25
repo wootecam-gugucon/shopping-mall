@@ -22,8 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private static final Sort SORT_BY_RATE = Sort.by(Sort.Direction.DESC, "rate");
-    private static final Sort SORT_BY_ORDER_COUNT = Sort.by(Sort.Direction.DESC, "orderCount");
+    private static final Sort SORT_BY_RATE = SortKey.RATE.getSort();
+    private static final Sort SORT_BY_ORDER_COUNT = SortKey.ORDER_COUNT.getSort();
 
     private final ProductRepository productRepository;
 
