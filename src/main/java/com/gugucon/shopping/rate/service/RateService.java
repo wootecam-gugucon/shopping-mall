@@ -11,10 +11,11 @@ import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
 import com.gugucon.shopping.rate.repository.RateRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +37,6 @@ public class RateService {
         validateDuplicateRate(orderItem.getId());
 
         final Rate rate = Rate.builder()
-            .memberId(memberId)
             .orderItem(orderItem)
             .score(request.getScore())
             .build();
