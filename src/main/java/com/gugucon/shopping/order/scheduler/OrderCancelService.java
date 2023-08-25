@@ -29,20 +29,35 @@ public class OrderCancelService {
 
     @Transactional
     public void cancelIncompleteOrders() {
-        log.info("cancelling started");
+        log.info("cancelling started.");
         final LocalDateTime scanStartTime = lastScanTime == null ? DEFAULT_SCAN_START_TIME : lastScanTime;
         final LocalDateTime scanEndTime = LocalDateTime.now().minus(CANCEL_INTERVAL);
         if (scanStartTime.isAfter(scanEndTime)) {
             log.warn("scan start time is after scan end time. schedule is cancelled.");
             return;
         }
+
         final List<Order> incompleteOrders = orderRepository.findAllByStatusNotInAndLastModifiedAtBetweenWithOrderItems(
                 List.of(CANCELED, COMPLETED),
                 scanStartTime,
                 scanEndTime);
-        log.info("number of incomplete orders={}", incompleteOrders.size());
-        incompleteOrders.forEach(orderService::cancelOrder);
-        lastScanTime = scanEndTime;
-        log.info("cancelling ended");
+        log.info("number of incomplete orders={}.", incompleteOrders.size());
+
+        boolean allSucceeded = true;
+        for (Order incompleteOrder : incompleteOrders) {
+            try {
+                orderService.cancelOrder(incompleteOrder);
+            } catch (Exception e) {
+                log.warn("exception thrown while cancelling order. order id={}.", incompleteOrder.getId());
+                allSucceeded = false;
+            }
+        }
+
+        if (allSucceeded) {
+            lastScanTime = scanEndTime;
+            log.info("no exception thrown while cancelling order");
+        }
+
+        log.info("cancelling ended.");
     }
 }
