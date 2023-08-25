@@ -1,5 +1,6 @@
 package com.gugucon.shopping.point.controller;
 
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.point.dto.request.PointChargeRequest;
 import com.gugucon.shopping.point.dto.response.PointResponse;
 import com.gugucon.shopping.point.service.PointService;
@@ -24,13 +25,13 @@ public class PointController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public void charge(@RequestBody @Valid final PointChargeRequest pointChargeRequest,
-                       @AuthenticationPrincipal final Long memberId) {
-        pointService.charge(pointChargeRequest, memberId);
+                       @AuthenticationPrincipal final MemberPrincipal principal) {
+        pointService.charge(pointChargeRequest, principal.getId());
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PointResponse getCurrentPoint(@AuthenticationPrincipal final Long memberId) {
-        return pointService.getCurrentPoint(memberId);
+    public PointResponse getCurrentPoint(@AuthenticationPrincipal final MemberPrincipal principal) {
+        return pointService.getCurrentPoint(principal.getId());
     }
 }
