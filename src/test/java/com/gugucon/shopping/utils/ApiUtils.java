@@ -1,9 +1,5 @@
 package com.gugucon.shopping.utils;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
@@ -24,12 +20,18 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public class ApiUtils {
 
@@ -55,7 +57,13 @@ public class ApiUtils {
     }
 
     public static void signUp(final String email, final String password) {
-        final SignupRequest request = new SignupRequest(email, password, password, "testUser");
+        final SignupRequest request = SignupRequest.builder()
+                .email(email)
+                .password(password).passwordCheck(password)
+                .nickname("nickname")
+                .gender("FEMALE")
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
         ApiUtils.signup(request);
     }
 
