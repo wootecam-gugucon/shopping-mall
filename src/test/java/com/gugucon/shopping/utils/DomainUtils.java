@@ -78,6 +78,16 @@ public class DomainUtils {
                 .build();
     }
 
+    public static Member createMemberWithoutId() {
+        return Member.builder()
+                .email(Email.from("test_email@gmail.com"))
+                .password(Password.of("test_password", passwordEncoder))
+                .nickname(Nickname.from("test_nickname"))
+                .gender(Gender.FEMALE)
+                .birthDate(LocalDate.now())
+                .build();
+    }
+
     public static CartItem createCartItem() {
         sequence++;
         return CartItem.builder()

@@ -5,9 +5,6 @@ import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.domain.entity.Member;
-import com.gugucon.shopping.member.domain.vo.Email;
-import com.gugucon.shopping.member.domain.vo.Nickname;
-import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
@@ -20,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -71,8 +67,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -115,8 +110,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -157,8 +151,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -199,8 +192,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -242,8 +234,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -284,8 +275,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -326,8 +316,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -367,8 +356,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -408,8 +396,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -450,8 +437,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = Member.builder().email(Email.from("test@email.com")).password(
-                Password.of("password", new BCryptPasswordEncoder())).nickname(Nickname.from("nickname")).build();
+        final Member member = DomainUtils.createMemberWithoutId();
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
