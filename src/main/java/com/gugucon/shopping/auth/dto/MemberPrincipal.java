@@ -13,13 +13,13 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberPrincipal {
 
-    private Long id;
-    private LocalDate birthDate;
-    private Gender gender;
-    private Email email;
-    private Nickname nickname;
+    private final Long id;
+    private final LocalDate birthDate;
+    private final Gender gender;
+    private final Email email;
+    private final Nickname nickname;
 
-    public static MemberPrincipal from(Member member) {
+    public static MemberPrincipal from(final Member member) {
         return new MemberPrincipal(member.getId(),
                                    member.getBirthDate(),
                                    member.getGender(),
