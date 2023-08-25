@@ -247,7 +247,7 @@ class SignupIntegrationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {-1, 126})
+    @ValueSource(ints = {0, 126})
     @DisplayName("이메일 형식이 올바르지 않으면 회원가입을 요청했을 때 400 상태코드를 응답한다.")
     void signupFail_invalidBirthDate(final int age) {
         /* given */
