@@ -1,5 +1,18 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.member.domain.vo.Gender.MALE;
+import static com.gugucon.shopping.utils.ApiUtils.buyAllProductsByPoint;
+import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
+import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
+import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.payOrderByPoint;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.putOrder;
+import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
+import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -10,6 +23,7 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
+import com.gugucon.shopping.item.dto.response.ProductRecommendResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.OrderStatRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
@@ -29,17 +43,12 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Comparator;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
-import java.util.Comparator;
-import java.util.List;
-
-import static com.gugucon.shopping.member.domain.vo.Gender.MALE;
-import static com.gugucon.shopping.utils.ApiUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("상품 기능 통합 테스트")
@@ -604,6 +613,36 @@ class ProductIntegrationTest {
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_PRODUCT.getMessage());
     }
 
+    @Test
+    @DisplayName("해당 상품을 구매한 사용자들이 함께 찾는 상품 목록을 반환한다")
+    void recommendedProducts() {
+        // given
+        final long 아디다스_크롭_탑 = insertProduct("아디다스 크롭 탑", 49000); // 조회 상품
+        final long 데비웨어_요가웨어 = insertProduct("데비웨어_요가웨어", 19780); // 연관 구매 3건
+        final long 안다르_바이크_5부 = insertProduct("안다르 바이크 5부", 33000); // 연관 구매 2건
+        final long 에이치덱스_땀복 = insertProduct("에이치덱스_땀복", 74400); // 연관 구매 2건
+        final long 젝시믹스_머슬핏 = insertProduct("젝시믹스_머슬핏", 29000); // 연관 구매 1건
+
+        buyAllProducts(List.of(아디다스_크롭_탑, 데비웨어_요가웨어, 안다르_바이크_5부));
+        buyAllProducts(List.of(아디다스_크롭_탑, 데비웨어_요가웨어, 젝시믹스_머슬핏));
+        buyAllProducts(List.of(아디다스_크롭_탑, 데비웨어_요가웨어, 에이치덱스_땀복));
+        buyAllProducts(List.of(아디다스_크롭_탑, 안다르_바이크_5부, 에이치덱스_땀복));
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/api/v1/products/{productId}/recommend", 아디다스_크롭_탑)
+            .then().contentType(ContentType.JSON).log().all()
+            .extract();
+
+        // then
+        final ProductRecommendResponse recommend = response.as(ProductRecommendResponse.class);
+        final List<Long> actualProductIds = recommend.getProducts()
+            .stream()
+            .map(ProductDetailResponse::getId).toList();
+        assertThat(actualProductIds).containsExactly(데비웨어_요가웨어, 안다르_바이크_5부, 에이치덱스_땀복, 젝시믹스_머슬핏);
+    }
+
     private Long insertProduct(final String productName, final long price) {
         final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         return productRepository.save(product).getId();
@@ -637,5 +676,10 @@ class ProductIntegrationTest {
                                         .totalScore(totalScore)
                                         .count(count)
                                         .build());
+    }
+
+    private void buyAllProducts(List<Long> productIds) {
+        final String accessToken = loginAfterSignUp("test@woowa.com", "1234abc");
+        buyAllProductsByPoint(accessToken, productIds, 10000000L);
     }
 }
