@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link rel="stylesheet" th:href="@{/css/index.css}">
   <title>Shopping</title>
 </head>
@@ -11,8 +11,8 @@
 <div class="root">
   <div th:replace="~{layouts/header :: header}"></div>
   <label class="product-search-container">
-    <input th:type="text" placeholder="상품을 검색하세요" id="keyword">
-    <input th:type="submit" value="검색" onclick="search()">
+    <input id="keyword" placeholder="상품을 검색하세요" th:type="text">
+    <input onclick="search()" th:type="submit" value="검색">
   </label>
 
   <section class="product-container">
@@ -43,7 +43,7 @@
                 let product = data.contents[i];
                 element += `
               <div>
-                <a href="product/${product.id}">
+                <a href="/product/${product.id}">
                   <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
                 </a>
                 <div class="flex justify-between w-280 p-5">

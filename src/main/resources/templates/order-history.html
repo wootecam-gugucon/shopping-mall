@@ -49,7 +49,9 @@
                     itemElement += `
                         <div class="order-list-item">
                           <div class="flex gap-15 mt-10">
-                            <img class="w-144 h-144" src="/assets/${orderItem.imageFileName}"/>
+                            <a href="/product/${orderItem.productId}">
+                              <img class="w-144 h-144" src="/assets/${orderItem.imageFileName}"/>
+                            </a>
                             <div class="flex-col gap-15">
                               <span class="order-name">${orderItem.name}</span>
                               <span class="order-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span>

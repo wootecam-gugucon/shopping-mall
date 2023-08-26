@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public final class OrderItemResponse {
 
     private long id;
+    private long productId;
     private String name;
     private long price;
     private String imageFileName;
@@ -19,6 +20,7 @@ public final class OrderItemResponse {
 
     public static OrderItemResponse from(final OrderItem orderItem) {
         return new OrderItemResponse(orderItem.getId(),
+                                     orderItem.getProductId(),
                                      orderItem.getName(),
                                      orderItem.getPrice().getValue(),
                                      orderItem.getImageFileName(),
