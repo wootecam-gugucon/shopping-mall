@@ -1,6 +1,7 @@
 package com.gugucon.shopping.item.controller.api;
 
 import com.gugucon.shopping.common.dto.response.PagedResponse;
+import com.gugucon.shopping.item.domain.SearchCondition;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.service.ProductService;
@@ -36,7 +37,13 @@ public class ProductController {
                                                                  @SortDefault(sort = "createdAt", direction = Direction.DESC),
                                                                  @SortDefault(sort = "price")
                                                          }) final Pageable pageable) {
-        return productService.searchProducts(keyword, pageable);
+        final SearchCondition searchCondition = SearchCondition.builder()
+                .keyword(keyword)
+                .birthYearRange(birthYearRange)
+                .gender(gender)
+                .pageable(pageable)
+                .build();
+        return productService.searchProducts(searchCondition);
     }
 
     @GetMapping("/{productId}")
