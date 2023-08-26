@@ -25,7 +25,7 @@ public class ProductController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PagedResponse<ProductResponse> getProducts(@SortDefault(sort = "createdAt", direction = Direction.DESC) final Pageable pageable) {
+    public PagedResponse<ProductResponse> getProducts(@SortDefault(sort = "id", direction = Direction.DESC) final Pageable pageable) {
         return productService.readAllProducts(pageable);
     }
 
@@ -33,7 +33,7 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     public PagedResponse<ProductResponse> searchProducts(@RequestParam final String keyword,
                                                          @SortDefault.SortDefaults(value = {
-                                                                 @SortDefault(sort = "createdAt", direction = Direction.DESC),
+                                                                 @SortDefault(sort = "id", direction = Direction.DESC),
                                                                  @SortDefault(sort = "price")
                                                          }) final Pageable pageable) {
         return productService.searchProducts(keyword, pageable);

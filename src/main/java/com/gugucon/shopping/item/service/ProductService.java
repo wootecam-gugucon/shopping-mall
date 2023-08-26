@@ -8,6 +8,7 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,15 +16,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProductService {
 
     private static final Sort SORT_BY_RATE = SortKey.RATE.getSort();
-    private static final Sort SORT_BY_ORDER_COUNT = SortKey.ORDER_COUNT.getSort();
+    private static final Sort SORT_BY_ORDER_COUNT = SortKey.ORDER_COUNT_DESC.getSort();
 
     private final ProductRepository productRepository;
 

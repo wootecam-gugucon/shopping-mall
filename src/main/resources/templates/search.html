@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="UTF-8"/>
-  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" th:href="@{/css/index.css}">
   <title>Shopping</title>
 </head>
@@ -11,34 +11,34 @@
 <div class="root">
   <div th:replace="~{layouts/header :: header}"></div>
   <label class="product-search-container">
-    <input id="keyword" placeholder="상품을 검색하세요" th:type="text">
-    <input onclick="search()" th:type="submit" value="검색">
+    <input th:type="text" placeholder="상품을 검색하세요" id="keyword">
+    <input th:type="submit" value="검색" onclick="search()">
   </label>
   <div class="product-search-result">
-    <span style="font-weight: bold; color: darkslategray" th:text="${param.keyword}"></span>
+    <span th:text="${param.keyword}" style="font-weight: bold; color: darkslategray"></span>
     에 대한 검색 결과입니다
   </div>
   <div class="product-sort-container">
-    <button name="sort-select-button"
+    <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
-            th:with="value='createdAt,desc'"
-            type="button">최신순</button>
-    <button name="sort-select-button"
+            th:with="value='id,desc'"
+            name="sort-select-button">최신순</button>
+    <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
             th:with="value='price,desc'"
-            type="button">가격 높은순</button>
-    <button name="sort-select-button"
+            name="sort-select-button">가격 높은순</button>
+    <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
             th:with="value='price,asc'"
-            type="button">가격 낮은순</button>
-    <button name="sort-select-button"
+            name="sort-select-button">가격 낮은순</button>
+    <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
             th:with="value='orderCount,desc'"
-            type="button">주문 많은순</button>
-    <button name="sort-select-button"
+            name="sort-select-button">주문 많은순</button>
+    <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
             th:with="value='rate,desc'"
-            type="button">별점 높은순</button>
+            name="sort-select-button">별점 높은순</button>
   </div>
   <section class="product-container">
     <div class="product-list">
