@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public final class CartItemResponse {
 
     private Long cartItemId;
+    private Long productId;
     private String name;
     private String imageFileName;
     private long price;
@@ -21,6 +22,7 @@ public final class CartItemResponse {
     public static CartItemResponse from(CartItem cartItem) {
         return new CartItemResponse(
                 cartItem.getId(),
+                cartItem.getProduct().getId(),
                 cartItem.getProduct().getName(),
                 cartItem.getProduct().getImageFileName(),
                 cartItem.getProduct().getPrice().getValue(),
