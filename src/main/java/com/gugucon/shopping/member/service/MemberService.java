@@ -27,8 +27,8 @@ public class MemberService {
     private final JwtProvider jwtProvider;
 
     public LoginResponse login(final LoginRequest loginRequest) {
-        Member member = memberRepository.findByEmail(Email.from(loginRequest.getEmail()))
-            .orElseThrow(() -> new ShoppingException(ErrorCode.EMAIL_NOT_REGISTERED));
+        final Member member = memberRepository.findByEmail(Email.from(loginRequest.getEmail()))
+                .orElseThrow(() -> new ShoppingException(ErrorCode.EMAIL_NOT_REGISTERED));
         validatePassword(loginRequest, member);
 
         final String accessToken = jwtProvider.generateToken(String.valueOf(member.getId()));
