@@ -27,5 +27,5 @@ public class OrderStat extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private Integer count;
+    private Long count;
 }

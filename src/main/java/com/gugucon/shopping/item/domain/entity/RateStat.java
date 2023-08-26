@@ -27,7 +27,7 @@ public class RateStat extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private Integer totalScore;
+    private Long totalScore;
 
-    private Integer count;
+    private Long count;
 }
