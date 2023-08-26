@@ -6,13 +6,13 @@ const search = () => {
         return;
     }
 
-    window.location.href = '/search?keyword='.concat(keyword).concat("&sort=createdAt,desc");
+    window.location.href = '/search?keyword='.concat(keyword).concat("&sort=id,desc");
 }
 
 const selectSortKey = (sortKey) => {
     const buttons = document.getElementsByName("sort-select-button");
     let button;
-    if (sortKey === "createdAt,desc") {
+    if (sortKey === "id,desc") {
         button = buttons[0];
     } else if(sortKey === "price,desc") {
         button = buttons[1];

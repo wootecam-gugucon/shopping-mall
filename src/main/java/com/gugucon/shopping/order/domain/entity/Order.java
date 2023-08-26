@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "orders")
@@ -41,6 +42,7 @@ public class Order extends BaseTimeEntity {
     private static final String MULTIPLE_ITEM_EXPRESSION = " 외 %d건";
 
     @OneToMany(cascade = CascadeType.ALL)
+    @BatchSize(size = 20)
     @JoinColumn(name = "order_id")
     private final List<OrderItem> orderItems = new ArrayList<>();
 

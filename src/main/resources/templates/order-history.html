@@ -11,11 +11,15 @@
 <div class="root">
     <div th:replace="~{layouts/header :: header}"></div>
 
-    <section class="order-section">
+    <section class="order-history-list">
     </section>
+    <div class="pagination"></div>
 </div>
+</body>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+
         const credentials = localStorage.getItem('accessToken');
         if (!credentials) {
             alert('사용자 정보가 없습니다.');
@@ -23,7 +27,7 @@
             return;
         }
 
-        fetch('/api/v1/order-history', {
+        fetch('/api/v1/order-history?' + urlParams, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${credentials}`,
@@ -32,9 +36,15 @@
         }).then((response) => {
             return response.json();
         }).then((data) => {
+            const currentPage = data.currentPage;
+            const totalPage = data.totalPage;
+            const size = data.size;
+
             let element = '';
-            data.forEach(order => {
+            for (let i = 0; i < Math.min(size, data.contents.length); i++) {
+                let order = data.contents[i];
                 let itemElement = '';
+
                 order.orderItems.forEach((orderItem) => {
                     itemElement += `
                         <div class="order-list-item">
@@ -59,14 +69,15 @@
                       ${itemElement}
                     </div>
                     `;
-            });
+            }
 
-            document.querySelector('.order-section').innerHTML = element;
+            pagination(currentPage, totalPage, size, '.pagination', "");
+            document.querySelector('.order-history-list').innerHTML = element;
         }).catch((error) => {
             console.error(error);
         });
-
     });
+
 </script>
-</body>
+<script th:src="@{/js/pagination.js}"></script>
 </html>

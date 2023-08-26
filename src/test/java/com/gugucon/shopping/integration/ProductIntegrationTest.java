@@ -1,5 +1,11 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.utils.ApiUtils.buyAllProductsByPoint;
+import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -20,19 +26,12 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Comparator;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
-import java.util.Comparator;
-import java.util.List;
-
-import static com.gugucon.shopping.utils.ApiUtils.buyAllProductsByPoint;
-import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
-import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
-import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("상품 기능 통합 테스트")
@@ -143,7 +142,7 @@ class ProductIntegrationTest {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .queryParam("keyword", keyword)
-                .queryParam("sort", "createdAt,desc")
+                .queryParam("sort", "id,desc")
                 .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();
@@ -359,7 +358,7 @@ class ProductIntegrationTest {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .queryParam("keyword", "")
-                .queryParam("sort", "createdAt,desc")
+                .queryParam("sort", "id,desc")
                 .when().get("/api/v1/products/search")
                 .then().contentType(ContentType.JSON).log().all()
                 .extract();

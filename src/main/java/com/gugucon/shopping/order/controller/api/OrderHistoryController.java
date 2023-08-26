@@ -1,10 +1,13 @@
 package com.gugucon.shopping.order.controller.api;
 
 import com.gugucon.shopping.auth.dto.MemberPrincipal;
+import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
 import com.gugucon.shopping.order.service.OrderService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +24,8 @@ public class OrderHistoryController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderHistoryResponse> getOrderHistory(@AuthenticationPrincipal final MemberPrincipal principal) {
-        return orderService.getOrderHistory(principal.getId());
+    public PagedResponse<OrderHistoryResponse> getOrderHistory(@SortDefault(sort = "id", direction = Direction.DESC) final Pageable pageable,
+                                                               @AuthenticationPrincipal final MemberPrincipal principal) {
+        return orderService.getOrderHistory(pageable, principal.getId());
     }
 }
