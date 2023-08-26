@@ -87,8 +87,8 @@ CREATE TABLE IF NOT EXISTS rate_stat
     `product_id`       bigint                NOT NULL,
     `birth_year_range` varchar(255)          NOT NULL,
     `gender`           varchar(255)          NOT NULL,
-    `total_score`      int                NOT NULL,
-    `count`            int                   NOT NULL,
+    `total_score`      bigint                NOT NULL,
+    `count`            bigint                NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL
 );
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS order_stat
     `product_id`       bigint                NOT NULL,
     `birth_year_range` varchar(255)          NOT NULL,
     `gender`           varchar(255)          NOT NULL,
-    `count`            int                   NOT NULL,
+    `count`            bigint                NOT NULL,
     `created_at`       datetime              NOT NULL,
     `last_modified_at` datetime              NOT NULL
 );
