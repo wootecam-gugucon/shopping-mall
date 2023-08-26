@@ -18,12 +18,12 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
     @Query("SELECT r.score FROM Rate r INNER JOIN r.orderItem oi WHERE oi.productId = :productId")
     List<Integer> findScoresByProductId(final Long productId);
 
-    @Query("SELECT r FROM Order o " +
+    @Query("SELECT r.score FROM Order o " +
             "INNER JOIN o.orderItems oi " +
             "INNER JOIN Rate r ON oi.id = r.orderItem.id " +
             "WHERE o.memberId = :memberId " +
             "AND oi.id = :orderItemId")
-    Optional<Rate> findByMemberIdAndOrderItemId(final Long memberId, final Long orderItemId);
+    Optional<Integer> findByMemberIdAndOrderItemId(final Long memberId, final Long orderItemId);
 
     @Query("SELECT r.score FROM Member m " +
             "INNER JOIN Order o ON o.memberId = m.id " +
