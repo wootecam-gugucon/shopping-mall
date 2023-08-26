@@ -6,6 +6,7 @@ import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
@@ -28,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.*;
 import static com.gugucon.shopping.utils.ApiUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,14 +54,14 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(orderItemId, score))
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .body(new RateCreateRequest(orderItemId, score))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/rate")
+                .then()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -75,14 +77,14 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(notExistOrderItemId, score))
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .body(new RateCreateRequest(notExistOrderItemId, score))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/rate")
+                .then()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -105,14 +107,14 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(othersOrderItemId, score))
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .body(new RateCreateRequest(othersOrderItemId, score))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/rate")
+                .then()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -135,14 +137,14 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(orderItemId, score))
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .body(new RateCreateRequest(orderItemId, score))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/rate")
+                .then()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -162,14 +164,14 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(orderItemId, score))
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .body(new RateCreateRequest(orderItemId, score))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/rate")
+                .then()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -193,14 +195,14 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .body(new RateCreateRequest(orderItemId, score))
-            .contentType(ContentType.JSON)
-            .when()
-            .post("/api/v1/rate")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .body(new RateCreateRequest(orderItemId, score))
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/api/v1/rate")
+                .then()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -219,12 +221,12 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .when()
-            .get("/api/v1/rate/product/{productId}", productId)
-            .then()
-            .contentType(ContentType.JSON)
-            .extract();
+                .given().log().all()
+                .when()
+                .get("/api/v1/rate/product/{productId}", productId)
+                .then()
+                .contentType(ContentType.JSON)
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -244,13 +246,13 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/rate/product/{productId}", notExistProductId)
-            .then()
-            .contentType(ContentType.JSON)
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/rate/product/{productId}", notExistProductId)
+                .then()
+                .contentType(ContentType.JSON)
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -272,13 +274,13 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/rate/orderItem/{orderItemId}", orderItemId)
-            .then()
-            .contentType(ContentType.JSON)
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/rate/orderItem/{orderItemId}", orderItemId)
+                .then()
+                .contentType(ContentType.JSON)
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -297,13 +299,13 @@ class RateIntegrationTest {
 
         // when
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/rate/orderItem/{orderItemId}", orderItemId)
-            .then()
-            .contentType(ContentType.JSON)
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/rate/orderItem/{orderItemId}", orderItemId)
+                .then()
+                .contentType(ContentType.JSON)
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -314,42 +316,37 @@ class RateIntegrationTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"MALE,2000-01-01,3.0", "MALE,1994-01-01,2.0", "FEMALE,2010-01-01,3.0"})
+    @CsvSource(value = {"MALE,24,3.0", "MALE,35,2.0", "FEMALE,19,3.0"})
     @DisplayName("해당 물품의 주문자들 중 현재 접속한 사용자와 같은 나이대와 성별을 가진 주문자들의 평균 별점 정보를 가져온다")
-    void getCustomRate(final Gender gender, final LocalDate birthDate, final double expectedRate) {
+    void getCustomRate(final Gender gender, final int age, final double expectedRate) {
         // given
-        int sequence = 0;
+        int sequence = 0; // for Unique Email
+        final LocalDate birthDate = LocalDate.of(LocalDate.now().getYear() - age + 1, 1, 1);
         final String accessToken = loginAfterSignUp(createSignupRequest(sequence++, gender, birthDate.getYear()));
 
-        // 10대
-        final String 십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
-        final String 십대_여자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
-        final String 십대_여자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2008));
-        final String 십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2008));
+        final String 십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_여자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_여자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(UNDER_TEENS)));
 
-        // 20대 초반
-        final String 이십대_초반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2002));
-        final String 이십대_초반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2002));
+        final String 이십대_초반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(EARLY_TWENTIES)));
+        final String 이십대_초반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(EARLY_TWENTIES)));
 
-        // 20대 중반
-        final String 이십대_중반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2000));
-        final String 이십대_중반_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2000));
-        final String 이십대_중반_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 2000));
-        final String 이십대_중반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 2000));
+        final String 이십대_중반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(MID_TWENTIES)));
 
-        // 20대 후반
-        final String 이십대_후반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 1996));
-        final String 이십대_후반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1996));
+        final String 이십대_후반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(LATE_TWENTIES)));
+        final String 이십대_후반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(LATE_TWENTIES)));
 
-        // 30대
-        final String 삼십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1992));
-        final String 삼십대_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1992));
-        final String 삼십대_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1992));
-        final String 삼십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 1992));
+        final String 삼십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
+        final String 삼십대_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
+        final String 삼십대_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
+        final String 삼십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(THIRTIES)));
 
-        // 40대 이상
-        final String 사십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, 1960));
-        final String 사십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, 1960));
+        final String 사십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(OVER_FORTIES)));
+        final String 사십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(OVER_FORTIES)));
 
         final Long productId = insertProduct("product");
 
@@ -387,6 +384,10 @@ class RateIntegrationTest {
         final RateResponse rateResponse = response.as(RateResponse.class);
         assertThat(rateResponse.getRateCount()).isEqualTo(3);
         assertThat(rateResponse.getAverageRate()).isCloseTo(expectedRate, Percentage.withPercentage(99.9));
+    }
+
+    private static int getYear(final BirthYearRange birthYearRange) {
+        return birthYearRange.getStartDate().getYear();
     }
 
     private void rate(final String accessToken, final Long productId, final int score) {
