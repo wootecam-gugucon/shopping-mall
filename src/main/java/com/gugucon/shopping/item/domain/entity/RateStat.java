@@ -4,6 +4,7 @@ import com.gugucon.shopping.common.domain.entity.BaseTimeEntity;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -17,17 +18,21 @@ public class RateStat extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    private Product product;
+    @NotNull
+    private Long productId;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private BirthYearRange birthYearRange;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private Gender gender;
 
+    @NotNull
     private Long totalScore;
 
+    @NotNull
     private Long count;
 }
