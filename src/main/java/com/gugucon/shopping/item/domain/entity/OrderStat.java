@@ -19,7 +19,6 @@ public class OrderStat extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_id")
     @NotNull
     private Long productId;
 
