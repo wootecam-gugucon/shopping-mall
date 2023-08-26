@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS rates
     `last_modified_at` datetime              NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS rate_stat
+CREATE TABLE IF NOT EXISTS rate_stats
 (
     `id`               bigint auto_increment NOT NULL primary key,
     `product_id`       bigint                NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS rate_stat
     `last_modified_at` datetime              NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS order_stat
+CREATE TABLE IF NOT EXISTS order_stats
 (
     `id`               bigint auto_increment NOT NULL primary key,
     `product_id`       bigint                NOT NULL,
