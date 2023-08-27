@@ -6,7 +6,6 @@ import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.SearchCondition;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
-import com.gugucon.shopping.item.dto.response.ProductRecommendResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -93,11 +92,11 @@ public class ProductService {
         return ProductDetailResponse.from(product);
     }
 
-    public ProductRecommendResponse getRecommendations(final Long productId) {
+    public PagedResponse<ProductResponse> getRecommendations(final Long productId, final Pageable pageable) {
         validateProductExistence(productId);
 
-        final List<Product> recommendations = productRepository.findRecommendedProducts(productId);
-        return ProductRecommendResponse.of(recommendations);
+        final Page<Product> recommendations = productRepository.findRecommendedProducts(productId, pageable);
+        return convertToPage(recommendations);
     }
 
     private void validateProductExistence(final Long productId) {

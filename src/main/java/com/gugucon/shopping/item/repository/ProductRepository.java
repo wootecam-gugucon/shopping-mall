@@ -6,12 +6,11 @@ import com.gugucon.shopping.member.domain.vo.Gender;
 import jakarta.persistence.LockModeType;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -77,5 +76,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         + ") and p.id != :productId "
         + "group by p.id "
         + "order by sum(quantity) desc, p.id desc", nativeQuery = true)
-    List<Product> findRecommendedProducts(@Param("productId") final Long productId);
+    Page<Product> findRecommendedProducts(@Param("productId") final Long productId, final Pageable pageable);
 }

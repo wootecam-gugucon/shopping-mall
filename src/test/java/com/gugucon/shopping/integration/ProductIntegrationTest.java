@@ -23,7 +23,6 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
-import com.gugucon.shopping.item.dto.response.ProductRecommendResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.OrderStatRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
@@ -614,8 +613,8 @@ class ProductIntegrationTest {
     }
 
     @Test
-    @DisplayName("해당 상품을 구매한 사용자들이 함께 찾는 상품 목록을 반환한다")
-    void recommendedProducts() {
+    @DisplayName("해당 상품을 구매한 사용자들이 함께 찾는 상품 목록을 기본 페이징을 적용하여 반환한다. (page=0, size=5)")
+    void recommendedProducts_defaultPaging() {
         // given
         final long 아디다스_크롭_탑 = insertProduct("아디다스 크롭 탑", 49000); // 조회 상품
         final long 데비웨어_요가웨어 = insertProduct("데비웨어_요가웨어", 19780); // 연관 구매 3건
@@ -636,11 +635,48 @@ class ProductIntegrationTest {
             .extract();
 
         // then
-        final ProductRecommendResponse recommend = response.as(ProductRecommendResponse.class);
-        final List<Long> actualProductIds = recommend.getProducts()
-            .stream()
-            .map(ProductDetailResponse::getId).toList();
+        final List<Long> actualProductIds = response.body()
+            .jsonPath()
+            .getList("contents", ProductResponse.class)
+            .stream().map(ProductResponse::getId).toList();
         assertThat(actualProductIds).containsExactly(데비웨어_요가웨어, 에이치덱스_땀복, 안다르_바이크_5부, 젝시믹스_머슬핏);
+    }
+
+    @Test
+    @DisplayName("해당 상품을 구매한 사용자들이 함께 찾는 상품 목록을 페이징하여 반환한다 (page=1, size=2)")
+    void recommendedProducts_paging() {
+        // given
+        final long 아디다스_크롭_탑 = insertProduct("아디다스 크롭 탑", 49000); // 조회 상품
+        final long 데비웨어_요가웨어 = insertProduct("데비웨어_요가웨어", 19780); // 연관 구매 3건
+        final long 안다르_바이크_5부 = insertProduct("안다르 바이크 5부", 33000); // 연관 구매 2건
+        final long 에이치덱스_땀복 = insertProduct("에이치덱스_땀복", 74400); // 연관 구매 2건
+        final long 젝시믹스_머슬핏 = insertProduct("젝시믹스_머슬핏", 29000); // 연관 구매 1건
+
+        buyAllProducts(List.of(아디다스_크롭_탑, 데비웨어_요가웨어, 안다르_바이크_5부));
+        buyAllProducts(List.of(아디다스_크롭_탑, 데비웨어_요가웨어, 젝시믹스_머슬핏));
+        buyAllProducts(List.of(아디다스_크롭_탑, 데비웨어_요가웨어, 에이치덱스_땀복));
+        buyAllProducts(List.of(아디다스_크롭_탑, 안다르_바이크_5부, 에이치덱스_땀복));
+
+        // when
+        final int currentPage = 1;
+        final int size = 2;
+
+        final ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().get("/api/v1/products/{productId}/recommend?page=" + currentPage + "&size=" + size, 아디다스_크롭_탑)
+            .then().contentType(ContentType.JSON).log().all()
+            .extract();
+
+        // then
+        assertThat(response.body().jsonPath().getInt("totalPage")).isEqualTo(2);
+        assertThat(response.body().jsonPath().getInt("currentPage")).isEqualTo(currentPage);
+        assertThat(response.body().jsonPath().getInt("size")).isEqualTo(size);
+
+        final List<Long> actualProductIds = response.body()
+            .jsonPath()
+            .getList("contents", ProductResponse.class)
+            .stream().map(ProductResponse::getId).toList();
+        assertThat(actualProductIds).containsExactly(안다르_바이크_5부, 젝시믹스_머슬핏);
     }
 
     private Long insertProduct(final String productName, final long price) {
