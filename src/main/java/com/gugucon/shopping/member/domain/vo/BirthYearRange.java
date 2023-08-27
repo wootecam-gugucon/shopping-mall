@@ -34,7 +34,7 @@ public enum BirthYearRange {
     }
 
     public static boolean isInRange(final LocalDate birthDate) {
-        return birthDate.isAfter(OVER_FORTIES.getStartDate()) && birthDate.isBefore(UNDER_TEENS.getEndDate());
+        return birthDate.isAfter(OVER_FORTIES.getStartDate().minusDays(1)) && birthDate.isBefore(UNDER_TEENS.getEndDate());
     }
 
     public LocalDate getStartDate() {
