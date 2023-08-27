@@ -66,7 +66,7 @@ public class MemberService {
 
     private boolean isEmailExist(final Email email) {
         return memberRepository.findByEmail(email)
-                .isPresent();
+                               .isPresent();
     }
 
     private void validatePasswordChecked(final String password, final String passwordCheck) {
