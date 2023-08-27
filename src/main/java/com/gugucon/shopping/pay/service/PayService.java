@@ -4,8 +4,6 @@ import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.repository.CartItemRepository;
-import com.gugucon.shopping.member.domain.entity.Member;
-import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.config.TossPayConfiguration;
@@ -32,7 +30,6 @@ public class PayService {
     private final PayRepository payRepository;
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
-    private final MemberRepository memberRepository;
     private final PointRepository pointRepository;
     private final TossPayProvider tossPayProvider;
     private final TossPayConfiguration tossPayConfiguration;
@@ -55,13 +52,10 @@ public class PayService {
 
     public TossPayInfoResponse getTossInfo(final Long orderId, final Long memberId) {
         final Order order = findOrderBy(orderId, memberId);
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
 
         return TossPayInfoResponse.from(tossPayProvider.encodeOrderId(order.getId(), order.createOrderName()),
                                         order,
-                                        member,
-                                        tossPayProvider.generateCustomerKey(member.getId()),
+                                        tossPayProvider.generateCustomerKey(memberId),
                                         tossPayConfiguration.getSuccessUrl(),
                                         tossPayConfiguration.getFailUrl());
     }
