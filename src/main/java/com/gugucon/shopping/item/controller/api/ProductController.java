@@ -2,6 +2,7 @@ package com.gugucon.shopping.item.controller.api;
 
 import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.item.domain.SearchCondition;
+import com.gugucon.shopping.common.dto.response.SlicedResponse;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.service.ProductService;
@@ -60,8 +61,8 @@ public class ProductController {
 
     @GetMapping("/{productId}/recommend")
     @ResponseStatus(HttpStatus.OK)
-    public PagedResponse<ProductResponse> getRecommendations(@PathVariable final Long productId,
-                                                             @PageableDefault(size = 5) final Pageable pageable) {
+    public SlicedResponse<ProductDetailResponse> getRecommendations(@PathVariable final Long productId,
+                                                              @PageableDefault(size = 5) final Pageable pageable) {
         return productService.getRecommendations(productId, pageable);
     }
 }

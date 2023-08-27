@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -81,5 +82,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             + "where order_id in ("
             + " select order_id from order_items where order_items.product_id = :productId "
             + ") and p.id != :productId" , nativeQuery = true)
-    Page<Product> findRecommendedProducts(@Param("productId") final Long productId, final Pageable pageable);
+    Slice<Product> findRecommendedProducts(@Param("productId") final Long productId, final Pageable pageable);
 }

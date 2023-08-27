@@ -1,6 +1,7 @@
 package com.gugucon.shopping.item.service;
 
 import com.gugucon.shopping.common.dto.response.PagedResponse;
+import com.gugucon.shopping.common.dto.response.SlicedResponse;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.SearchCondition;
@@ -8,13 +9,13 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -92,11 +93,16 @@ public class ProductService {
         return ProductDetailResponse.from(product);
     }
 
-    public PagedResponse<ProductResponse> getRecommendations(final Long productId, final Pageable pageable) {
+    public SlicedResponse<ProductDetailResponse> getRecommendations(final Long productId, final Pageable pageable) {
         validateProductExistence(productId);
 
-        final Page<Product> recommendations = productRepository.findRecommendedProducts(productId, pageable);
-        return convertToPage(recommendations);
+        final Slice<Product> recommendations = productRepository.findRecommendedProducts(productId, pageable);
+        return convertToSlice(recommendations);
+    }
+
+    private SlicedResponse<ProductDetailResponse> convertToSlice(final Slice<Product> products) {
+        final List<ProductDetailResponse> contents = products.map(ProductDetailResponse::from).toList();
+        return new SlicedResponse<>(contents, products.hasNext(), products.getNumber(), products.getSize());
     }
 
     private void validateProductExistence(final Long productId) {

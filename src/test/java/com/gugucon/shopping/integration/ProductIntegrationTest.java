@@ -637,8 +637,8 @@ class ProductIntegrationTest {
         // then
         final List<Long> actualProductIds = response.body()
             .jsonPath()
-            .getList("contents", ProductResponse.class)
-            .stream().map(ProductResponse::getId).toList();
+            .getList("contents", ProductDetailResponse.class)
+            .stream().map(ProductDetailResponse::getId).toList();
         assertThat(actualProductIds).containsExactly(데비웨어_요가웨어, 에이치덱스_땀복, 안다르_바이크_5부, 젝시믹스_머슬핏);
     }
 
@@ -668,14 +668,14 @@ class ProductIntegrationTest {
             .extract();
 
         // then
-        assertThat(response.body().jsonPath().getInt("totalPage")).isEqualTo(2);
+        assertThat(response.body().jsonPath().getBoolean("hasNextPage")).isFalse();
         assertThat(response.body().jsonPath().getInt("currentPage")).isEqualTo(currentPage);
         assertThat(response.body().jsonPath().getInt("size")).isEqualTo(size);
 
         final List<Long> actualProductIds = response.body()
             .jsonPath()
-            .getList("contents", ProductResponse.class)
-            .stream().map(ProductResponse::getId).toList();
+            .getList("contents", ProductDetailResponse.class)
+            .stream().map(ProductDetailResponse::getId).toList();
         assertThat(actualProductIds).containsExactly(안다르_바이크_5부, 젝시믹스_머슬핏);
     }
 
