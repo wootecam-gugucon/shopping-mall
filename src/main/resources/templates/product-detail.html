@@ -40,6 +40,7 @@
         </div>
         <div class="flex justify-between p-20 mt-20">
           <h3 class="highlight-text">추천상품</h3>
+          <p class="product-recommend-page" style="padding-left:20px"></p>
         </div>
         <div class="flex justify-between p-20 mt-20" style="width:60%">
           <section class="product-recommend-list" style="display:grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
@@ -92,13 +93,11 @@
   });
 
   function onNextClick() {
-    console.log(recommendationPage);
     recommendationPage += 1;
     updateRecommendation(productId, recommendationPage);
   }
 
   function onPrevClick() {
-    console.log(recommendationPage);
     recommendationPage -= 1;
     updateRecommendation(productId, recommendationPage);
   }
@@ -114,6 +113,8 @@
       window.location.href = "/";
     }).then((data) => {
       const size = data.size;
+      const currentPage = data.currentPage;
+      const hasNextPage = data.hasNextPage;
 
       let element = '';
       for (let i = 0; i < Math.min(size, data.contents.length); i++) {
@@ -129,23 +130,29 @@
           </div>
         `
       }
+      document.querySelector('.product-recommend-page').innerText = `${currentPage+1} 페이지`;
       document.querySelector('.product-recommend-list').innerHTML = element;
-      updatePaginationButton();
+      updatePaginationButton(currentPage, hasNextPage);
 
     }).catch((error) => {
       console.error(error);
     })
   }
 
-  const updatePaginationButton = () => {
-    if (false) {
-      const next = document.getElementById(`page-next`);
+  const updatePaginationButton = (currentPage, hasNextPage) => {
+    const next = document.getElementById(`page-next`);
+    const prev = document.getElementById(`page-prev`);
+
+    if (!hasNextPage) {
       next.setAttribute("disabled", true);
+    } else {
+      next.removeAttribute("disabled");
     }
 
-    if (recommendationPage === 0) {
-      const prev = document.getElementById(`page-prev`);
+    if (currentPage === 0) {
       prev.setAttribute("disabled", true);
+    } else {
+      prev.removeAttribute("disabled");
     }
   }
 
