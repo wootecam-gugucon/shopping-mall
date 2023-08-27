@@ -3,6 +3,8 @@ package com.gugucon.shopping.utils;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
+import com.gugucon.shopping.member.domain.vo.BirthYearRange;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
@@ -30,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.gugucon.shopping.member.domain.vo.Gender.MALE;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -78,6 +81,18 @@ public class ApiUtils {
         signup(signupRequest);
         final LoginRequest request = new LoginRequest(signupRequest.getEmail(), signupRequest.getPassword());
         return ApiUtils.login(request);
+    }
+
+    public static String loginAfterSignUp(final BirthYearRange birthYearRange, final Gender gender) {
+        final SignupRequest signupRequest = SignupRequest.builder()
+                .email("test_email@woowafriends.com")
+                .password("test_password!")
+                .passwordCheck("test_password!")
+                .nickname("tester")
+                .gender(MALE.name())
+                .birthDate(birthYearRange.getStartDate())
+                .build();
+        return loginAfterSignUp(signupRequest);
     }
 
     public static ExtractableResponse<Response> insertCartItem(final String accessToken,
@@ -252,7 +267,8 @@ public class ApiUtils {
                 .extract().as(PayResponse.class);
     }
 
-    public static OrderDetailResponse buyAllProductsByPoint(final String accessToken, final List<Long> productIds, final Long point) {
+    public static OrderDetailResponse buyAllProductsByPoint(final String accessToken, final List<Long> productIds,
+                                                            final Long point) {
         chargePoint(accessToken, point);
         productIds.forEach(productId -> insertCartItem(accessToken, new CartItemInsertRequest(productId)));
         Long orderId = placeOrder(accessToken);
