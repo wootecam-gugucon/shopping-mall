@@ -4,6 +4,7 @@ import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.item.repository.RateStatRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
@@ -32,20 +33,26 @@ public class RateService {
     private final RateRepository rateRepository;
     private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
+    private final RateStatRepository rateStatRepository;
 
     @Transactional
-    public void createRate(final Long memberId, final RateCreateRequest request) {
-        validateScoreRange(request.getScore());
+    public void createRate(final MemberPrincipal principal, final RateCreateRequest request) {
+        final short score = request.getScore();
+        validateScoreRange(score);
 
-        final OrderItem orderItem = searchOrderItem(memberId, request.getOrderItemId());
+        final OrderItem orderItem = searchOrderItem(principal.getId(), request.getOrderItemId());
         validateDuplicateRate(orderItem.getId());
 
         final Rate rate = Rate.builder()
                 .orderItem(orderItem)
-                .score(request.getScore())
+                .score(score)
                 .build();
 
         rateRepository.save(rate);
+        rateStatRepository.updateRateStatByScore(score,
+                                                 orderItem.getProductId(),
+                                                 BirthYearRange.from(principal.getBirthDate()),
+                                                 principal.getGender());
     }
 
     public RateResponse getRates(final Long productId) {
