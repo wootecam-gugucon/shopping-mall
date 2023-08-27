@@ -17,21 +17,21 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Page<Order> findAllByMemberIdAndStatus(Long memberId, OrderStatus status, Pageable pageable);
+    Page<Order> findAllByMemberIdAndStatus(final Long memberId, final OrderStatus status, final Pageable pageable);
 
-    @Query("SELECT o FROM Order o "
-        + "WHERE o.id = :id AND o.memberId = :memberId")
+    @Query("SELECT o FROM Order o " +
+            "WHERE o.id = :id AND o.memberId = :memberId")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<Order> findByIdAndMemberIdExclusively(Long id, Long memberId);
+    Optional<Order> findByIdAndMemberIdExclusively(final Long id, final Long memberId);
 
-    Optional<Order> findByIdAndMemberId(Long id, Long memberId);
+    Optional<Order> findByIdAndMemberId(final Long id, final Long memberId);
 
     @Query("SELECT DISTINCT o FROM Order o " +
             "JOIN FETCH o.orderItems " +
             "WHERE o.status IN :statuses AND (o.lastModifiedAt BETWEEN :start AND :end)")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Order> findAllByStatusInAndLastModifiedAtBetweenWithOrderItems(
-            @Param("statuses") List<OrderStatus> statuses,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end);
+            @Param("statuses") final List<OrderStatus> statuses,
+            @Param("start") final LocalDateTime start,
+            @Param("end") final LocalDateTime end);
 }
