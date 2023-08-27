@@ -68,7 +68,7 @@ public class RateService {
                                                                                               birthYearRange.getStartDate(),
                                                                                               birthYearRange.getEndDate());
         final double averageRate = calculateAverageOf(rates).orElse(ZERO_RATE);
-        return new RateResponse(rates.size(), averageRate);
+        return new RateResponse(rates.size(), roundDownAverage(averageRate));
     }
 
     private OptionalDouble calculateAverageOf(final List<Integer> rates) {

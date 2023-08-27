@@ -37,6 +37,10 @@
             <h3 class="highlight-text">별점</h3>
             <span class="highlight-text rate"></span>
           </div>
+          <div class="flex justify-between p-20 mt-20 custom-rate-box" style="display: none">
+            <h3 class="highlight-text">사용자와 비슷한 사람들이 남긴 별점</h3>
+            <span class="highlight-text custom-rate"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -73,7 +77,26 @@
       window.location.href = "/";
     }).then((data) => {
       document.querySelector('.rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
-    })
+    });
+
+    if(localStorage.getItem("accessToken")) {
+        fetch(`/api/v1/rate/product/${productId}/custom`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            response.json().then((data) => alert(data.message));
+            window.location.href = "/";
+        }).then((data) => {
+            document.querySelector('.custom-rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
+            document.querySelector('.custom-rate-box').style.display = 'block';
+        });
+    }
   });
 </script>
 </body>
