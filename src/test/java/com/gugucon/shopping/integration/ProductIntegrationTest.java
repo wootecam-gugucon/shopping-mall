@@ -640,7 +640,7 @@ class ProductIntegrationTest {
         final List<Long> actualProductIds = recommend.getProducts()
             .stream()
             .map(ProductDetailResponse::getId).toList();
-        assertThat(actualProductIds).containsExactly(데비웨어_요가웨어, 안다르_바이크_5부, 에이치덱스_땀복, 젝시믹스_머슬핏);
+        assertThat(actualProductIds).containsExactly(데비웨어_요가웨어, 에이치덱스_땀복, 안다르_바이크_5부, 젝시믹스_머슬핏);
     }
 
     private Long insertProduct(final String productName, final long price) {
