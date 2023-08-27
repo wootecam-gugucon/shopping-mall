@@ -16,10 +16,13 @@ import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.item.repository.RateStatRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
+import com.gugucon.shopping.order.domain.PayType;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
+import com.gugucon.shopping.order.dto.response.OrderPayResponse;
+import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
-import com.gugucon.shopping.utils.ApiUtils;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -34,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.gugucon.shopping.member.domain.vo.Gender.MALE;
 import static com.gugucon.shopping.utils.ApiUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -259,21 +263,21 @@ class ProductIntegrationTest {
         final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
 
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
-        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(사과_id));
-        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(사과는맛있어_id));
-        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(가나다라마사과과_id));
-        ApiUtils.insertCartItem(accessToken, new CartItemInsertRequest(맛있는사과_id));
+        insertCartItem(accessToken, new CartItemInsertRequest(사과_id));
+        insertCartItem(accessToken, new CartItemInsertRequest(사과는맛있어_id));
+        insertCartItem(accessToken, new CartItemInsertRequest(가나다라마사과과_id));
+        insertCartItem(accessToken, new CartItemInsertRequest(맛있는사과_id));
 
-        final List<CartItemResponse> cartItemResponses = ApiUtils.readCartItems(accessToken);
+        final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         final Long 사과_장바구니_id = cartItemResponses.get(0).getCartItemId();
         final Long 사과는맛있어_장바구니_id = cartItemResponses.get(1).getCartItemId();
         final Long 가나다라마사과과_장바구니_id = cartItemResponses.get(2).getCartItemId();
         final Long 맛있는사과_장바구니_id = cartItemResponses.get(3).getCartItemId();
 
-        ApiUtils.updateCartItem(accessToken, 사과_장바구니_id, new CartItemUpdateRequest(10));
-        ApiUtils.updateCartItem(accessToken, 사과는맛있어_장바구니_id, new CartItemUpdateRequest(9));
-        ApiUtils.updateCartItem(accessToken, 가나다라마사과과_장바구니_id, new CartItemUpdateRequest(8));
-        ApiUtils.updateCartItem(accessToken, 맛있는사과_장바구니_id, new CartItemUpdateRequest(7));
+        updateCartItem(accessToken, 사과_장바구니_id, new CartItemUpdateRequest(10));
+        updateCartItem(accessToken, 사과는맛있어_장바구니_id, new CartItemUpdateRequest(9));
+        updateCartItem(accessToken, 가나다라마사과과_장바구니_id, new CartItemUpdateRequest(8));
+        updateCartItem(accessToken, 맛있는사과_장바구니_id, new CartItemUpdateRequest(7));
 
         placeOrder(accessToken);
 
@@ -365,15 +369,36 @@ class ProductIntegrationTest {
 
         final String keyword = "사과";
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
-        final Gender gender = Gender.MALE;
+        final Gender gender = MALE;
 
-        makeOrderStat(사과_id, birthYearRange, gender, 15L); // 2nd
-        makeOrderStat(맛있는사과_id, birthYearRange, gender, 10L); // 3rd
-        makeOrderStat(사과는맛있어_id, birthYearRange, gender, 20L); // 1st
-        makeOrderStat(가나다라마사과과_id, birthYearRange, gender, 5L); // 4th
-        makeOrderStat(가나다라마바사_id, birthYearRange, gender, 100L); // X
-        makeOrderStat(과놔돠롸_id, birthYearRange, gender, 100L); // X
+        createOrderStat(사과_id, birthYearRange, gender, 0L);
+        createOrderStat(맛있는사과_id, birthYearRange, gender, 0L);
+        createOrderStat(사과는맛있어_id, birthYearRange, gender, 0L);
+        createOrderStat(가나다라마사과과_id, birthYearRange, gender, 0L);
 
+        final String accessToken = loginAfterSignUp(birthYearRange, gender);
+
+        insertCartItem(accessToken, new CartItemInsertRequest(사과_id));
+        insertCartItem(accessToken, new CartItemInsertRequest(사과는맛있어_id));
+        insertCartItem(accessToken, new CartItemInsertRequest(가나다라마사과과_id));
+        insertCartItem(accessToken, new CartItemInsertRequest(맛있는사과_id));
+
+        final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
+        final Long 사과_장바구니_id = cartItemResponses.get(0).getCartItemId();
+        final Long 사과는맛있어_장바구니_id = cartItemResponses.get(1).getCartItemId();
+        final Long 가나다라마사과과_장바구니_id = cartItemResponses.get(2).getCartItemId();
+        final Long 맛있는사과_장바구니_id = cartItemResponses.get(3).getCartItemId();
+
+        updateCartItem(accessToken, 사과_장바구니_id, new CartItemUpdateRequest(10));
+        updateCartItem(accessToken, 사과는맛있어_장바구니_id, new CartItemUpdateRequest(9));
+        updateCartItem(accessToken, 가나다라마사과과_장바구니_id, new CartItemUpdateRequest(8));
+        updateCartItem(accessToken, 맛있는사과_장바구니_id, new CartItemUpdateRequest(7));
+
+        final Long orderId = placeOrder(accessToken);
+        chargePoint(accessToken, 1_000_000L);
+        final OrderPayResponse orderPayResponse = putOrder(accessToken,
+                                                           new OrderPayRequest(orderId, PayType.POINT.name()));
+        payOrderByPoint(accessToken, new PointPayRequest(orderPayResponse.getOrderId()));
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -394,7 +419,7 @@ class ProductIntegrationTest {
                 .getList("contents", ProductResponse.class)
                 .stream().map(ProductResponse::getName).toList();
 
-        assertThat(names).containsExactly("사과는 맛있어", "사과", "맛있는 사과", "가나다라마사과과");
+        assertThat(names).containsExactly("사과", "사과는 맛있어", "가나다라마사과과", "맛있는 사과");
     }
 
     @Test
@@ -411,15 +436,26 @@ class ProductIntegrationTest {
 
         final String keyword = "사과";
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
-        final Gender gender = Gender.MALE;
+        final Gender gender = MALE;
 
-        makeRateStat(사과_id, birthYearRange, gender, 4L, 1L); // 2nd
-        makeRateStat(맛있는사과_id, birthYearRange, gender, 3L, 1L); // 3rd
-        makeRateStat(사과는맛있어_id, birthYearRange, gender, 5L, 1L); // 1st
-        makeRateStat(가나다라마사과과_id, birthYearRange, gender, 1L, 1L); // 4th
-        makeRateStat(가나다라마바사_id, birthYearRange, gender, 5L, 1L); // X
-        makeRateStat(과놔돠롸_id, birthYearRange, gender, 5L, 1L); // X
+        createRateStat(사과_id, birthYearRange, gender, 0L, 0L);
+        createRateStat(맛있는사과_id, birthYearRange, gender, 0L, 0L);
+        createRateStat(사과는맛있어_id, birthYearRange, gender, 0L, 0L);
+        createRateStat(가나다라마사과과_id, birthYearRange, gender, 0L, 0L);
 
+        final String accessToken = loginAfterSignUp(birthYearRange, gender);
+
+        final OrderDetailResponse orderDetailResponse = buyAllProductsByPoint(accessToken, productIds, 10500L);
+        final List<OrderItemResponse> orderItemResponses = orderDetailResponse.getOrderItems();
+        final Long 사과_주문_id = orderItemResponses.get(0).getId();
+        final Long 맛있는사과_주문_id = orderItemResponses.get(1).getId();
+        final Long 사과는맛있어_주문_id = orderItemResponses.get(2).getId();
+        final Long 가나다라마사과과_주문_id = orderItemResponses.get(3).getId();
+
+        createRateToOrderedItem(accessToken, new RateCreateRequest(사과_주문_id, (short) 1));
+        createRateToOrderedItem(accessToken, new RateCreateRequest(사과는맛있어_주문_id, (short) 2));
+        createRateToOrderedItem(accessToken, new RateCreateRequest(가나다라마사과과_주문_id, (short) 3));
+        createRateToOrderedItem(accessToken, new RateCreateRequest(맛있는사과_주문_id, (short) 4));
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -440,7 +476,7 @@ class ProductIntegrationTest {
                 .getList("contents", ProductResponse.class)
                 .stream().map(ProductResponse::getName).toList();
 
-        assertThat(names).containsExactly("사과는 맛있어", "사과", "맛있는 사과", "가나다라마사과과");
+        assertThat(names).containsExactly("맛있는 사과", "가나다라마사과과", "사과는 맛있어", "사과");
     }
 
     @Test
@@ -577,10 +613,10 @@ class ProductIntegrationTest {
         productNames.forEach(name -> insertProduct(name, 1000L));
     }
 
-    private void makeOrderStat(final Long productId,
-                               final BirthYearRange birthYearRange,
-                               final Gender gender,
-                               final Long count) {
+    private void createOrderStat(final Long productId,
+                                 final BirthYearRange birthYearRange,
+                                 final Gender gender,
+                                 final Long count) {
         orderStatRepository.save(OrderStat.builder()
                                          .productId(productId)
                                          .birthYearRange(birthYearRange)
@@ -589,11 +625,11 @@ class ProductIntegrationTest {
                                          .build());
     }
 
-    private void makeRateStat(final Long productId,
-                              final BirthYearRange birthYearRange,
-                              final Gender gender,
-                              final Long totalScore,
-                              final Long count) {
+    private void createRateStat(final Long productId,
+                                final BirthYearRange birthYearRange,
+                                final Gender gender,
+                                final Long totalScore,
+                                final Long count) {
         rateStatRepository.save(RateStat.builder()
                                         .productId(productId)
                                         .birthYearRange(birthYearRange)
