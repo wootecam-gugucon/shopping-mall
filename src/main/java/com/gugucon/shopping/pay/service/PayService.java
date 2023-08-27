@@ -80,8 +80,8 @@ public class PayService {
         final Order order = findOrderBy(orderId, memberId);
 
         order.validateMoney(Money.from(tossPayRequest.getAmount()));
-        tossPayProvider.validatePayment(tossPayRequest);
         order.getOrderItems().forEach(orderItem -> updateOrderStatBy(principal, orderItem));
+        tossPayProvider.validatePayment(tossPayRequest);
 
         return completePay(memberId, order);
     }
