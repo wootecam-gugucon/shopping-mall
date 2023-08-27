@@ -51,8 +51,7 @@ public class RateService {
     public RateResponse getRates(final Long productId) {
         validateProduct(productId);
         final List<Integer> rates = rateRepository.findScoresByProductId(productId);
-        final double averageRate = calculateAverageOf(rates)
-                .orElse(ZERO_RATE);
+        final double averageRate = calculateAverageOf(rates).orElse(ZERO_RATE);
         return new RateResponse(rates.size(), roundDownAverage(averageRate));
     }
 
@@ -68,8 +67,7 @@ public class RateService {
                                                                                               principal.getGender(),
                                                                                               birthYearRange.getStartDate(),
                                                                                               birthYearRange.getEndDate());
-        final double averageRate = calculateAverageOf(rates)
-                .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+        final double averageRate = calculateAverageOf(rates).orElse(ZERO_RATE);
         return new RateResponse(rates.size(), averageRate);
     }
 
