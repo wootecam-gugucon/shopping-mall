@@ -75,6 +75,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         + " select order_id from order_items where order_items.product_id = :productId "
         + ") and p.id != :productId "
         + "group by p.id "
-        + "order by sum(quantity) desc, p.id desc", nativeQuery = true)
+        + "order by sum(quantity) desc, p.id desc",
+        countQuery = "select count(distinct p.id) from order_items "
+            + "inner join products p on order_items.product_id = p.id "
+            + "where order_id in ("
+            + " select order_id from order_items where order_items.product_id = :productId "
+            + ") and p.id != :productId" , nativeQuery = true)
     Page<Product> findRecommendedProducts(@Param("productId") final Long productId, final Pageable pageable);
 }
