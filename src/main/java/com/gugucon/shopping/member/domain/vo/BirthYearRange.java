@@ -9,7 +9,12 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum BirthYearRange {
-    UNDER_TEENS(0, 19),
+    UNDER_TEENS(1, 19) {
+        @Override
+        public LocalDate getEndDate() {
+            return LocalDate.now();
+        }
+    },
     EARLY_TWENTIES(20, 23),
     MID_TWENTIES(24, 26),
     LATE_TWENTIES(27, 29),
@@ -26,6 +31,10 @@ public enum BirthYearRange {
                      .filter(range -> range.firstAge <= age && range.lastAge >= age)
                      .findAny()
                      .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_BIRTH_DATE));
+    }
+
+    public static boolean isInRange(final LocalDate birthDate) {
+        return birthDate.isAfter(OVER_FORTIES.getStartDate()) && birthDate.isBefore(UNDER_TEENS.getEndDate());
     }
 
     public LocalDate getStartDate() {
