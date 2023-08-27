@@ -1,12 +1,8 @@
 package com.gugucon.shopping.common.exception;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import org.springframework.http.HttpStatus;
+
+import static org.springframework.http.HttpStatus.*;
 
 public enum ErrorCode {
 
@@ -46,7 +42,10 @@ public enum ErrorCode {
     EMPTY_INPUT(BAD_REQUEST, "내용을 입력해주세요."),
     INVALID_PAY_TYPE(BAD_REQUEST, "지원하지 않는 결제 형식입니다."),
     INVALID_ORDER_STATUS(BAD_REQUEST, "주문 상태가 올바르지 않습니다."),
-    INVALID_BIRTH_DATE(BAD_REQUEST, "생년월일이 올바르지 않습니다.");
+    INVALID_BIRTH_DATE(BAD_REQUEST, "생년월일이 올바르지 않습니다."),
+    INVALID_BIRTH_YEAR_RANGE(BAD_REQUEST, "지원하지 않는 나이대 조건입니다."),
+    INVALID_GENDER(BAD_REQUEST, "지원하지 않는 성별 조건입니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;
