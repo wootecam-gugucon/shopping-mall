@@ -9,6 +9,8 @@ import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
+import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
@@ -391,7 +393,11 @@ class RateIntegrationTest {
     }
 
     private void rate(final String accessToken, final Long productId, final int score) {
-        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, productId);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+        chargePoint(accessToken, 1000000L);
+        final Long orderId = placeOrder(accessToken);
+        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
+        payOrderByPoint(accessToken, new PointPayRequest(orderId));
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, (short) score));
     }
