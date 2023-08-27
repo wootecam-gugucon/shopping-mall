@@ -84,8 +84,10 @@ public class OrderService {
 
     @Transactional
     public OrderPayResponse requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
-        final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
-                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+        final Order order = orderRepository.findByIdAndMemberIdExclusively(orderPayRequest.getOrderId(), memberId)
+                                           .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+
+        order.validateCanceled();
         order.startPay(PayType.from(orderPayRequest.getPayType()));
         decreaseStock(order);
         return OrderPayResponse.from(order);
