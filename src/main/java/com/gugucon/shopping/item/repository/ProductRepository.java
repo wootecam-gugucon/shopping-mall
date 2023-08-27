@@ -6,6 +6,7 @@ import com.gugucon.shopping.member.domain.vo.Gender;
 import jakarta.persistence.LockModeType;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -68,4 +69,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("birthYearRange") final BirthYearRange birthYearRange,
             @Param("gender") final Gender gender,
             final Pageable pageable);
+
+    @Query(value = "select p.* from order_items "
+        + "inner join products p on order_items.product_id = p.id "
+        + "where order_id in ("
+        + " select order_id from order_items where order_items.product_id = :productId "
+        + ") and p.id != :productId "
+        + "group by p.id "
+        + "order by sum(quantity) desc", nativeQuery = true)
+    List<Product> findRecommendedProducts(@Param("productId") final Long productId);
 }

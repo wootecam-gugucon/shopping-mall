@@ -6,6 +6,7 @@ import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.SearchCondition;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
+import com.gugucon.shopping.item.dto.response.ProductRecommendResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -76,12 +77,6 @@ public class ProductService {
         return productRepository.findAllByNameSortByRateDesc(searchCondition.getKeyword(), newPageable);
     }
 
-    public ProductDetailResponse getProductDetail(final Long productId) {
-        final Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
-        return ProductDetailResponse.from(product);
-    }
-
     private Pageable createPageable(final Pageable pageable) {
         return Pageable.ofSize(pageable.getPageSize())
                 .withPage(pageable.getPageNumber());
@@ -90,5 +85,24 @@ public class ProductService {
     private PagedResponse<ProductResponse> convertToPage(final Page<Product> products) {
         final List<ProductResponse> contents = products.map(ProductResponse::from).toList();
         return new PagedResponse<>(contents, products.getTotalPages(), products.getNumber(), products.getSize());
+    }
+
+    public ProductDetailResponse getProductDetail(final Long productId) {
+        final Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
+        return ProductDetailResponse.from(product);
+    }
+
+    public ProductRecommendResponse getRecommendations(final Long productId) {
+        validateProductExistence(productId);
+
+        final List<Product> recommendations = productRepository.findRecommendedProducts(productId);
+        return ProductRecommendResponse.of(recommendations);
+    }
+
+    private void validateProductExistence(final Long productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new ShoppingException(ErrorCode.INVALID_PRODUCT);
+        }
     }
 }

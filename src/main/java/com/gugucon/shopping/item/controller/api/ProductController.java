@@ -3,6 +3,7 @@ package com.gugucon.shopping.item.controller.api;
 import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.item.domain.SearchCondition;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
+import com.gugucon.shopping.item.dto.response.ProductRecommendResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.service.ProductService;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
@@ -59,6 +60,7 @@ public class ProductController {
 
     @GetMapping("/{productId}/recommend")
     @ResponseStatus(HttpStatus.OK)
-    public void getRecommendedProducts(@PathVariable final Long productId) {
+    public ProductRecommendResponse getRecommendations(@PathVariable final Long productId) {
+        return productService.getRecommendations(productId);
     }
 }
