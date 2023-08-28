@@ -1,21 +1,21 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.buyAllProductsByPoint;
-import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
-import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
-import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
+import com.gugucon.shopping.item.domain.entity.OrderStat;
 import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.item.domain.entity.RateStat;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
+import com.gugucon.shopping.item.repository.OrderStatRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.item.repository.RateStatRepository;
+import com.gugucon.shopping.member.domain.vo.BirthYearRange;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
@@ -26,12 +26,16 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.Comparator;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import java.util.Comparator;
+import java.util.List;
+
+import static com.gugucon.shopping.utils.ApiUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("상품 기능 통합 테스트")
@@ -39,6 +43,10 @@ class ProductIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private OrderStatRepository orderStatRepository;
+    @Autowired
+    private RateStatRepository rateStatRepository;
 
     @Test
     @DisplayName("페이징 조건이 기재되지 않으면 기본 설정 (page=0, size=20) 에 따라 페이징하여 반환한다.")
@@ -336,11 +344,101 @@ class ProductIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final List<String> names = response.body()
-                                           .jsonPath()
-                                           .getList("contents", ProductResponse.class)
-                                           .stream().map(ProductResponse::getName).toList();
+                .jsonPath()
+                .getList("contents", ProductResponse.class)
+                .stream().map(ProductResponse::getName).toList();
 
         assertThat(names).containsExactly("맛있는 사과", "가나다라마사과과", "사과는 맛있어", "사과");
+    }
+
+    @Test
+    @DisplayName("검색어로 검색한 결과를 나이대, 성별로 필터링한 후 주문이 많은 순으로 정렬하여 반환한다")
+    void searchProducts_filterWithBirthYearRangeAndGenderSortByOrderCountDesc() {
+        // given
+        final Long 사과_id = insertProduct("사과", 2500);// O
+        final Long 맛있는사과_id = insertProduct("맛있는 사과", 3000);    // O
+        final Long 사과는맛있어_id = insertProduct("사과는 맛있어", 1000);    // O
+        final Long 가나다라마사과과_id = insertProduct("가나다라마사과과", 4000);    // O
+        final Long 가나다라마바사_id = insertProduct("가나다라마바사", 2000);    // X
+        final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
+
+        final String keyword = "사과";
+        final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
+        final Gender gender = Gender.MALE;
+
+        makeOrderStat(사과_id, birthYearRange, gender, 15L); // 2nd
+        makeOrderStat(맛있는사과_id, birthYearRange, gender, 10L); // 3rd
+        makeOrderStat(사과는맛있어_id, birthYearRange, gender, 20L); // 1st
+        makeOrderStat(가나다라마사과과_id, birthYearRange, gender, 5L); // 4th
+        makeOrderStat(가나다라마바사_id, birthYearRange, gender, 100L); // X
+        makeOrderStat(과놔돠롸_id, birthYearRange, gender, 100L); // X
+
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("keyword", keyword)
+                .queryParam("sort", "orderCount,desc")
+                .queryParam("birthYearRange", birthYearRange.name())
+                .queryParam("gender", gender.name())
+                .when().get("/api/v1/products/search")
+                .then().contentType(ContentType.JSON).log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final List<String> names = response.body()
+                .jsonPath()
+                .getList("contents", ProductResponse.class)
+                .stream().map(ProductResponse::getName).toList();
+
+        assertThat(names).containsExactly("사과는 맛있어", "사과", "맛있는 사과", "가나다라마사과과");
+    }
+
+    @Test
+    @DisplayName("검색어로 검색한 결과를 나이대, 성별로 필터링한 후 별점이 높은 순으로 정렬하여 반환한다")
+    void searchProducts_filterWithBirthYearRangeAndGenderSortByRateDesc() {
+        // given
+        final Long 사과_id = insertProduct("사과", 2500);// O
+        final Long 맛있는사과_id = insertProduct("맛있는 사과", 3000);    // O
+        final Long 사과는맛있어_id = insertProduct("사과는 맛있어", 1000);    // O
+        final Long 가나다라마사과과_id = insertProduct("가나다라마사과과", 4000);    // O
+        final Long 가나다라마바사_id = insertProduct("가나다라마바사", 2000);    // X
+        final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
+
+        final String keyword = "사과";
+        final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
+        final Gender gender = Gender.MALE;
+
+        makeRateStat(사과_id, birthYearRange, gender, 4L, 1L); // 2nd
+        makeRateStat(맛있는사과_id, birthYearRange, gender, 3L, 1L); // 3rd
+        makeRateStat(사과는맛있어_id, birthYearRange, gender, 5L, 1L); // 1st
+        makeRateStat(가나다라마사과과_id, birthYearRange, gender, 1L, 1L); // 4th
+        makeRateStat(가나다라마바사_id, birthYearRange, gender, 5L, 1L); // X
+        makeRateStat(과놔돠롸_id, birthYearRange, gender, 5L, 1L); // X
+
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("keyword", keyword)
+                .queryParam("sort", "rate,desc")
+                .queryParam("birthYearRange", birthYearRange.name())
+                .queryParam("gender", gender.name())
+                .when().get("/api/v1/products/search")
+                .then().contentType(ContentType.JSON).log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final List<String> names = response.body()
+                .jsonPath()
+                .getList("contents", ProductResponse.class)
+                .stream().map(ProductResponse::getName).toList();
+
+        assertThat(names).containsExactly("사과는 맛있어", "사과", "맛있는 사과", "가나다라마사과과");
     }
 
     @Test
@@ -475,5 +573,31 @@ class ProductIntegrationTest {
 
     private void insertAllProducts(final List<String> productNames) {
         productNames.forEach(name -> insertProduct(name, 1000L));
+    }
+
+    private void makeOrderStat(final Long productId,
+                               final BirthYearRange birthYearRange,
+                               final Gender gender,
+                               final Long count) {
+        orderStatRepository.save(OrderStat.builder()
+                                         .productId(productId)
+                                         .birthYearRange(birthYearRange)
+                                         .gender(gender)
+                                         .count(count)
+                                         .build());
+    }
+
+    private void makeRateStat(final Long productId,
+                              final BirthYearRange birthYearRange,
+                              final Gender gender,
+                              final Long totalScore,
+                              final Long count) {
+        rateStatRepository.save(RateStat.builder()
+                                        .productId(productId)
+                                        .birthYearRange(birthYearRange)
+                                        .gender(gender)
+                                        .totalScore(totalScore)
+                                        .count(count)
+                                        .build());
     }
 }

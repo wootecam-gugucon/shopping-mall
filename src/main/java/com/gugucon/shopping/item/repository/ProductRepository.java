@@ -1,10 +1,13 @@
 package com.gugucon.shopping.item.repository;
 
 import com.gugucon.shopping.item.domain.entity.Product;
+import com.gugucon.shopping.member.domain.vo.BirthYearRange;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,4 +38,28 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "WHERE p.id = :id")
     @Modifying
     void increaseStockByIdAndValue(@Param("id") Long id, @Param("value") Integer value);
+
+    @Query("SELECT p FROM Product p " +
+            "LEFT JOIN OrderStat os ON p.id = os.productId " +
+            "WHERE os.birthYearRange = :birthYearRange " +
+            "AND os.gender = :gender " +
+            "AND p.name LIKE %:keyword% " +
+            "ORDER BY os.count DESC")
+    Page<Product> findAllByNameFilterWithBirthYearRangeAndGenderSortByOrderCountDesc(
+            @Param("keyword") final String keyword,
+            @Param("birthYearRange") final BirthYearRange birthYearRange,
+            @Param("gender") final Gender gender,
+            final Pageable pageable);
+
+    @Query("SELECT p FROM Product p " +
+            "LEFT JOIN RateStat rs ON p.id = rs.productId " +
+            "WHERE rs.birthYearRange = :birthYearRange " +
+            "AND rs.gender = :gender " +
+            "AND p.name LIKE %:keyword% " +
+            "ORDER BY rs.totalScore / rs.count DESC")
+    Page<Product> findAllByNameFilterWithBirthYearRangeAndGenderSortByRateDesc(
+            @Param("keyword") final String keyword,
+            @Param("birthYearRange") final BirthYearRange birthYearRange,
+            @Param("gender") final Gender gender,
+            final Pageable pageable);
 }
