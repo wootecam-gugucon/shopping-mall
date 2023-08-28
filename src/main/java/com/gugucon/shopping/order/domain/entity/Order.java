@@ -6,28 +6,15 @@ import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.order.domain.PayType;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "orders")
@@ -97,7 +84,7 @@ public class Order extends BaseTimeEntity {
         final int size = orderItems.size();
         final OrderItem firstOrderItem = findFirstOrderItem();
         if (hasMultipleOrderItem()) {
-            return firstOrderItem.getName() + String.format(MULTIPLE_ITEM_EXPRESSION, size-1);
+            return firstOrderItem.getName() + String.format(MULTIPLE_ITEM_EXPRESSION, size - 1);
         }
         return firstOrderItem.getName();
     }
@@ -108,8 +95,8 @@ public class Order extends BaseTimeEntity {
 
     private OrderItem findFirstOrderItem() {
         return orderItems.stream()
-                         .min(Comparator.comparingLong(OrderItem::getId))
-                         .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
+                .min(Comparator.comparingLong(OrderItem::getId))
+                .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
     }
 
     public void completePay() {
@@ -139,6 +126,14 @@ public class Order extends BaseTimeEntity {
         if (calculateTotalPrice().isNotSame(money)) {
             throw new ShoppingException(ErrorCode.PAY_FAILED);
         }
+    }
+
+    public void cancel() {
+        this.status = OrderStatus.CANCELED;
+    }
+
+    public boolean isCreated() {
+        return this.status == OrderStatus.CREATED;
     }
 
     public enum OrderStatus {CREATED, PAYING, COMPLETED, CANCELED}

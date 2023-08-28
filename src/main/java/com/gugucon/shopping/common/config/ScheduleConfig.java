@@ -2,10 +2,10 @@ package com.gugucon.shopping.common.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
-@EnableJpaAuditing
-@Profile("!scheduling-test")
-public class JpaConfig {
+@EnableScheduling
+@Profile({"!test"})
+public class ScheduleConfig {
 }
