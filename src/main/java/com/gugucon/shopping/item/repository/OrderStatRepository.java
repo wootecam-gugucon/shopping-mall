@@ -32,8 +32,8 @@ public interface OrderStatRepository extends JpaRepository<OrderStat, Long> {
             "AND os.birthYearRange = :birthYearRange " +
             "AND os.gender = :gender")
     @Modifying
-    void updateOrderStatByCount(@Param("count") Integer count,
-                                @Param("productId") Long productId,
-                                @Param("birthYearRange") BirthYearRange birthYearRange,
-                                @Param("gender") Gender gender);
+    void updateOrderStatByCount(@Param("count") final Integer count,
+                                @Param("productId") final Long productId,
+                                @Param("birthYearRange") final BirthYearRange birthYearRange,
+                                @Param("gender") final Gender gender);
 }
