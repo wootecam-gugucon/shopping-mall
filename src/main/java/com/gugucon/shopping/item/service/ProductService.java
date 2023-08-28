@@ -3,26 +3,23 @@ package com.gugucon.shopping.item.service;
 import com.gugucon.shopping.common.dto.response.PagedResponse;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.item.domain.SortKey;
+import com.gugucon.shopping.item.domain.SearchCondition;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.response.ProductDetailResponse;
 import com.gugucon.shopping.item.dto.response.ProductResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProductService {
-
-    private static final Sort SORT_BY_RATE = SortKey.RATE.getSort();
-    private static final Sort SORT_BY_ORDER_COUNT = SortKey.ORDER_COUNT_DESC.getSort();
 
     private final ProductRepository productRepository;
 
@@ -31,49 +28,58 @@ public class ProductService {
         return convertToPage(products);
     }
 
-    public PagedResponse<ProductResponse> searchProducts(final String keyword, final Pageable pageable) {
-        final Sort sort = pageable.getSort();
-        validateSort(sort);
-        validateNotBlank(keyword);
+    public PagedResponse<ProductResponse> searchProducts(final SearchCondition searchCondition) {
+        searchCondition.validateSort();
+        searchCondition.validateKeywordNotBlank();
 
-        if (sort.equals(SORT_BY_RATE)) {
-            return searchProductsSortByRate(keyword, pageable);
+        return convertToPage(searchProductsByCondition(searchCondition));
+    }
+
+    private Page<Product> searchProductsByCondition(final SearchCondition searchCondition) {
+        if (searchCondition.isSortedByRate()) {
+            return searchProductsSortByRate(searchCondition);
         }
-        if (sort.equals(SORT_BY_ORDER_COUNT)) {
-            return searchProductsSortByOrderCount(keyword, pageable);
+        if (searchCondition.isSortedByOrderCount()) {
+            return searchProductsSortByOrderCount(searchCondition);
         }
-        return searchProductsSortBy(keyword, pageable);
+        return searchProductsSortBy(searchCondition);
     }
 
-    private void validateSort(final Sort sort) {
-        if (!SortKey.contains(sort)) {
-            throw new ShoppingException(ErrorCode.INVALID_SORT);
+    private Page<Product> searchProductsSortBy(final SearchCondition searchCondition) {
+        return productRepository.findAllByNameContainingIgnoreCase(searchCondition.getKeyword(),
+                                                                   searchCondition.getPageable());
+    }
+
+    private Page<Product> searchProductsSortByOrderCount(final SearchCondition searchCondition) {
+        final Pageable newPageable = createPageable(searchCondition.getPageable());
+        if (searchCondition.hasValidFilters()) {
+            return productRepository.findAllByNameFilterWithBirthYearRangeAndGenderSortByOrderCountDesc(
+                    searchCondition.getKeyword(),
+                    searchCondition.getBirthYearRange(),
+                    searchCondition.getGender(),
+                    newPageable
+            );
         }
+        return productRepository.findAllByNameSortByOrderCountDesc(searchCondition.getKeyword(), newPageable);
     }
 
-    private PagedResponse<ProductResponse> searchProductsSortBy(final String keyword, final Pageable pageable) {
-        final Page<Product> products = productRepository.findAllByNameContainingIgnoreCase(keyword, pageable);
-        return convertToPage(products);
-    }
-
-    private void validateNotBlank(final String keyword) {
-        if (keyword.isBlank()) {
-            throw new ShoppingException(ErrorCode.EMPTY_INPUT);
+    private Page<Product> searchProductsSortByRate(final SearchCondition searchCondition) {
+        final Pageable newPageable = createPageable(searchCondition.getPageable());
+        if (searchCondition.hasValidFilters()) {
+            return productRepository.findAllByNameFilterWithBirthYearRangeAndGenderSortByRateDesc(
+                    searchCondition.getKeyword(),
+                    searchCondition.getBirthYearRange(),
+                    searchCondition.getGender(),
+                    newPageable
+            );
         }
+        return productRepository.findAllByNameSortByRateDesc(searchCondition.getKeyword(), newPageable);
     }
 
-    private PagedResponse<ProductResponse> searchProductsSortByOrderCount(final String keyword,
-                                                                          final Pageable pageable) {
-        final Pageable newPageable = createPageable(pageable);
-        final Page<Product> products = productRepository.findAllByNameSortByOrderCountDesc(keyword, newPageable);
-        return convertToPage(products);
-    }
-
-    private PagedResponse<ProductResponse> searchProductsSortByRate(final String keyword,
-                                                                    final Pageable pageable) {
-        final Pageable newPageable = createPageable(pageable);
-        final Page<Product> products = productRepository.findAllByNameSortByRateDesc(keyword, newPageable);
-        return convertToPage(products);
+    public ProductDetailResponse getProductDetail(final Long productId) {
+        final Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
+        return ProductDetailResponse.from(product);
     }
 
     private Pageable createPageable(final Pageable pageable) {
@@ -84,11 +90,5 @@ public class ProductService {
     private PagedResponse<ProductResponse> convertToPage(final Page<Product> products) {
         final List<ProductResponse> contents = products.map(ProductResponse::from).toList();
         return new PagedResponse<>(contents, products.getTotalPages(), products.getNumber(), products.getSize());
-    }
-
-    public ProductDetailResponse getProductDetail(final Long productId) {
-        final Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_PRODUCT));
-        return ProductDetailResponse.from(product);
     }
 }
