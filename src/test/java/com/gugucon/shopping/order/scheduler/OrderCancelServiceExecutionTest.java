@@ -1,16 +1,26 @@
 package com.gugucon.shopping.order.scheduler;
 
+import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.CANCELED;
+import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.CREATED;
+import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.PAYING;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.domain.entity.Member;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.utils.DomainUtils;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,13 +29,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static com.gugucon.shopping.order.domain.entity.Order.OrderStatus.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @EnableJpaAuditing(setDates = false, modifyOnCreate = false)
@@ -67,7 +70,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -110,7 +113,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -151,7 +154,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -192,7 +195,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -234,7 +237,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -275,7 +278,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -316,7 +319,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -356,7 +359,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -396,7 +399,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 
@@ -437,7 +440,7 @@ class OrderCancelServiceExecutionTest {
         final Product 사과 = insertProduct("사과", 2000);
         final Quantity beforeStock = 사과.getStock();
 
-        final Member member = DomainUtils.createMemberWithoutId();
+        final Member member = DomainUtils.createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         ReflectionTestUtils.setField(member, "createdAt", DEFAULT_CREATED_AT);
         ReflectionTestUtils.setField(member, "lastModifiedAt", DEFAULT_CREATED_AT);
 

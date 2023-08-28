@@ -1,20 +1,25 @@
 package com.gugucon.shopping.item.repository;
 
+import static com.gugucon.shopping.utils.DomainUtils.createMemberWithoutId;
+import static com.gugucon.shopping.utils.DomainUtils.createOrderItem;
+import static com.gugucon.shopping.utils.DomainUtils.createOrderWithoutId;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.config.JpaConfig;
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.member.domain.entity.Member;
-import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.domain.vo.Gender;
-import com.gugucon.shopping.member.domain.vo.Nickname;
-import com.gugucon.shopping.member.domain.vo.Password;
 import com.gugucon.shopping.member.repository.MemberRepository;
 import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
+import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.utils.DomainUtils;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +27,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static com.gugucon.shopping.utils.DomainUtils.createOrderItem;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(JpaConfig.class)
 @DataJpaTest
@@ -57,20 +55,10 @@ class ProductRepositoryTest {
         final Product 가나다라마사과과 = insertProduct("가나다라마사과과", 4000);    // O
         final Product 가나다라마바사 = insertProduct("가나다라마바사", 2000);    // X
 
-        final Member member = Member.builder()
-                .email(Email.from("test@email.com"))
-                .password(Password.of("password", new BCryptPasswordEncoder()))
-                .nickname(Nickname.from("nickname"))
-                .gender(Gender.FEMALE)
-                .birthDate(LocalDate.now())
-                .build();
+        final Member member = createMemberWithoutId("test@email.com", LocalDate.now(), Gender.FEMALE);
         final Member persistMember = memberRepository.save(member);
 
-        final Order order = Order.builder()
-                .memberId(persistMember.getId())
-                .status(Order.OrderStatus.COMPLETED)
-                .payType(PayType.NONE)
-                .build();
+        final Order order = createOrderWithoutId(persistMember.getId(), OrderStatus.COMPLETED, PayType.NONE);
         orderRepository.save(order);
 
         final OrderItem 사과_주문상품 = createOrderItem("사과", 사과.getId(), Quantity.from(10));
