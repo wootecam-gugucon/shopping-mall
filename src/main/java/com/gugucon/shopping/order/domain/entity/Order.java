@@ -9,6 +9,7 @@ import com.gugucon.shopping.order.domain.PayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class Order extends BaseTimeEntity {
     private static final String MULTIPLE_ITEM_EXPRESSION = " 외 %d건";
 
     @OneToMany(cascade = CascadeType.ALL)
+    @BatchSize(size = 20)
     @JoinColumn(name = "order_id")
     private final List<OrderItem> orderItems = new ArrayList<>();
 

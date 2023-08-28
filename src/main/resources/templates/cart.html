@@ -44,7 +44,9 @@
                 element += `
                     <div class="cart-container">
                       <div class="flex gap-15 mt-10">
-                        <img class="w-144 h-144 cover-image" src="assets/${cartItem.imageFileName}"/>
+                        <a href="/product/${cartItem.productId}">
+                          <img class="w-144 h-144 cover-image" src="assets/${cartItem.imageFileName}"/>
+                        </a>
                         <span class="cart-name">${cartItem.name}</span><br>
                         <span style="display:${cartItem.soldOut ? 'block': 'none'}">현재 품절된 상품입니다.</span>
                       </div>

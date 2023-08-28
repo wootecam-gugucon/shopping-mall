@@ -10,8 +10,8 @@ import org.springframework.data.domain.Sort;
 @Getter
 public enum SortKey {
 
-    ORDER_COUNT(DESC, "orderCount"),
-    CREATED_AT(DESC, "createdAt"),
+    ORDER_COUNT_DESC(DESC, "orderCount"),
+    ID_DESC(DESC, "id"),
     PRICE_DESC(DESC, "price"),
     PRICE_ASC(ASC, "price"),
     RATE(DESC, "rate");

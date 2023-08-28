@@ -21,7 +21,7 @@
   <div class="product-sort-container">
     <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
-            th:with="value='createdAt,desc'"
+            th:with="value='id,desc'"
             name="sort-select-button">최신순</button>
     <button type="button"
             th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
@@ -68,7 +68,9 @@
                 let product = data.contents[i];
                 element += `
               <div>
-                <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
+                <a href="/product/${product.id}">
+                  <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
+                </a>
                 <div class="flex justify-between w-280 p-5">
                 <div class="product-info">
                   <span class="product-info__name">${product.name}</span>
