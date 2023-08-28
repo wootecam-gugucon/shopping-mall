@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gugucon.shopping.common.config.JpaConfig;
 import com.gugucon.shopping.common.domain.vo.Quantity;
+import com.gugucon.shopping.item.domain.entity.OrderStat;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.member.domain.entity.Member;
 import com.gugucon.shopping.member.domain.vo.Gender;
@@ -18,6 +19,7 @@ import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.utils.DomainUtils;
+import com.gugucon.shopping.utils.StatsUtils;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +47,9 @@ class ProductRepositoryTest {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private OrderStatRepository orderStatRepository;
+
     @Test
     @DisplayName("해당 키워드를 이름에 포함하는 product를 주문이 많은 순으로 조회한다.")
     void findAllByNameSortByOrderCountDesc() {
@@ -71,6 +76,7 @@ class ProductRepositoryTest {
                 사과_주문상품, 맛있는사과_주문상품, 사과는맛있어_주문상품, 가나다라마사과과_주문상품, 가나다라마바사_주문상품
         );
         orderItemRepository.saveAll(orderItems);
+        insertOrderStats(member, orderItems);
 
         final String keyword = "사과";
 
@@ -78,13 +84,16 @@ class ProductRepositoryTest {
         final Page<Product> products = productRepository.findAllByNameSortByOrderCountDesc(keyword, Pageable.ofSize(20));
 
         // then
-        assertThat(products).containsExactly(
-                사과, 사과는맛있어, 가나다라마사과과, 맛있는사과
-        );
+        assertThat(products.getContent()).containsExactly(사과, 사과는맛있어, 가나다라마사과과, 맛있는사과);
     }
 
     private Product insertProduct(final String productName, final long price) {
         final Product product = DomainUtils.createProductWithoutId(productName, price, 10);
         return productRepository.save(product);
+    }
+
+    private void insertOrderStats(final Member member, final List<OrderItem> orderItems) {
+        final List<OrderStat> orderStats = StatsUtils.createSingleOrderStat(member, orderItems);
+        orderStatRepository.saveAll(orderStats);
     }
 }
