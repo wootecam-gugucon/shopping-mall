@@ -21,7 +21,7 @@ public class RateController {
     @PostMapping
     public ResponseEntity<Void> createRate(@RequestBody final RateCreateRequest request,
                                            @AuthenticationPrincipal final MemberPrincipal principal) {
-        rateService.createRate(principal.getId(), request);
+        rateService.createRate(principal, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

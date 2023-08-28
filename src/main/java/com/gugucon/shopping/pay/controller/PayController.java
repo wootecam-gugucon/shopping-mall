@@ -11,13 +11,7 @@ import com.gugucon.shopping.pay.service.PayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/pay")
@@ -30,7 +24,7 @@ public final class PayController {
     @ResponseStatus(HttpStatus.OK)
     public PayResponse payByPoint(@RequestBody final PointPayRequest pointPayRequest,
                                   @AuthenticationPrincipal final MemberPrincipal principal) {
-        return payService.payByPoint(pointPayRequest, principal.getId());
+        return payService.payByPoint(pointPayRequest, principal);
     }
 
     @GetMapping("/toss")
@@ -44,7 +38,7 @@ public final class PayController {
     @ResponseStatus(HttpStatus.OK)
     public PayResponse payByToss(@RequestBody final TossPayRequest tossPayRequest,
                                  @AuthenticationPrincipal final MemberPrincipal principal) {
-        return payService.payByToss(tossPayRequest, principal.getId());
+        return payService.payByToss(tossPayRequest, principal);
     }
 
     @PostMapping("/fail")
