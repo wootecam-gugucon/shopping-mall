@@ -33,7 +33,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllByNameSortByOrderCountDesc(@Param("keyword") final String keyword, final Pageable pageable);
 
     @Query(value = "select p from Product p " +
-            "left join RateStat rs " +
+            "left join RateStat rs on rs.productId = p.id " +
             "where p.name like %:keyword% " +
             "group by p.id " +
             "order by sum(rs.totalScore) / sum(rs.count) desc",
