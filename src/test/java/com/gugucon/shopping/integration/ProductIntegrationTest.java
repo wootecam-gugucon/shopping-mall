@@ -16,9 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
-import com.gugucon.shopping.item.domain.entity.OrderStat;
 import com.gugucon.shopping.item.domain.entity.Product;
-import com.gugucon.shopping.item.domain.entity.RateStat;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
@@ -37,6 +35,7 @@ import com.gugucon.shopping.order.dto.response.OrderPayResponse;
 import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.utils.DomainUtils;
+import com.gugucon.shopping.utils.StatsUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -379,10 +378,10 @@ class ProductIntegrationTest {
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
         final Gender gender = MALE;
 
-        createOrderStat(사과_id, birthYearRange, gender, 0L);
-        createOrderStat(맛있는사과_id, birthYearRange, gender, 0L);
-        createOrderStat(사과는맛있어_id, birthYearRange, gender, 0L);
-        createOrderStat(가나다라마사과과_id, birthYearRange, gender, 0L);
+        createOrderStat(사과_id, birthYearRange, gender);
+        createOrderStat(맛있는사과_id, birthYearRange, gender);
+        createOrderStat(사과는맛있어_id, birthYearRange, gender);
+        createOrderStat(가나다라마사과과_id, birthYearRange, gender);
 
         final String accessToken = loginAfterSignUp(birthYearRange, gender);
 
@@ -446,10 +445,10 @@ class ProductIntegrationTest {
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
         final Gender gender = MALE;
 
-        createRateStat(사과_id, birthYearRange, gender, 0L, 0L);
-        createRateStat(맛있는사과_id, birthYearRange, gender, 0L, 0L);
-        createRateStat(사과는맛있어_id, birthYearRange, gender, 0L, 0L);
-        createRateStat(가나다라마사과과_id, birthYearRange, gender, 0L, 0L);
+        createRateStat(사과_id, birthYearRange, gender);
+        createRateStat(맛있는사과_id, birthYearRange, gender);
+        createRateStat(사과는맛있어_id, birthYearRange, gender);
+        createRateStat(가나다라마사과과_id, birthYearRange, gender);
 
         final String accessToken = loginAfterSignUp(birthYearRange, gender);
 
@@ -690,28 +689,14 @@ class ProductIntegrationTest {
 
     private void createOrderStat(final Long productId,
                                  final BirthYearRange birthYearRange,
-                                 final Gender gender,
-                                 final Long count) {
-        orderStatRepository.save(OrderStat.builder()
-                                         .productId(productId)
-                                         .birthYearRange(birthYearRange)
-                                         .gender(gender)
-                                         .count(count)
-                                         .build());
+                                 final Gender gender) {
+        orderStatRepository.save(StatsUtils.createInitialOrderStat(gender, birthYearRange.getStartDate(), productId));
     }
 
     private void createRateStat(final Long productId,
                                 final BirthYearRange birthYearRange,
-                                final Gender gender,
-                                final Long totalScore,
-                                final Long count) {
-        rateStatRepository.save(RateStat.builder()
-                                        .productId(productId)
-                                        .birthYearRange(birthYearRange)
-                                        .gender(gender)
-                                        .totalScore(totalScore)
-                                        .count(count)
-                                        .build());
+                                final Gender gender) {
+        rateStatRepository.save(StatsUtils.createInitialRateStat(gender, birthYearRange.getStartDate(), productId));
     }
 
     private void buyAllProducts(List<Long> productIds) {
