@@ -13,7 +13,6 @@
         const orderId = urlParams.get('orderId');
         const amount = urlParams.get('amount');
         const paymentType = urlParams.get('paymentType');
-        let status;
 
         const credentials = localStorage.getItem('accessToken');
         if (!credentials) {

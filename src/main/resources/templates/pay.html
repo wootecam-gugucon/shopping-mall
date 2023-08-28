@@ -45,8 +45,6 @@
             const price = data.price;
             const successUrl = data.successUrl;
             const failUrl = data.failUrl;
-            const customerEmail = data.customerEmail;
-            const customerName = data.customerName;
             const customerKey = data.customerKey;
 
             document.querySelector('#order-name').innerHTML = orderName;
@@ -76,8 +74,6 @@
                     orderName: orderName,
                     successUrl: successUrl,
                     failUrl: failUrl,
-                    customerEmail: customerEmail,
-                    customerName: customerName
                 });
             })
         }).catch((error) => {

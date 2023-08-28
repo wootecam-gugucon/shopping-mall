@@ -32,7 +32,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.gugucon.shopping.member.domain.vo.Gender.MALE;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -89,7 +88,7 @@ public class ApiUtils {
                 .password("test_password!")
                 .passwordCheck("test_password!")
                 .nickname("tester")
-                .gender(MALE.name())
+                .gender(Gender.MALE.name())
                 .birthDate(birthYearRange.getStartDate())
                 .build();
         return loginAfterSignUp(signupRequest);

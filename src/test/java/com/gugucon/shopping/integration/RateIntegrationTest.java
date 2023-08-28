@@ -43,10 +43,6 @@ class RateIntegrationTest {
     @Autowired
     private RestTemplate restTemplate;
 
-    private static int getYear(final BirthYearRange birthYearRange) {
-        return birthYearRange.getStartDate().getYear();
-    }
-
     @Test
     @DisplayName("주문 상품에 별점을 남긴다")
     void rate() {
@@ -401,6 +397,10 @@ class RateIntegrationTest {
         final RateResponse rateResponse = response.as(RateResponse.class);
         assertThat(rateResponse.getRateCount()).isEqualTo(3);
         assertThat(rateResponse.getAverageRate()).isCloseTo(expectedRate, Percentage.withPercentage(99.9));
+    }
+
+    private int getYear(final BirthYearRange birthYearRange) {
+        return birthYearRange.getStartDate().getYear();
     }
 
     private void rate(final String accessToken, final Long productId, final int score) {

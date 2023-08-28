@@ -34,7 +34,7 @@ class BirthYearRangeTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"0,UNDER_TEENS",
+    @CsvSource(value = {"1,UNDER_TEENS",
             "19,UNDER_TEENS",
             "20,EARLY_TWENTIES",
             "23,EARLY_TWENTIES",
@@ -61,7 +61,7 @@ class BirthYearRangeTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {-1, 126})
+    @ValueSource(ints = {0, 126})
     void createFail_ageNotInRange(final int age) {
         // given
         final LocalDate birthDate = LocalDate.of(LocalDate.now().getYear() - age + 1, 1, 1);

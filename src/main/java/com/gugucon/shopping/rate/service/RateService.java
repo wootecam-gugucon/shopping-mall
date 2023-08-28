@@ -80,7 +80,7 @@ public class RateService {
 
     private OptionalDouble calculateAverageOf(final List<Integer> rates) {
         return rates.stream()
-                .mapToInt(rate -> rate)
+                .mapToInt(Integer::intValue)
                 .average();
     }
 
@@ -102,13 +102,13 @@ public class RateService {
 
     private OrderItem searchOrderItem(final Long memberId, final Long orderItemId) {
         return orderItemRepository.findByOrderIdAndMemberIdAndOrderStatus(memberId, orderItemId, OrderStatus.COMPLETED)
-                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER_ITEM));
+            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER_ITEM));
     }
 
     private void validateDuplicateRate(final Long orderItemId) {
         rateRepository.findByOrderItemId(orderItemId)
-                .ifPresent(rate -> {
-                    throw new ShoppingException(ErrorCode.ALREADY_RATED);
-                });
+            .ifPresent(rate -> {
+                throw new ShoppingException(ErrorCode.ALREADY_RATED);
+            });
     }
 }

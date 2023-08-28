@@ -114,3 +114,4 @@ create index idx_member_points on points (member_id);
 create index idx_order_item_rates on rates (order_item_id);
 
 create index idx_1 on order_items (product_id, quantity);
+create index idx_2 on orders (last_modified_at);
