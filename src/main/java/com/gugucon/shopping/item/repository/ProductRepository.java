@@ -44,7 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "SET p.stock.value = p.stock.value + :value " +
             "WHERE p.id = :id")
     @Modifying
-    void increaseStockByIdAndValue(@Param("id") Long id, @Param("value") Integer value);
+    void increaseStockByIdAndValue(@Param("id") final Long id, @Param("value") final Integer value);
 
     @Query("SELECT p FROM Product p " +
             "LEFT JOIN OrderStat os ON p.id = os.productId " +
