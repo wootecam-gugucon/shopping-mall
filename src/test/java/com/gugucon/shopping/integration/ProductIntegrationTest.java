@@ -1,6 +1,11 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.member.domain.vo.Gender.MALE;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.EARLY_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.LATE_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.MID_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.OVER_FORTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.THIRTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.UNDER_TEENS;
 import static com.gugucon.shopping.utils.ApiUtils.buyAllProductsByPoint;
 import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
 import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
@@ -11,6 +16,8 @@ import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
 import static com.gugucon.shopping.utils.ApiUtils.putOrder;
 import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
 import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
+import static com.gugucon.shopping.utils.StatsUtils.createInitialOrderStat;
+import static com.gugucon.shopping.utils.StatsUtils.createInitialRateStat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gugucon.shopping.common.exception.ErrorCode;
@@ -35,7 +42,6 @@ import com.gugucon.shopping.order.dto.response.OrderPayResponse;
 import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.utils.DomainUtils;
-import com.gugucon.shopping.utils.StatsUtils;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -268,6 +274,7 @@ class ProductIntegrationTest {
         final Long 가나다라마사과과_id = insertProduct("가나다라마사과과", 4000);    // O
         final Long 가나다라마바사_id = insertProduct("가나다라마바사", 2000);    // X
         final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
+        final List<Long> productIds = List.of(사과_id, 맛있는사과_id, 사과는맛있어_id, 가나다라마사과과_id);
 
         final String accessToken = loginAfterSignUp("test_email@woowafriends.com", "test_password!");
         insertCartItem(accessToken, new CartItemInsertRequest(사과_id));
@@ -286,7 +293,8 @@ class ProductIntegrationTest {
         updateCartItem(accessToken, 가나다라마사과과_장바구니_id, new CartItemUpdateRequest(8));
         updateCartItem(accessToken, 맛있는사과_장바구니_id, new CartItemUpdateRequest(7));
 
-        placeOrder(accessToken);
+        initializeAllOrderStats(productIds);
+        buyAllProductsByPoint(accessToken, productIds, 1000000L);
 
         final String keyword = "사과";
 
@@ -335,6 +343,7 @@ class ProductIntegrationTest {
         final Long 사과는맛있어_주문_id = orderItemResponses.get(2).getId();
         final Long 가나다라마사과과_주문_id = orderItemResponses.get(3).getId();
 
+        initializeAllRatesStats(productIds);
         createRateToOrderedItem(accessToken, new RateCreateRequest(사과_주문_id, (short) 1));
         createRateToOrderedItem(accessToken, new RateCreateRequest(사과는맛있어_주문_id, (short) 2));
         createRateToOrderedItem(accessToken, new RateCreateRequest(가나다라마사과과_주문_id, (short) 3));
@@ -376,7 +385,7 @@ class ProductIntegrationTest {
 
         final String keyword = "사과";
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
-        final Gender gender = MALE;
+        final Gender gender = Gender.MALE;
 
         createOrderStat(사과_id, birthYearRange, gender);
         createOrderStat(맛있는사과_id, birthYearRange, gender);
@@ -443,7 +452,7 @@ class ProductIntegrationTest {
 
         final String keyword = "사과";
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
-        final Gender gender = MALE;
+        final Gender gender = Gender.MALE;
 
         createRateStat(사과_id, birthYearRange, gender);
         createRateStat(맛있는사과_id, birthYearRange, gender);
@@ -690,13 +699,57 @@ class ProductIntegrationTest {
     private void createOrderStat(final Long productId,
                                  final BirthYearRange birthYearRange,
                                  final Gender gender) {
-        orderStatRepository.save(StatsUtils.createInitialOrderStat(gender, birthYearRange.getStartDate(), productId));
+        orderStatRepository.save(createInitialOrderStat(gender, birthYearRange.getStartDate(), productId));
     }
 
     private void createRateStat(final Long productId,
                                 final BirthYearRange birthYearRange,
                                 final Gender gender) {
-        rateStatRepository.save(StatsUtils.createInitialRateStat(gender, birthYearRange.getStartDate(), productId));
+        rateStatRepository.save(createInitialRateStat(gender, birthYearRange.getStartDate(), productId));
+    }
+
+    private void initializeAllRatesStats(final List<Long> productIds) {
+        productIds.forEach(this::initializeAllAgeAndGenderProductStats);
+    }
+
+    private void initializeAllAgeAndGenderProductStats(final long productId) {
+        createRateStat(productId, UNDER_TEENS, Gender.FEMALE);
+        createRateStat(productId, UNDER_TEENS, Gender.MALE);
+        createRateStat(productId, EARLY_TWENTIES, Gender.FEMALE);
+        createRateStat(productId, EARLY_TWENTIES, Gender.MALE);
+        createRateStat(productId, MID_TWENTIES, Gender.FEMALE);
+        createRateStat(productId, MID_TWENTIES, Gender.MALE);
+        createRateStat(productId, LATE_TWENTIES, Gender.FEMALE);
+        createRateStat(productId, LATE_TWENTIES, Gender.MALE);
+        createRateStat(productId, THIRTIES, Gender.FEMALE);
+        createRateStat(productId, THIRTIES, Gender.MALE);
+        createRateStat(productId, OVER_FORTIES, Gender.FEMALE);
+        createRateStat(productId, OVER_FORTIES, Gender.MALE);
+    }
+
+    private void createOrderStats(final Long productId,
+                                final BirthYearRange birthYearRange,
+                                final Gender gender) {
+        orderStatRepository.save(createInitialOrderStat(gender, birthYearRange.getStartDate(), productId));
+    }
+
+    private void initializeAllOrderStats(final List<Long> productIds) {
+        productIds.forEach(this::initializeAllAgeAndGenderOrderStats);
+    }
+
+    private void initializeAllAgeAndGenderOrderStats(final long productId) {
+        createOrderStats(productId, UNDER_TEENS, Gender.FEMALE);
+        createOrderStats(productId, UNDER_TEENS, Gender.MALE);
+        createOrderStats(productId, EARLY_TWENTIES, Gender.FEMALE);
+        createOrderStats(productId, EARLY_TWENTIES, Gender.MALE);
+        createOrderStats(productId, MID_TWENTIES, Gender.FEMALE);
+        createOrderStats(productId, MID_TWENTIES, Gender.MALE);
+        createOrderStats(productId, LATE_TWENTIES, Gender.FEMALE);
+        createOrderStats(productId, LATE_TWENTIES, Gender.MALE);
+        createOrderStats(productId, THIRTIES, Gender.FEMALE);
+        createOrderStats(productId, THIRTIES, Gender.MALE);
+        createOrderStats(productId, OVER_FORTIES, Gender.FEMALE);
+        createOrderStats(productId, OVER_FORTIES, Gender.MALE);
     }
 
     private void buyAllProducts(List<Long> productIds) {
