@@ -728,8 +728,8 @@ class ProductIntegrationTest {
     }
 
     private void createOrderStats(final Long productId,
-                                final BirthYearRange birthYearRange,
-                                final Gender gender) {
+                                  final BirthYearRange birthYearRange,
+                                  final Gender gender) {
         orderStatRepository.save(createInitialOrderStat(gender, birthYearRange.getStartDate(), productId));
     }
 
