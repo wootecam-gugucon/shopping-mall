@@ -361,7 +361,6 @@ class ProductIntegrationTest {
         final Long 가나다라마사과과_id = insertProduct("가나다라마사과과", 4000);    // O
         final Long 가나다라마바사_id = insertProduct("가나다라마바사", 2000);    // X
         final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
-        final List<Long> productIds = List.of(사과_id, 맛있는사과_id, 사과는맛있어_id, 가나다라마사과과_id);
 
         final String keyword = "사과";
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
@@ -407,7 +406,6 @@ class ProductIntegrationTest {
         final Long 가나다라마사과과_id = insertProduct("가나다라마사과과", 4000);    // O
         final Long 가나다라마바사_id = insertProduct("가나다라마바사", 2000);    // X
         final Long 과놔돠롸_id = insertProduct("과놔돠롸", 4500);    // X
-        final List<Long> productIds = List.of(사과_id, 맛있는사과_id, 사과는맛있어_id, 가나다라마사과과_id);
 
         final String keyword = "사과";
         final BirthYearRange birthYearRange = BirthYearRange.MID_TWENTIES;
