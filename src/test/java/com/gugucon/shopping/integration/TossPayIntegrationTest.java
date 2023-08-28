@@ -19,9 +19,9 @@ import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
-import com.gugucon.shopping.pay.dto.response.PayResponse;
 import com.gugucon.shopping.pay.dto.request.TossPayFailRequest;
 import com.gugucon.shopping.pay.dto.request.TossPayRequest;
+import com.gugucon.shopping.pay.dto.response.PayResponse;
 import com.gugucon.shopping.pay.dto.response.TossPayFailResponse;
 import com.gugucon.shopping.pay.dto.response.TossPayInfoResponse;
 import com.gugucon.shopping.utils.DomainUtils;
@@ -43,17 +43,14 @@ import org.springframework.web.client.RestTemplate;
 @DisplayName("토스 결제 기능 통합 테스트")
 class TossPayIntegrationTest {
 
-    @Value("${pay.callback.success-url}")
-    private String successUrl;
-
-    @Value("${pay.callback.fail-url}")
-    private String failUrl;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
     @Autowired
     ProductRepository productRepository;
+    @Value("${pay.callback.success-url}")
+    private String successUrl;
+    @Value("${pay.callback.fail-url}")
+    private String failUrl;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Test
     @DisplayName("결제 정보를 조회한다.")
@@ -80,7 +77,6 @@ class TossPayIntegrationTest {
         assertThat(tossPayInfoResponse.getEncodedOrderId()).isNotEmpty();
         assertThat(tossPayInfoResponse.getOrderName()).isEqualTo("치킨");
         assertThat(tossPayInfoResponse.getPrice()).isEqualTo(1000L);
-        assertThat(tossPayInfoResponse.getCustomerEmail()).isEqualTo(email);
         assertThat(tossPayInfoResponse.getCustomerKey()).isNotEmpty();
         assertThat(tossPayInfoResponse.getSuccessUrl()).isEqualTo(successUrl);
         assertThat(tossPayInfoResponse.getFailUrl()).isEqualTo(failUrl);

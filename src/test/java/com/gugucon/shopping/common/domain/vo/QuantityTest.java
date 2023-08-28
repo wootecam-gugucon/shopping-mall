@@ -86,4 +86,28 @@ class QuantityTest {
         // then
         assertThat(result).isFalse();
     }
+
+    @Test
+    @DisplayName("수량을 더한다.")
+    void increaseBy() {
+        // given
+        final Quantity five = Quantity.from(5);
+        final Quantity three = Quantity.from(3);
+        final Quantity eight = Quantity.from(8);
+
+        // when & then
+        assertThat(five.increaseBy(three)).isEqualTo(eight);
+    }
+
+    @Test
+    @DisplayName("수량을 뺀다.")
+    void decreaseBy() {
+        // given
+        final Quantity eight = Quantity.from(8);
+        final Quantity five = Quantity.from(5);
+        final Quantity three = Quantity.from(3);
+
+        // when & then
+        assertThat(eight.decreaseBy(five)).isEqualTo(three);
+    }
 }

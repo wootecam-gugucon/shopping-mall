@@ -38,26 +38,26 @@ public class ApiUtils {
 
     public static String login(final LoginRequest loginRequest) {
         return RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(loginRequest)
-            .when().post("/api/v1/login")
-            .then().log().all()
-            .extract()
-            .as(LoginResponse.class)
-            .getAccessToken();
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(loginRequest)
+                .when().post("/api/v1/login")
+                .then().log().all()
+                .extract()
+                .as(LoginResponse.class)
+                .getAccessToken();
     }
 
     public static void signup(final SignupRequest signupRequest) {
         RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(signupRequest)
-            .when().post("/api/v1/signup")
-            .then().log().all();
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(signupRequest)
+                .when().post("/api/v1/signup")
+                .then().log().all();
     }
 
-    public static void signUp(final String email, final String password) {
+    public static void signup(final String email, final String password) {
         final SignupRequest request = SignupRequest.builder()
                 .email(email)
                 .password(password).passwordCheck(password)
@@ -69,55 +69,61 @@ public class ApiUtils {
     }
 
     public static String loginAfterSignUp(final String email, final String password) {
-        signUp(email, password);
+        signup(email, password);
         final LoginRequest request = new LoginRequest(email, password);
+        return ApiUtils.login(request);
+    }
+
+    public static String loginAfterSignUp(final SignupRequest signupRequest) {
+        signup(signupRequest);
+        final LoginRequest request = new LoginRequest(signupRequest.getEmail(), signupRequest.getPassword());
         return ApiUtils.login(request);
     }
 
     public static ExtractableResponse<Response> insertCartItem(final String accessToken,
                                                                final CartItemInsertRequest cartItemInsertRequest) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(cartItemInsertRequest)
-            .when().post("/api/v1/cart/items")
-            .then().log().all()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(cartItemInsertRequest)
+                .when().post("/api/v1/cart/items")
+                .then().log().all()
+                .extract();
     }
 
     public static ExtractableResponse<Response> updateCartItem(final String accessToken,
                                                                final long cartItemId,
                                                                final CartItemUpdateRequest cartItemUpdateRequest) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(cartItemUpdateRequest)
-            .when().patch("/api/v1/cart/items/{cartItemId}", cartItemId)
-            .then().log().all()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(cartItemUpdateRequest)
+                .when().patch("/api/v1/cart/items/{cartItemId}", cartItemId)
+                .then().log().all()
+                .extract();
     }
 
     public static List<CartItemResponse> readCartItems(final String accessToken) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when().get("/api/v1/cart/items")
-            .then().log().all()
-            .extract()
-            .jsonPath()
-            .getList(".", CartItemResponse.class);
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when().get("/api/v1/cart/items")
+                .then().log().all()
+                .extract()
+                .jsonPath()
+                .getList(".", CartItemResponse.class);
     }
 
     public static Long placeOrder(final String accessToken) {
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .post("/api/v1/order")
-            .then().log().all()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then().log().all()
+                .extract();
         return Long.parseLong(response.header("Location").split("/")[2]);
     }
 
@@ -149,13 +155,13 @@ public class ApiUtils {
 
     public static TossPayInfoResponse getPaymentInfo(final String accessToken, final Long orderId) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/pay/toss?orderId=" + orderId)
-            .then().log().all()
-            .extract()
-            .as(TossPayInfoResponse.class);
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/pay/toss?orderId=" + orderId)
+                .then().log().all()
+                .extract()
+                .as(TossPayInfoResponse.class);
     }
 
     public static OrderPayResponse putOrder(final String accessToken, final OrderPayRequest orderPayRequest) {
@@ -173,16 +179,16 @@ public class ApiUtils {
 
     public static Long validatePayment(final String accessToken, final TossPayRequest tossPayRequest) {
         return RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(tossPayRequest)
-            .when()
-            .post("/api/v1/pay/toss")
-            .then().log().all()
-            .extract()
-            .as(PayResponse.class)
-            .getOrderId();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(tossPayRequest)
+                .when()
+                .post("/api/v1/pay/toss")
+                .then().log().all()
+                .extract()
+                .as(PayResponse.class)
+                .getOrderId();
     }
 
     public static Long buyProduct(final String accessToken, final Long productId, final int quantity) {
@@ -225,14 +231,14 @@ public class ApiUtils {
                                              final String accessToken,
                                              final Long productId) {
         mockServerSuccess(restTemplate, 1);
-        return ApiUtils.buyProduct(accessToken, productId, 10);
+        return ApiUtils.buyProduct(accessToken, productId, 1);
     }
 
     public static void mockServerSuccess(final RestTemplate restTemplate, final int count) {
         final MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
         server.expect(ExpectedCount.times(count), anything())
-            .andExpect(method(HttpMethod.POST))
-            .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{ \"status\": \"DONE\" }", MediaType.APPLICATION_JSON));
     }
 
     public static PayResponse payOrderByPoint(final String accessToken, final PointPayRequest pointPayRequest) {

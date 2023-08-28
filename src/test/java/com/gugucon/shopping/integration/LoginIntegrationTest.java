@@ -1,8 +1,5 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.signUp;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -18,6 +15,9 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static com.gugucon.shopping.utils.ApiUtils.signup;
+import static org.assertj.core.api.Assertions.assertThat;
+
 @IntegrationTest
 @DisplayName("로그인 기능 통합 테스트")
 class LoginIntegrationTest {
@@ -28,7 +28,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        signUp(email, password);
+        signup(email, password);
         LoginRequest loginRequest = new LoginRequest(email, password);
 
         /* when */
@@ -75,7 +75,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        signUp(email, password);
+        signup(email, password);
         LoginRequest loginRequest = new LoginRequest(email, "invalid_password");
 
         /* when */
@@ -100,7 +100,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        signUp(email, password);
+        signup(email, password);
         LoginRequest loginRequest = new LoginRequest(loginEmail, password);
 
         /* when */
@@ -125,7 +125,7 @@ class LoginIntegrationTest {
         /* given */
         final String email = "test_email@woowafriends.com";
         final String password = "test_password!";
-        signUp(email, password);
+        signup(email, password);
         LoginRequest loginRequest = new LoginRequest(email, loginPassword);
 
         /* when */

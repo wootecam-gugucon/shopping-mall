@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -30,6 +32,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "group by p.id " +
             "order by avg(r.score) desc ")
     Page<Product> findAllByNameSortByRateDesc(@Param("keyword") final String keyword, final Pageable pageable);
+
+    @Query("UPDATE Product p " +
+            "SET p.stock.value = p.stock.value + :value " +
+            "WHERE p.id = :id")
+    @Modifying
+    void increaseStockByIdAndValue(@Param("id") Long id, @Param("value") Integer value);
 
     @Query("SELECT p FROM Product p " +
             "LEFT JOIN OrderStat os ON p.id = os.productId " +
