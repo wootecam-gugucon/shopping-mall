@@ -266,7 +266,8 @@ public class ApiUtils {
                 .extract().as(PayResponse.class);
     }
 
-    public static OrderDetailResponse buyAllProductsByPoint(final String accessToken, final List<Long> productIds,
+    public static OrderDetailResponse buyAllProductsByPoint(final String accessToken,
+                                                            final List<Long> productIds,
                                                             final Long point) {
         chargePoint(accessToken, point);
         productIds.forEach(productId -> insertCartItem(accessToken, new CartItemInsertRequest(productId)));
