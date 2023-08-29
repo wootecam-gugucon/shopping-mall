@@ -9,11 +9,13 @@ import com.gugucon.shopping.member.domain.vo.Email;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.domain.vo.Nickname;
 import com.gugucon.shopping.member.domain.vo.Password;
+import com.gugucon.shopping.order.domain.PayType;
+import com.gugucon.shopping.order.domain.entity.Order;
+import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
+import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.time.LocalDate;
 
 public class DomainUtils {
 
@@ -78,14 +80,14 @@ public class DomainUtils {
                 .build();
     }
 
-    public static Member createMemberWithoutId() {
+    public static Member createMemberWithoutId(final String email, final LocalDate birthDate, final Gender gender) {
         return Member.builder()
-                .email(Email.from("test_email@gmail.com"))
-                .password(Password.of("test_password", passwordEncoder))
-                .nickname(Nickname.from("test_nickname"))
-                .gender(Gender.FEMALE)
-                .birthDate(LocalDate.now())
-                .build();
+            .email(Email.from(email))
+            .password(Password.of("test_password", passwordEncoder))
+            .nickname(Nickname.from("test_nickname_" + sequence))
+            .gender(gender)
+            .birthDate(birthDate)
+            .build();
     }
 
     public static CartItem createCartItem() {
@@ -115,5 +117,13 @@ public class DomainUtils {
                 .imageFileName("")
                 .quantity(quantity)
                 .price(Money.ZERO).build();
+    }
+
+    public static Order createOrderWithoutId(final Long memberId, final OrderStatus status, final PayType payType) {
+        return Order.builder()
+            .memberId(memberId)
+            .status(status)
+            .payType(payType)
+            .build();
     }
 }

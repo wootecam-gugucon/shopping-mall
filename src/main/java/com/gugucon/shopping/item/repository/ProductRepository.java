@@ -26,18 +26,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllByNameContainingIgnoreCase(final @NotNull String name, final Pageable pageable);
 
     @Query("select p from Product p " +
-            "left join OrderItem oi on p.id = oi.productId " +
+            "left join OrderStat os on p.id = os.productId " +
             "where p.name like %:keyword% " +
             "group by p.id " +
-            "order by sum(oi.quantity.value) desc ")
+            "order by sum(os.count) desc ")
     Page<Product> findAllByNameSortByOrderCountDesc(@Param("keyword") final String keyword, final Pageable pageable);
 
     @Query(value = "select p from Product p " +
-            "left join OrderItem oi on oi.productId = p.id " +
-            "left join Rate r on r.orderItem.id = oi.id " +
+            "left join RateStat rs on rs.productId = p.id " +
             "where p.name like %:keyword% " +
             "group by p.id " +
-            "order by avg(r.score) desc ",
+            "order by sum(rs.totalScore) / sum(rs.count) desc",
             countQuery = "select count(p.id) from Product p where p.name like %:keyword%")
     Page<Product> findAllByNameSortByRateDesc(@Param("keyword") final String keyword, final Pageable pageable);
 
@@ -45,7 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "SET p.stock.value = p.stock.value + :value " +
             "WHERE p.id = :id")
     @Modifying
-    void increaseStockByIdAndValue(@Param("id") Long id, @Param("value") Integer value);
+    void increaseStockByIdAndValue(@Param("id") final Long id, @Param("value") final Integer value);
 
     @Query("SELECT p FROM Product p " +
             "LEFT JOIN OrderStat os ON p.id = os.productId " +

@@ -1,11 +1,32 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.EARLY_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.LATE_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.MID_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.OVER_FORTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.THIRTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.UNDER_TEENS;
+import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
+import static com.gugucon.shopping.utils.ApiUtils.buyProductWithSuccess;
+import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
+import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
+import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
+import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
+import static com.gugucon.shopping.utils.ApiUtils.payOrderByPoint;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.putOrder;
+import static com.gugucon.shopping.utils.StatsUtils.createInitialRateStat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.item.repository.RateStatRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
@@ -19,6 +40,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.time.LocalDate;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,18 +50,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-
-import static com.gugucon.shopping.member.domain.vo.BirthYearRange.*;
-import static com.gugucon.shopping.utils.ApiUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
 @IntegrationTest
 @DisplayName("별점 기능 통합 테스트")
 class RateIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private RateStatRepository rateStatRepository;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -217,6 +236,8 @@ class RateIntegrationTest {
     void getAverageRate() {
         // given
         final Long productId = insertProduct("good Product");
+        initializeAllAgeAndGenderProductStats(productId);
+
         final int rateCount = 5;
         final double averageRate = createRateToProduct(productId, rateCount);
 
@@ -348,6 +369,7 @@ class RateIntegrationTest {
         final String 사십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(OVER_FORTIES)));
 
         final Long productId = insertProduct("product");
+        initializeAllAgeAndGenderProductStats(productId);
 
         rate(십대_여자_1_토큰, productId, 2);
         rate(십대_남자_1_토큰, productId, 1);
@@ -414,6 +436,7 @@ class RateIntegrationTest {
 
         final Long productId = insertProduct("product");
 
+        initializeAllAgeAndGenderProductStats(productId);
         rate(십대_여자_1_토큰, productId, 2);
         rate(십대_남자_1_토큰, productId, 1);
         rate(이십대_초반_여자_1_토큰, productId, 4);
@@ -479,6 +502,7 @@ class RateIntegrationTest {
 
         final Long productId = insertProduct("product");
 
+        initializeAllAgeAndGenderProductStats(productId);
         rate(십대_여자_1_토큰, productId, 2);
         rate(십대_여자_2_토큰, productId, 5);
         rate(십대_여자_3_토큰, productId, 2);
@@ -541,6 +565,25 @@ class RateIntegrationTest {
         final Product product = DomainUtils.createProductWithoutId(productName, 1000, 100);
         productRepository.save(product);
         return product.getId();
+    }
+
+    private void createProductStats(final Gender gender, final BirthYearRange birthYearRange, final long productId) {
+        rateStatRepository.save(createInitialRateStat(gender, birthYearRange, productId));
+    }
+
+    private void initializeAllAgeAndGenderProductStats(final long productId) {
+        createProductStats(Gender.FEMALE, UNDER_TEENS, productId);
+        createProductStats(Gender.MALE, UNDER_TEENS, productId);
+        createProductStats(Gender.FEMALE, EARLY_TWENTIES, productId);
+        createProductStats(Gender.MALE, EARLY_TWENTIES, productId);
+        createProductStats(Gender.FEMALE, MID_TWENTIES, productId);
+        createProductStats(Gender.MALE, MID_TWENTIES, productId);
+        createProductStats(Gender.FEMALE, LATE_TWENTIES, productId);
+        createProductStats(Gender.MALE, LATE_TWENTIES, productId);
+        createProductStats(Gender.FEMALE, THIRTIES, productId);
+        createProductStats(Gender.MALE, THIRTIES, productId);
+        createProductStats(Gender.FEMALE, OVER_FORTIES, productId);
+        createProductStats(Gender.MALE, OVER_FORTIES, productId);
     }
 
     private double createRateToProduct(final Long productId, final int count) {
