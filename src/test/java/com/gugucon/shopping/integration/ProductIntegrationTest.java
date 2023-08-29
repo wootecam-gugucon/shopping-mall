@@ -699,13 +699,13 @@ class ProductIntegrationTest {
     private void createOrderStat(final Long productId,
                                  final BirthYearRange birthYearRange,
                                  final Gender gender) {
-        orderStatRepository.save(createInitialOrderStat(gender, birthYearRange.getStartDate(), productId));
+        orderStatRepository.save(createInitialOrderStat(gender, birthYearRange, productId));
     }
 
     private void createRateStat(final Long productId,
                                 final BirthYearRange birthYearRange,
                                 final Gender gender) {
-        rateStatRepository.save(createInitialRateStat(gender, birthYearRange.getStartDate(), productId));
+        rateStatRepository.save(createInitialRateStat(gender, birthYearRange, productId));
     }
 
     private void initializeAllRatesStats(final List<Long> productIds) {
@@ -730,7 +730,7 @@ class ProductIntegrationTest {
     private void createOrderStats(final Long productId,
                                   final BirthYearRange birthYearRange,
                                   final Gender gender) {
-        orderStatRepository.save(createInitialOrderStat(gender, birthYearRange.getStartDate(), productId));
+        orderStatRepository.save(createInitialOrderStat(gender, birthYearRange, productId));
     }
 
     private void initializeAllOrderStats(final List<Long> productIds) {

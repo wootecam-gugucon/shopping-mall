@@ -562,23 +562,23 @@ class RateIntegrationTest {
         return product.getId();
     }
 
-    private void createProductStats(final Gender gender, final LocalDate birthDate, final long productId) {
-        rateStatRepository.save(createInitialRateStat(gender, birthDate, productId));
+    private void createProductStats(final Gender gender, final BirthYearRange birthYearRange, final long productId) {
+        rateStatRepository.save(createInitialRateStat(gender, birthYearRange, productId));
     }
 
     private void initializeAllAgeAndGenderProductStats(final long productId) {
-        createProductStats(Gender.FEMALE, UNDER_TEENS.getStartDate(), productId);
-        createProductStats(Gender.MALE, UNDER_TEENS.getStartDate(), productId);
-        createProductStats(Gender.FEMALE, EARLY_TWENTIES.getStartDate(), productId);
-        createProductStats(Gender.MALE, EARLY_TWENTIES.getStartDate(), productId);
-        createProductStats(Gender.FEMALE, MID_TWENTIES.getStartDate(), productId);
-        createProductStats(Gender.MALE, MID_TWENTIES.getStartDate(), productId);
-        createProductStats(Gender.FEMALE, LATE_TWENTIES.getStartDate(), productId);
-        createProductStats(Gender.MALE, LATE_TWENTIES.getStartDate(), productId);
-        createProductStats(Gender.FEMALE, THIRTIES.getStartDate(), productId);
-        createProductStats(Gender.MALE, THIRTIES.getStartDate(), productId);
-        createProductStats(Gender.FEMALE, OVER_FORTIES.getStartDate(), productId);
-        createProductStats(Gender.MALE, OVER_FORTIES.getStartDate(), productId);
+        createProductStats(Gender.FEMALE, UNDER_TEENS, productId);
+        createProductStats(Gender.MALE, UNDER_TEENS, productId);
+        createProductStats(Gender.FEMALE, EARLY_TWENTIES, productId);
+        createProductStats(Gender.MALE, EARLY_TWENTIES, productId);
+        createProductStats(Gender.FEMALE, MID_TWENTIES, productId);
+        createProductStats(Gender.MALE, MID_TWENTIES, productId);
+        createProductStats(Gender.FEMALE, LATE_TWENTIES, productId);
+        createProductStats(Gender.MALE, LATE_TWENTIES, productId);
+        createProductStats(Gender.FEMALE, THIRTIES, productId);
+        createProductStats(Gender.MALE, THIRTIES, productId);
+        createProductStats(Gender.FEMALE, OVER_FORTIES, productId);
+        createProductStats(Gender.MALE, OVER_FORTIES, productId);
     }
 
     private double createRateToProduct(final Long productId, final int count) {

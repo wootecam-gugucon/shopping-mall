@@ -96,7 +96,8 @@ class ProductRepositoryTest {
 
     private Product insertProductWithStats(final Member member, final String productName, final long price) {
         final Product product = insertProduct(productName, price);
-        final OrderStat orderStats = createInitialOrderStat(member.getGender(), member.getBirthDate(), product.getId());
+        final BirthYearRange birthYearRange = BirthYearRange.from(member.getBirthDate());
+        final OrderStat orderStats = createInitialOrderStat(member.getGender(), birthYearRange, product.getId());
         orderStatRepository.save(orderStats);
         return product;
     }

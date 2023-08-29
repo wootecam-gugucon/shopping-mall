@@ -4,27 +4,28 @@ import com.gugucon.shopping.item.domain.entity.OrderStat;
 import com.gugucon.shopping.item.domain.entity.RateStat;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
-import java.time.LocalDate;
 
 public class StatsUtils {
 
     public static OrderStat createInitialOrderStat(final Gender gender,
-                                                   final LocalDate birthDate,
+                                                   final BirthYearRange birthYearRange,
                                                    final long productId) {
         return OrderStat.builder()
                         .productId(productId)
                         .count(0L)
                         .gender(gender)
-                        .birthYearRange(BirthYearRange.from(birthDate))
+                        .birthYearRange(birthYearRange)
                         .build();
     }
 
-    public static RateStat createInitialRateStat(final Gender gender, final LocalDate birthDate, final long productId) {
+    public static RateStat createInitialRateStat(final Gender gender,
+                                                 final BirthYearRange birthYearRange,
+                                                 final long productId) {
         return RateStat.builder()
                         .productId(productId)
                         .count(0L)
                         .gender(gender)
-                        .birthYearRange(BirthYearRange.from(birthDate))
+                        .birthYearRange(birthYearRange)
                         .totalScore(0L)
                         .build();
     }
