@@ -128,6 +128,12 @@ public class Order extends BaseTimeEntity {
         }
     }
 
+    public void validateNotCanceled() {
+        if (status == OrderStatus.CANCELED) {
+            throw new ShoppingException(ErrorCode.UNKNOWN_ERROR);
+        }
+    }
+
     public void cancel() {
         this.status = OrderStatus.CANCELED;
     }

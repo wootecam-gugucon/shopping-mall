@@ -37,7 +37,8 @@ public class PayService {
     public PayResponse payByPoint(final PointPayRequest pointPayRequest, final MemberPrincipal principal) {
         final Long orderId = pointPayRequest.getOrderId();
         final Long memberId = principal.getId();
-        final Order order = orderService.findOrderBy(orderId, memberId);
+        final Order order = orderService.findOrderByExclusively(orderId, memberId);
+        order.validateNotCanceled();
 
         final Point point = findPointBy(memberId);
         point.use(order.calculateTotalPrice());
@@ -53,6 +54,7 @@ public class PayService {
 
     public TossPayInfoResponse getTossInfo(final Long orderId, final Long memberId) {
         final Order order = orderService.findOrderBy(orderId, memberId);
+        order.validateNotCanceled();
 
         return TossPayInfoResponse.from(tossPayProvider.encodeOrderId(order.getId(), order.createOrderName()),
                                         order,
@@ -65,8 +67,9 @@ public class PayService {
     public PayResponse payByToss(final TossPayRequest tossPayRequest, final MemberPrincipal principal) {
         final Long orderId = tossPayProvider.decodeOrderId(tossPayRequest.getOrderId());
         final Long memberId = principal.getId();
-        final Order order = orderService.findOrderBy(orderId, memberId);
+        final Order order = orderService.findOrderByExclusively(orderId, memberId);
 
+        order.validateNotCanceled();
         order.validateMoney(Money.from(tossPayRequest.getAmount()));
         orderService.complete(order, principal);
         final Pay pay = payRepository.save(Pay.from(order));

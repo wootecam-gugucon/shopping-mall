@@ -76,6 +76,12 @@ public class OrderService {
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
     }
 
+    @Transactional
+    public Order findOrderByExclusively(final Long orderId, final Long memberId) {
+        return orderRepository.findByIdAndMemberIdExclusively(orderId, memberId)
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+    }
+
     private PagedResponse<OrderHistoryResponse> convertToPage(final Page<Order> orders) {
         final List<OrderHistoryResponse> contents = orders.map(OrderHistoryResponse::from).toList();
         return new PagedResponse<>(contents, orders.getTotalPages(), orders.getNumber(), orders.getSize());
@@ -102,8 +108,10 @@ public class OrderService {
 
     @Transactional
     public OrderPayResponse requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
-        final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
+        final Order order = orderRepository.findByIdAndMemberIdExclusively(orderPayRequest.getOrderId(), memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+
+        order.validateNotCanceled();
         order.startPay(PayType.from(orderPayRequest.getPayType()));
         decreaseStock(order);
         return OrderPayResponse.from(order);
@@ -111,7 +119,7 @@ public class OrderService {
 
     private void decreaseStock(final Order order) {
         order.getOrderItems().forEach(orderItem -> {
-            final Product product = productRepository.findById(orderItem.getProductId())
+            final Product product = productRepository.findByIdWithExclusiveLock(orderItem.getProductId())
                     .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
             product.validateStockIsNotLessThan(orderItem.getQuantity());
             product.decreaseStockBy(orderItem.getQuantity());
