@@ -8,12 +8,15 @@ import static com.gugucon.shopping.member.domain.vo.BirthYearRange.THIRTIES;
 import static com.gugucon.shopping.member.domain.vo.BirthYearRange.UNDER_TEENS;
 import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
 import static com.gugucon.shopping.utils.ApiUtils.buyProductWithSuccess;
+import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
 import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
 import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
 import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
 import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
 import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
+import static com.gugucon.shopping.utils.ApiUtils.payOrderByPoint;
 import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.putOrder;
 import static com.gugucon.shopping.utils.StatsUtils.createInitialRateStat;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -433,6 +436,7 @@ class RateIntegrationTest {
 
         final Long productId = insertProduct("product");
 
+        initializeAllAgeAndGenderProductStats(productId);
         rate(십대_여자_1_토큰, productId, 2);
         rate(십대_남자_1_토큰, productId, 1);
         rate(이십대_초반_여자_1_토큰, productId, 4);
@@ -498,6 +502,7 @@ class RateIntegrationTest {
 
         final Long productId = insertProduct("product");
 
+        initializeAllAgeAndGenderProductStats(productId);
         rate(십대_여자_1_토큰, productId, 2);
         rate(십대_여자_2_토큰, productId, 5);
         rate(십대_여자_3_토큰, productId, 2);
