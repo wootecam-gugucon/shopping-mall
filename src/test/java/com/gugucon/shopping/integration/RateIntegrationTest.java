@@ -241,9 +241,9 @@ class RateIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final RateResponse rateResponse = response.as(RateResponse.class);
-        final double roundedAverageRate = Double.parseDouble(String.format("%.2f", averageRate));
+        
         assertThat(rateResponse.getRateCount()).isEqualTo(rateCount);
-        assertThat(rateResponse.getAverageRate()).isEqualTo(Double.valueOf(roundedAverageRate));
+        assertThat(rateResponse.getAverageRate()).isEqualTo(Math.floor(averageRate * 100) / 100.0);
     }
 
     @Test
