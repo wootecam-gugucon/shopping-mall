@@ -18,6 +18,8 @@ spring:
     basename: messages, errors
 
 management:
+  server:
+    port: 9098
   endpoints:
     web:
       exposure:
