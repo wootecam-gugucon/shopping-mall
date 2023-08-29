@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+  <section class="search-container" th:fragment="searchbar">
+    <form class="full-width mt-30" id="search-form">
+      <div class="full-width flex justify-center">
+        <label for="searchInput"></label>
+        <input class="search-input" id="searchInput" placeholder="검색어를 입력하세요" required type="text">
+        <button class="search-button" id="searchButton" type="submit">검색</button>
+      </div>
+
+      <div class="mt-30 flex justify-around">
+        <div>
+          <label for="sortSelect">정렬</label>
+          <div class="select">
+            <select id="sortSelect">
+              <option selected value="id,desc">최신순</option>
+              <option value="price,desc">가격 높은순</option>
+              <option value="price,asc">가격 낮은순</option>
+              <option value="orderCount,desc">주문 많은순</option>
+              <option value="rate,desc">별점 높은순</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="gender">성별</label>
+          <div class="select">
+            <select id="gender" name="gender">
+              <option selected></option>
+              <option value="MALE">남자</option>
+              <option value="FEMALE">여자</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="birthYearRange">나이대</label>
+          <div class="select">
+            <select id="birthYearRange" name="birthYearRange">
+              <option selected></option>
+              <option value="UNDER_TEENS">10대 이하</option>
+              <option value="EARLY_TWENTIES">20대 초반</option>
+              <option value="MID_TWENTIES">20대 중반</option>
+              <option value="LATE_TWENTIES">20대 후반</option>
+              <option value="THIRTIES">30대</option>
+              <option value="OVER_FORTIES">40대 이상</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+    </form>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.size === 0) {
+          return;
+        }
+
+        document.getElementById("searchInput").value = urlParams.get("keyword");
+        document.getElementById("sortSelect").value = urlParams.get("sort");
+        document.getElementById("gender").value = urlParams.get("gender");
+        document.getElementById("birthYearRange").value = urlParams.get("birthYearRange");
+
+        fetch('/api/v1/products/search?' + urlParams, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then((response) => {
+          return response.json();
+        }).then((data) => {
+          const currentPage = data.currentPage;
+          const totalPage = data.totalPage;
+          const size = data.size;
+
+          let element = '';
+          for (let i = 0; i < Math.min(size, data.contents.length); i++) {
+            let product = data.contents[i];
+            element += `
+              <div>
+                <a href="/product/${product.id}">
+                  <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
+                </a>
+                <div class="flex justify-between w-280 p-5">
+                <div class="product-info">
+                  <span class="product-info__name">${product.name}</span>
+                  <span class="product-info__price">${product.price}</span>
+                </div>
+                <button type="submit" class="product-btn" ${product.stock <= 0 ? 'disabled' : ''} onclick="addCartItem(${product.id})">
+                  <img src="assets/svgs/cart.svg" alt="장바구니"/>
+                </button>
+                </div>
+              </div>
+              `;
+          }
+
+          pagination(currentPage, totalPage, size, '.pagination', urlParams);
+          document.querySelector('.product-list').innerHTML = element;
+        }).catch((error) => {
+          console.error(error);
+        });
+      });
+    </script>
+    <script th:src="@{/js/pagination.js}"></script>
+    <script th:src="@{/js/cart.js}"></script>
+    <script th:src="@{/js/search.js}"></script>
+  </section>
+</body>
+</html>

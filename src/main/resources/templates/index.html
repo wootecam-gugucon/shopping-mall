@@ -10,10 +10,7 @@
 <body>
 <div class="root">
   <div th:replace="~{layouts/header :: header}"></div>
-  <label class="product-search-container">
-    <input id="keyword" placeholder="상품을 검색하세요" th:type="text">
-    <input onclick="search()" th:type="submit" value="검색">
-  </label>
+  <div th:replace="~{layouts/searchbar :: searchbar}"></div>
 
   <section class="product-container">
     <div class="product-list">
