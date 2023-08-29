@@ -8,9 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -68,4 +69,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("birthYearRange") final BirthYearRange birthYearRange,
             @Param("gender") final Gender gender,
             final Pageable pageable);
+
+    @Query(value = "select p.* from order_items oi "
+        + "inner join products p on oi.product_id = p.id "
+        + "where order_id in ("
+        + " select order_id from order_items where order_items.product_id = :productId "
+        + ") and p.id != :productId "
+        + "group by p.id "
+        + "order by count(oi.id) desc, p.id desc", nativeQuery = true)
+    Slice<Product> findRecommendedProducts(@Param("productId") final Long productId, final Pageable pageable);
 }
