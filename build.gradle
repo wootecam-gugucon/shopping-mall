@@ -31,6 +31,8 @@ jacocoTestReport {
             fileTree(dir: it, exclude: [
                     "com/gugucon/**/*DTO.*",
                     "com/gugucon/**/*Scheduler.*",
+                    "com/gugucon/**/*PageController.*",
+                    "com/gugucon/**/ShoppingApplication.*",
                     "**/config/*"
             ])
         }))
