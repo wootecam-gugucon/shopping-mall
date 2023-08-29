@@ -9,6 +9,8 @@ import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
+import com.gugucon.shopping.order.dto.request.OrderPayRequest;
+import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
@@ -21,7 +23,6 @@ import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -315,63 +316,109 @@ class RateIntegrationTest {
         assertThat(errorResponse.getMessage()).isEqualTo(ErrorCode.INVALID_RATE.getMessage());
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"MALE,24,3.0", "MALE,35,2.0", "FEMALE,19,3.0"})
+    @Test
     @DisplayName("해당 물품의 주문자들 중 현재 접속한 사용자와 같은 나이대와 성별을 가진 주문자들의 평균 별점 정보를 가져온다")
-    void getCustomRate(final Gender gender, final int age, final double expectedRate) {
+    void getCustomRate1() {
         // given
         int sequence = 0; // for Unique Email
+
+        final Gender gender = Gender.MALE;
+        final int age = 24;
         final LocalDate birthDate = LocalDate.of(LocalDate.now().getYear() - age + 1, 1, 1);
         final String accessToken = loginAfterSignUp(createSignupRequest(sequence++, gender, birthDate.getYear()));
 
-        final String 십대_여자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
-        final String 십대_여자_2_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
-        final String 십대_여자_3_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
         final String 십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(UNDER_TEENS)));
 
-        final String 이십대_초반_여자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.FEMALE, getYear(EARLY_TWENTIES)));
-        final String 이십대_초반_남자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.MALE, getYear(EARLY_TWENTIES)));
+        final String 이십대_초반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(EARLY_TWENTIES)));
+        final String 이십대_초반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(EARLY_TWENTIES)));
 
-        final String 이십대_중반_남자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
-        final String 이십대_중반_남자_2_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
-        final String 이십대_중반_남자_3_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
-        final String 이십대_중반_여자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.FEMALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(MID_TWENTIES)));
 
-        final String 이십대_후반_여자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.FEMALE, getYear(LATE_TWENTIES)));
-        final String 이십대_후반_남자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.MALE, getYear(LATE_TWENTIES)));
+        final String 이십대_후반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(LATE_TWENTIES)));
+        final String 이십대_후반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(LATE_TWENTIES)));
 
         final String 삼십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
-        final String 삼십대_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
-        final String 삼십대_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
         final String 삼십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(THIRTIES)));
 
-        final String 사십대_여자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.FEMALE, getYear(OVER_FORTIES)));
-        final String 사십대_남자_1_토큰 = loginAfterSignUp(
-                createSignupRequest(sequence++, Gender.MALE, getYear(OVER_FORTIES)));
+        final String 사십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(OVER_FORTIES)));
+        final String 사십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(OVER_FORTIES)));
 
         final Long productId = insertProduct("product");
 
         rate(십대_여자_1_토큰, productId, 2);
-        rate(십대_여자_2_토큰, productId, 5);
-        rate(십대_여자_3_토큰, productId, 2);
         rate(십대_남자_1_토큰, productId, 1);
         rate(이십대_초반_여자_1_토큰, productId, 4);
         rate(이십대_초반_남자_1_토큰, productId, 4);
         rate(이십대_중반_남자_1_토큰, productId, 1);
         rate(이십대_중반_남자_2_토큰, productId, 5);
         rate(이십대_중반_남자_3_토큰, productId, 3);
+        rate(이십대_중반_여자_1_토큰, productId, 1);
+        rate(이십대_후반_여자_1_토큰, productId, 5);
+        rate(이십대_후반_남자_1_토큰, productId, 2);
+        rate(삼십대_남자_1_토큰, productId, 2);
+        rate(삼십대_여자_1_토큰, productId, 4);
+        rate(사십대_여자_1_토큰, productId, 1);
+        rate(사십대_남자_1_토큰, productId, 2);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when().get("/api/v1/rate/product/{productId}/custom", productId)
+                .then()
+                .contentType(ContentType.JSON)
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final RateResponse rateResponse = response.as(RateResponse.class);
+        assertThat(rateResponse.getRateCount()).isEqualTo(3);
+        assertThat(rateResponse.getAverageRate()).isCloseTo(3.0, Percentage.withPercentage(99.9));
+    }
+
+    @Test
+    @DisplayName("해당 물품의 주문자들 중 현재 접속한 사용자와 같은 나이대와 성별을 가진 주문자들의 평균 별점 정보를 가져온다")
+    void getCustomRate2() {
+        // given
+        int sequence = 0; // for Unique Email
+
+        final Gender gender = Gender.MALE;
+        final int age = 35;
+        final LocalDate birthDate = LocalDate.of(LocalDate.now().getYear() - age + 1, 1, 1);
+        final String accessToken = loginAfterSignUp(createSignupRequest(sequence++, gender, birthDate.getYear()));
+
+        final String 십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(UNDER_TEENS)));
+
+        final String 이십대_초반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(EARLY_TWENTIES)));
+        final String 이십대_초반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(EARLY_TWENTIES)));
+
+        final String 이십대_중반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(MID_TWENTIES)));
+
+        final String 이십대_후반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(LATE_TWENTIES)));
+        final String 이십대_후반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(LATE_TWENTIES)));
+
+        final String 삼십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
+        final String 삼십대_남자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
+        final String 삼십대_남자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
+        final String 삼십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(THIRTIES)));
+
+        final String 사십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(OVER_FORTIES)));
+        final String 사십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(OVER_FORTIES)));
+
+        final Long productId = insertProduct("product");
+
+        rate(십대_여자_1_토큰, productId, 2);
+        rate(십대_남자_1_토큰, productId, 1);
+        rate(이십대_초반_여자_1_토큰, productId, 4);
+        rate(이십대_초반_남자_1_토큰, productId, 4);
+        rate(이십대_중반_남자_1_토큰, productId, 1);
         rate(이십대_중반_여자_1_토큰, productId, 1);
         rate(이십대_후반_여자_1_토큰, productId, 5);
         rate(이십대_후반_남자_1_토큰, productId, 2);
@@ -396,7 +443,72 @@ class RateIntegrationTest {
 
         final RateResponse rateResponse = response.as(RateResponse.class);
         assertThat(rateResponse.getRateCount()).isEqualTo(3);
-        assertThat(rateResponse.getAverageRate()).isCloseTo(expectedRate, Percentage.withPercentage(99.9));
+        assertThat(rateResponse.getAverageRate()).isCloseTo(2.0, Percentage.withPercentage(99.9));
+    }
+
+    @Test
+    @DisplayName("해당 물품의 주문자들 중 현재 접속한 사용자와 같은 나이대와 성별을 가진 주문자들의 평균 별점 정보를 가져온다")
+    void getCustomRate3() {
+        // given
+        int sequence = 0; // for Unique Email
+
+        final Gender gender = Gender.FEMALE;
+        final int age = 19;
+        final LocalDate birthDate = LocalDate.of(LocalDate.now().getYear() - age + 1, 1, 1);
+        final String accessToken = loginAfterSignUp(createSignupRequest(sequence++, gender, birthDate.getYear()));
+
+        final String 십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_여자_2_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_여자_3_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(UNDER_TEENS)));
+        final String 십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(UNDER_TEENS)));
+
+        final String 이십대_초반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(EARLY_TWENTIES)));
+        final String 이십대_초반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(EARLY_TWENTIES)));
+
+        final String 이십대_중반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(MID_TWENTIES)));
+        final String 이십대_중반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(MID_TWENTIES)));
+
+        final String 이십대_후반_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(LATE_TWENTIES)));
+        final String 이십대_후반_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(LATE_TWENTIES)));
+
+        final String 삼십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(THIRTIES)));
+        final String 삼십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(THIRTIES)));
+
+        final String 사십대_여자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.FEMALE, getYear(OVER_FORTIES)));
+        final String 사십대_남자_1_토큰 = loginAfterSignUp(createSignupRequest(sequence++, Gender.MALE, getYear(OVER_FORTIES)));
+
+        final Long productId = insertProduct("product");
+
+        rate(십대_여자_1_토큰, productId, 2);
+        rate(십대_여자_2_토큰, productId, 5);
+        rate(십대_여자_3_토큰, productId, 2);
+        rate(십대_남자_1_토큰, productId, 1);
+        rate(이십대_초반_여자_1_토큰, productId, 4);
+        rate(이십대_초반_남자_1_토큰, productId, 4);
+        rate(이십대_중반_남자_1_토큰, productId, 1);
+        rate(이십대_중반_여자_1_토큰, productId, 1);
+        rate(이십대_후반_여자_1_토큰, productId, 5);
+        rate(이십대_후반_남자_1_토큰, productId, 2);
+        rate(삼십대_남자_1_토큰, productId, 2);
+        rate(삼십대_여자_1_토큰, productId, 4);
+        rate(사십대_여자_1_토큰, productId, 1);
+        rate(사십대_남자_1_토큰, productId, 2);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when().get("/api/v1/rate/product/{productId}/custom", productId)
+                .then()
+                .contentType(ContentType.JSON)
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final RateResponse rateResponse = response.as(RateResponse.class);
+        assertThat(rateResponse.getRateCount()).isEqualTo(3);
+        assertThat(rateResponse.getAverageRate()).isCloseTo(3.0, Percentage.withPercentage(99.9));
     }
 
     private int getYear(final BirthYearRange birthYearRange) {
@@ -404,7 +516,11 @@ class RateIntegrationTest {
     }
 
     private void rate(final String accessToken, final Long productId, final int score) {
-        final Long orderId = buyProductWithSuccess(restTemplate, accessToken, productId);
+        insertCartItem(accessToken, new CartItemInsertRequest(productId));
+        chargePoint(accessToken, 1000000L);
+        final Long orderId = placeOrder(accessToken);
+        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
+        payOrderByPoint(accessToken, new PointPayRequest(orderId));
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, (short) score));
     }
