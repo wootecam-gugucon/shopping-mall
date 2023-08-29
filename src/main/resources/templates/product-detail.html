@@ -21,7 +21,7 @@
             <span class="highlight-text product-name"></span>
           </div>
           <div class="flex justify-between p-20 mt-20">
-            <img class="product-image" />
+            <img class="product-image"/>
           </div>
           <div class="flex justify-between p-20 mt-20">
             <span class="highlight-text">상품금액</span>
@@ -38,13 +38,26 @@
             <span class="highlight-text rate"></span>
           </div>
         </div>
+        <div class="flex justify-between p-20 mt-20">
+          <h3 class="highlight-text">추천상품 상위 30개</h3>
+          <p class="product-recommend-page" style="padding-left:20px"></p>
+        </div>
+        <div class="flex justify-between p-20 mt-20" style="width:60%">
+          <section class="product-recommend-list" style="display:grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
+          </section>
+        </div>
+        <div class="pagination" style="width:60%; margin-top:20px">
+        </div>
       </div>
     </div>
   </section>
 </div>
 <script th:inline="javascript">
+
+  let recommendationPage = 0;
+  const productId = [[${productId}]];
+
   document.addEventListener("DOMContentLoaded", function () {
-    const productId = [[${productId}]];
 
     fetch(`/api/v1/products/${productId}`, {
       method: 'GET',
@@ -74,7 +87,87 @@
     }).then((data) => {
       document.querySelector('.rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
     })
+
+    updateRecommendation(productId, 0);
+    slidePagination(5, ".pagination")
   });
+
+  function onNextClick() {
+    recommendationPage += 1;
+    updateRecommendation(productId, recommendationPage);
+  }
+
+  function onPrevClick() {
+    recommendationPage -= 1;
+    updateRecommendation(productId, recommendationPage);
+  }
+
+  const updateRecommendation = (productId, page) => {
+    fetch(`/api/v1/products/${productId}/recommend?page=${page}`, {
+      method: 'GET'
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      response.json().then((data) => alert(data.message));
+      window.location.href = "/";
+    }).then((data) => {
+      const size = data.size;
+      const currentPage = data.currentPage;
+      const hasNextPage = data.hasNextPage;
+
+      let element = '';
+      for (let i = 0; i < Math.min(size, data.contents.length); i++) {
+        let recommendedProduct = data.contents[i];
+
+        element += `
+          <div class="product-recommend-item">
+            <a href="/product/${recommendedProduct.id}">
+              <img src='/assets/${recommendedProduct.imageFileName}' />
+            </a>
+            <p>${recommendedProduct.name}</p>
+            <p>${recommendedProduct.price} 원</p>
+          </div>
+        `
+      }
+      document.querySelector('.product-recommend-page').innerText = `${currentPage+1} 페이지`;
+      document.querySelector('.product-recommend-list').innerHTML = element;
+      updatePaginationButton(currentPage, hasNextPage);
+
+    }).catch((error) => {
+      console.error(error);
+    })
+  }
+
+  const updatePaginationButton = (currentPage, hasNextPage) => {
+    const next = document.getElementById(`page-next`);
+    const prev = document.getElementById(`page-prev`);
+
+    if (!hasNextPage || currentPage >= 5) {
+      next.setAttribute("disabled", true);
+    } else {
+      next.removeAttribute("disabled");
+    }
+
+    if (currentPage === 0) {
+      prev.setAttribute("disabled", true);
+    } else {
+      prev.removeAttribute("disabled");
+    }
+  }
+
+  const slidePagination = (size, className) => {
+    let pages = '';
+
+    pages += `
+          <button id="page-prev" onclick='onPrevClick()'>\t&lt;</button>
+        `;
+    pages += `
+          <button id="page-next" onclick='onNextClick()'>\t&gt;</button>
+        `;
+
+    document.querySelector(className).innerHTML = pages;
+  }
 </script>
 </body>
 </html>

@@ -1,10 +1,14 @@
 package com.gugucon.shopping.pay.service;
 
+import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.common.domain.vo.Money;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.repository.CartItemRepository;
+import com.gugucon.shopping.item.repository.OrderStatRepository;
+import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.order.domain.entity.Order;
+import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderRepository;
 import com.gugucon.shopping.pay.config.TossPayConfiguration;
 import com.gugucon.shopping.pay.domain.Pay;
@@ -33,14 +37,18 @@ public class PayService {
     private final PointRepository pointRepository;
     private final TossPayProvider tossPayProvider;
     private final TossPayConfiguration tossPayConfiguration;
+    private final OrderStatRepository orderStatRepository;
 
     @Transactional
-    public PayResponse payByPoint(final PointPayRequest pointPayRequest, final Long memberId) {
+    public PayResponse payByPoint(final PointPayRequest pointPayRequest, final MemberPrincipal principal) {
         final Long orderId = pointPayRequest.getOrderId();
-        final Order order = findOrderBy(orderId, memberId);
+        final Long memberId = principal.getId();
+        final Order order = findOrderByExclusively(orderId, memberId);
+        order.validateCanceled();
 
         final Point point = findPointBy(memberId);
         point.use(order.calculateTotalPrice());
+        order.getOrderItems().forEach(orderItem -> updateOrderStatBy(principal, orderItem));
 
         return completePay(memberId, order);
     }
@@ -52,6 +60,7 @@ public class PayService {
 
     public TossPayInfoResponse getTossInfo(final Long orderId, final Long memberId) {
         final Order order = findOrderBy(orderId, memberId);
+        order.validateCanceled();
 
         return TossPayInfoResponse.from(tossPayProvider.encodeOrderId(order.getId(), order.createOrderName()),
                                         order,
@@ -61,11 +70,14 @@ public class PayService {
     }
 
     @Transactional
-    public PayResponse payByToss(final TossPayRequest tossPayRequest, final Long memberId) {
+    public PayResponse payByToss(final TossPayRequest tossPayRequest, final MemberPrincipal principal) {
         final Long orderId = tossPayProvider.decodeOrderId(tossPayRequest.getOrderId());
-        final Order order = findOrderBy(orderId, memberId);
+        final Long memberId = principal.getId();
+        final Order order = findOrderByExclusively(orderId, memberId);
 
+        order.validateCanceled();
         order.validateMoney(Money.from(tossPayRequest.getAmount()));
+        order.getOrderItems().forEach(orderItem -> updateOrderStatBy(principal, orderItem));
         tossPayProvider.validatePayment(tossPayRequest);
 
         return completePay(memberId, order);
@@ -75,6 +87,18 @@ public class PayService {
         cartItemRepository.deleteAllByMemberId(memberId);
         order.completePay();
         return PayResponse.from(payRepository.save(Pay.from(order)));
+    }
+
+    private void updateOrderStatBy(final MemberPrincipal principal, final OrderItem orderItem) {
+        orderStatRepository.updateOrderStatByCount(orderItem.getQuantity().getValue(),
+                                                   orderItem.getProductId(),
+                                                   BirthYearRange.from(principal.getBirthDate()),
+                                                   principal.getGender());
+    }
+
+    private Order findOrderByExclusively(final Long orderId, final Long memberId) {
+        return orderRepository.findByIdAndMemberIdExclusively(orderId, memberId)
+            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
     }
 
     private Order findOrderBy(final Long orderId, final Long memberId) {
