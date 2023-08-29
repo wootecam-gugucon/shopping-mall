@@ -1,98 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link rel="stylesheet" th:href="@{/css/index.css}">
   <title>Shopping</title>
 </head>
 <body>
 <div class="root">
   <div th:replace="~{layouts/header :: header}"></div>
-  <label class="product-search-container">
-    <input th:type="text" placeholder="상품을 검색하세요" id="keyword">
-    <input th:type="submit" value="검색" onclick="search()">
-  </label>
-  <div class="product-search-result">
-    <span th:text="${param.keyword}" style="font-weight: bold; color: darkslategray"></span>
-    에 대한 검색 결과입니다
-  </div>
-  <div class="product-sort-container">
-    <button type="button"
-            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
-            th:with="value='id,desc'"
-            name="sort-select-button">최신순</button>
-    <button type="button"
-            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
-            th:with="value='price,desc'"
-            name="sort-select-button">가격 높은순</button>
-    <button type="button"
-            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
-            th:with="value='price,asc'"
-            name="sort-select-button">가격 낮은순</button>
-    <button type="button"
-            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
-            th:with="value='orderCount,desc'"
-            name="sort-select-button">주문 많은순</button>
-    <button type="button"
-            th:onclick="|location.href='@{/search(keyword=${param.keyword}, sort=${value})}'|"
-            th:with="value='rate,desc'"
-            name="sort-select-button">별점 높은순</button>
-  </div>
+  <div th:replace="~{layouts/searchbar :: searchbar}"></div>
+
   <section class="product-container">
-    <div class="product-list">
-    </div>
   </section>
   <div class="pagination"></div>
 </div>
 </body>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-
-        fetch('/api/v1/products/search?' + urlParams, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then((response) => {
-            return response.json();
-        }).then((data) => {
-            const currentPage = data.currentPage;
-            const totalPage = data.totalPage;
-            const size = data.size;
-
-            let element = '';
-            for (let i = 0; i < Math.min(size, data.contents.length); i++) {
-                let product = data.contents[i];
-                element += `
-              <div>
-                <a href="/product/${product.id}">
-                  <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
-                </a>
-                <div class="flex justify-between w-280 p-5">
-                <div class="product-info">
-                  <span class="product-info__name">${product.name}</span>
-                  <span class="product-info__price">${product.price}</span>
-                </div>
-                <button type="submit" class="product-btn" ${product.stock <= 0 ? 'disabled' : ''} onclick="addCartItem(${product.id})">
-                  <img src="assets/svgs/cart.svg" alt="장바구니"/>
-                </button>
-                </div>
-              </div>
-              `;
-            }
-
-            selectSortKey(urlParams.get("sort"));
-            pagination(currentPage, totalPage, size, '.pagination', urlParams);
-            document.querySelector('.product-list').innerHTML = element;
-        }).catch((error) => {
-            console.error(error);
-        });
-    });
-</script>
-<script th:src="@{/js/pagination.js}"></script>
-<script th:src="@{/js/cart.js}"></script>
-<script th:src="@{/js/search.js}"></script>
 </html>

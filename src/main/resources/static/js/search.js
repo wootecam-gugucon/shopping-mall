@@ -1,33 +1,24 @@
-const search = () => {
-    const keyword = document.getElementById("keyword").value.trim();
+const form = document.getElementById('search-form');
 
-    if (keyword === "") {
-        alert("검색어를 입력해주세요.");
-        return;
+form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const searchInput = document.getElementById("searchInput").value;
+    const sortSelect = document.getElementById("sortSelect");
+    const selectedSort = sortSelect.options[sortSelect.selectedIndex].value;
+    let queryParams = `keyword=${searchInput}&sort=${selectedSort}`;
+
+    if (selectedSort === "orderCount,desc" || selectedSort === "rate,desc") {
+        const gender = document.getElementById("gender").value;
+        const birthYearRange = document.getElementById("birthYearRange").value;
+        if (gender && birthYearRange) {
+            queryParams += `&gender=${gender}&birthYearRange=${birthYearRange}`;
+        }
+        else if (gender || birthYearRange) {
+            alert("성별과 나이대 모두 선택해주세요.");
+        }
     }
 
-    window.location.href = '/search?keyword='.concat(keyword).concat("&sort=id,desc");
-}
+    window.location.href = `/search?${queryParams}`;
+});
 
-const selectSortKey = (sortKey) => {
-    const buttons = document.getElementsByName("sort-select-button");
-    let button;
-    if (sortKey === "id,desc") {
-        button = buttons[0];
-    } else if(sortKey === "price,desc") {
-        button = buttons[1];
-    } else if(sortKey === "price,asc") {
-        button = buttons[2];
-    } else if(sortKey === "orderCount,desc") {
-        button = buttons[3];
-    } else if (sortKey === "rate,desc") {
-        button = buttons[4];
-    } else {
-        console.error("Invalid Sort: ".concat(sortKey));
-        return;
-    }
-
-    button.style.fontWeight = "bold";
-    button.style.color = "white";
-    button.style.backgroundColor = "darkslategray";
-}

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RateResponse {
 
-    private int rateCount;
+    private long rateCount;
     private double averageRate;
 }

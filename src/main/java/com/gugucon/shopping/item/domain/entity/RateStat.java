@@ -9,10 +9,10 @@ import lombok.*;
 
 @Entity
 @Table(name = "rate_stats")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RateStat extends BaseTimeEntity {
 
     @Id
