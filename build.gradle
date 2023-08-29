@@ -29,7 +29,6 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
-                    "com/gugucon/**/ExcludedPOJO.class",
                     "com/gugucon/**/*DTO.*",
                     "com/gugucon/**/*Scheduler.*",
                     "**/config/*"
