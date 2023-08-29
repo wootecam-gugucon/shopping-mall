@@ -511,7 +511,7 @@ class RateIntegrationTest {
         assertThat(rateResponse.getAverageRate()).isCloseTo(3.0, Percentage.withPercentage(99.9));
     }
 
-    private static int getYear(final BirthYearRange birthYearRange) {
+    private int getYear(final BirthYearRange birthYearRange) {
         return birthYearRange.getStartDate().getYear();
     }
 
@@ -533,7 +533,7 @@ class RateIntegrationTest {
                 .password("password").passwordCheck("password")
                 .nickname("nickname")
                 .gender(gender.toString())
-                .birthDate(LocalDate.of(birthYear, 1, 1))
+                .birthDate(LocalDate.of(birthYear, 1, 2))
                 .build();
     }
 

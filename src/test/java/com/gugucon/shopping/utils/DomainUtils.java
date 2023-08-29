@@ -78,12 +78,30 @@ public class DomainUtils {
                 .build();
     }
 
+    public static Member createMemberWithoutId() {
+        return Member.builder()
+                .email(Email.from("test_email@gmail.com"))
+                .password(Password.of("test_password", passwordEncoder))
+                .nickname(Nickname.from("test_nickname"))
+                .gender(Gender.FEMALE)
+                .birthDate(LocalDate.now())
+                .build();
+    }
+
     public static CartItem createCartItem() {
         sequence++;
         return CartItem.builder()
                 .id(sequence)
                 .memberId(1L)
                 .product(createProduct(100))
+                .quantity(Quantity.from(1))
+                .build();
+    }
+
+    public static CartItem createCartItemWithoutId(final Long memberId, final Product product) {
+        return CartItem.builder()
+                .memberId(memberId)
+                .product(product)
                 .quantity(Quantity.from(1))
                 .build();
     }

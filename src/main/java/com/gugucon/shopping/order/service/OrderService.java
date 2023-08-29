@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -62,6 +63,19 @@ public class OrderService {
         return new PagedResponse<>(contents, orders.getTotalPages(), orders.getNumber(), orders.getSize());
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void cancelPayingOrder(final Order order) {
+        order.getOrderItems()
+                .forEach(orderItem -> productRepository.increaseStockByIdAndValue(orderItem.getProductId(),
+                                                                                  orderItem.getQuantity().getValue()));
+        order.cancel();
+    }
+
+    @Transactional
+    public void cancelCreatedOrder(final Order order) {
+        order.cancel();
+    }
+
     private void validateNotEmpty(final List<CartItem> cartItems) {
         if (cartItems.isEmpty()) {
             throw new ShoppingException(ErrorCode.EMPTY_CART);
@@ -70,8 +84,10 @@ public class OrderService {
 
     @Transactional
     public OrderPayResponse requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
-        final Order order = orderRepository.findByIdAndMemberId(orderPayRequest.getOrderId(), memberId)
+        final Order order = orderRepository.findByIdAndMemberIdExclusively(orderPayRequest.getOrderId(), memberId)
                                            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+
+        order.validateCanceled();
         order.startPay(PayType.from(orderPayRequest.getPayType()));
         decreaseStock(order);
         return OrderPayResponse.from(order);
@@ -79,7 +95,7 @@ public class OrderService {
 
     private void decreaseStock(final Order order) {
         order.getOrderItems().forEach(orderItem -> {
-            final Product product = productRepository.findById(orderItem.getProductId())
+            final Product product = productRepository.findByIdWithExclusiveLock(orderItem.getProductId())
                                                      .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
             product.validateStockIsNotLessThan(orderItem.getQuantity());
             product.decreaseStockBy(orderItem.getQuantity());

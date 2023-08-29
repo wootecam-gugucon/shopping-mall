@@ -46,4 +46,8 @@ public class Quantity {
     public Quantity decreaseBy(final Quantity other) {
         return Quantity.from(this.value - other.value);
     }
+
+    public Quantity increaseBy(final Quantity other) {
+        return Quantity.from(this.value + other.value);
+    }
 }
