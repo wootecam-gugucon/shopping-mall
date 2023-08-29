@@ -1,15 +1,14 @@
 package com.gugucon.shopping.pay.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ShoppingException;
-import com.gugucon.shopping.order.domain.entity.Order;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("OrderIdBase64Translator 단위테스트")
 class OrderIdBase64TranslatorTest {
@@ -19,7 +18,7 @@ class OrderIdBase64TranslatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"1", "주문 이름", "검정 하이엔드 골져스 원더풀 레저 스틸 가죽 자켓"})
     @DisplayName("인코딩한 내용을 디코딩하면 같은 내용이 된다")
-    void encodeAndDecodeSuccess_SameString(String orderName) {
+    void encodeAndDecodeSuccess_SameString(final String orderName) {
         // given
         Long orderId = 1_000_000L;
 
@@ -56,5 +55,15 @@ class OrderIdBase64TranslatorTest {
 
         // then
         assertThat(encodedString).hasSizeBetween(6, 64);
+    }
+
+    @Test
+    @DisplayName("디코딩할 문자열이 null이면 예외가 발생한다.")
+    void decodeFail_encodedOrderIdIsNull() {
+        // given
+
+        // when & then
+        final ShoppingException exception = assertThrows(ShoppingException.class, () -> orderIdTranslator.decode(null));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.UNKNOWN_ERROR);
     }
 }
