@@ -115,3 +115,6 @@ create index idx_order_item_rates on rates (order_item_id);
 
 create index idx_1 on order_items (product_id, quantity);
 create index idx_2 on orders (last_modified_at);
+
+create index idx_product_order_stats on order_stats (product_id);
+create index idx_product_rate_stats on rate_stats (product_id);

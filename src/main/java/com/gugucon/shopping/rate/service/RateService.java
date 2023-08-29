@@ -14,12 +14,10 @@ import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
 import com.gugucon.shopping.rate.repository.RateRepository;
+import com.gugucon.shopping.rate.repository.dto.AverageRateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.OptionalDouble;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,7 +26,6 @@ public class RateService {
 
     private static final short MIN_SCORE = 1;
     private static final short MAX_SCORE = 5;
-    private static final double ZERO_RATE = 0.0;
 
     private final RateRepository rateRepository;
     private final ProductRepository productRepository;
@@ -57,9 +54,9 @@ public class RateService {
 
     public RateResponse getRates(final Long productId) {
         validateProduct(productId);
-        final List<Integer> rates = rateRepository.findScoresByProductId(productId);
-        final double averageRate = calculateAverageOf(rates).orElse(ZERO_RATE);
-        return new RateResponse(rates.size(), roundDownAverage(averageRate));
+        final AverageRateDto rates = rateRepository.findScoresByProductId(productId);
+        final double averageRate = calculateAverageOf(rates);
+        return new RateResponse(rates.getCount(), roundDownAverage(averageRate));
     }
 
     public RateDetailResponse getRateDetail(final Long memberId, final Long orderItemId) {
@@ -70,18 +67,15 @@ public class RateService {
 
     public RateResponse getCustomRate(final Long productId, final MemberPrincipal principal) {
         final BirthYearRange birthYearRange = BirthYearRange.from(principal.getBirthDate());
-        final List<Integer> rates = rateRepository.findScoresByMemberGenderAndMemberBirthYear(productId,
-                                                                                              principal.getGender(),
-                                                                                              birthYearRange.getStartDate(),
-                                                                                              birthYearRange.getEndDate());
-        final double averageRate = calculateAverageOf(rates).orElse(ZERO_RATE);
-        return new RateResponse(rates.size(), averageRate);
+        final AverageRateDto rates = rateRepository.findScoresByMemberGenderAndMemberBirthYear(productId,
+                                                                                               principal.getGender(),
+                                                                                               birthYearRange);
+        final double averageRate = calculateAverageOf(rates);
+        return new RateResponse(rates.getCount(), averageRate);
     }
 
-    private OptionalDouble calculateAverageOf(final List<Integer> rates) {
-        return rates.stream()
-                .mapToInt(Integer::intValue)
-                .average();
+    private double calculateAverageOf(final AverageRateDto averageRateDto) {
+        return roundDownAverage((double) averageRateDto.getTotalScore() / averageRateDto.getCount());
     }
 
     private double roundDownAverage(final double average) {
