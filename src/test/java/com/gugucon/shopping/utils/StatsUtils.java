@@ -9,13 +9,13 @@ import java.time.LocalDate;
 public class StatsUtils {
 
     public static OrderStat createInitialOrderStat(final Gender gender,
-                                                   final LocalDate birthData,
+                                                   final LocalDate birthDate,
                                                    final long productId) {
         return OrderStat.builder()
                         .productId(productId)
                         .count(0L)
                         .gender(gender)
-                        .birthYearRange(BirthYearRange.from(birthData))
+                        .birthYearRange(BirthYearRange.from(birthDate))
                         .build();
     }
 
