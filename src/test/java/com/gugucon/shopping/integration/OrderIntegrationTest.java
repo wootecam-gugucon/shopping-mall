@@ -1,12 +1,5 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
-import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
-import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
-import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
-import static com.gugucon.shopping.utils.ApiUtils.updateCartItem;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.domain.vo.Quantity;
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
@@ -16,20 +9,24 @@ import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.dto.request.CartItemUpdateRequest;
 import com.gugucon.shopping.item.dto.response.CartItemResponse;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderItemResponse;
-import com.gugucon.shopping.utils.ApiUtils;
 import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static com.gugucon.shopping.utils.ApiUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("주문 기능 통합 테스트")
@@ -40,8 +37,8 @@ class OrderIntegrationTest {
 
     private static List<String> toNames(final OrderDetailResponse orderDetailResponse) {
         return orderDetailResponse.getOrderItems().stream()
-            .map(OrderItemResponse::getName)
-            .toList();
+                .map(OrderItemResponse::getName)
+                .toList();
     }
 
     @Test
@@ -53,12 +50,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .post("/api/v1/order")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -73,12 +70,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .post("/api/v1/order")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -99,12 +96,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .post("/api/v1/order")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -124,13 +121,13 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/api/v1/order")
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/api/v1/order")
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -151,12 +148,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/order/{orderId}", orderId)
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/order/{orderId}", orderId)
+                .then()
+                .extract();
 
         /* then */
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
@@ -175,12 +172,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(accessToken)
-            .when()
-            .get("/api/v1/order/{orderId}", invalidOrderId)
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when()
+                .get("/api/v1/order/{orderId}", invalidOrderId)
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -201,12 +198,12 @@ class OrderIntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .auth().oauth2(otherAccessToken)
-            .when()
-            .get("/api/v1/order/{orderId}", orderId)
-            .then()
-            .extract();
+                .given().log().all()
+                .auth().oauth2(otherAccessToken)
+                .when()
+                .get("/api/v1/order/{orderId}", orderId)
+                .then()
+                .extract();
 
         /* then */
         final ErrorResponse errorResponse = response.as(ErrorResponse.class);
@@ -227,7 +224,7 @@ class OrderIntegrationTest {
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new OrderPayRequest(orderId, "POINT"))
+                .body(new OrderPayRequest(orderId, PayType.POINT))
                 .when()
                 .put("/api/v1/order")
                 .then()
@@ -252,7 +249,7 @@ class OrderIntegrationTest {
                 .given().log().all()
                 .auth().oauth2(accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new OrderPayRequest(orderId, "POINT"))
+                .body(new OrderPayRequest(orderId, PayType.POINT))
                 .when()
                 .put("/api/v1/order")
                 .then()
@@ -266,8 +263,8 @@ class OrderIntegrationTest {
 
     private List<String> toNames(final List<CartItemResponse> cartItemResponses) {
         return cartItemResponses.stream()
-            .map(CartItemResponse::getName)
-            .toList();
+                .map(CartItemResponse::getName)
+                .toList();
     }
 
     private void updateCartItemQuantity(String accessToken, int quantity) {
@@ -280,13 +277,13 @@ class OrderIntegrationTest {
     private void changeProductStock(Long productId, int stock) {
         final Product product = productRepository.findById(productId).orElseThrow();
         final Product updatedProduct = Product.builder()
-            .id(productId)
-            .price(product.getPrice())
-            .name(product.getName())
-            .description(product.getDescription())
-            .imageFileName(product.getImageFileName())
-            .stock(Quantity.from(stock))
-            .build();
+                .id(productId)
+                .price(product.getPrice())
+                .name(product.getName())
+                .description(product.getDescription())
+                .imageFileName(product.getImageFileName())
+                .stock(Quantity.from(stock))
+                .build();
         productRepository.save(updatedProduct);
     }
 

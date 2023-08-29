@@ -1,14 +1,5 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
-import static com.gugucon.shopping.utils.ApiUtils.getOrderHistory;
-import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
-import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
-import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
-import static com.gugucon.shopping.utils.ApiUtils.putOrder;
-import static com.gugucon.shopping.utils.ApiUtils.readCartItems;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -24,12 +15,16 @@ import com.gugucon.shopping.utils.DomainUtils;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static com.gugucon.shopping.utils.ApiUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("포인트 결제 기능 통합 테스트")
@@ -46,7 +41,7 @@ class PointPayIntegrationTest {
         chargePoint(accessToken, 2000L);
         addProductToCart(accessToken, "testProduct", 1000L);
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.POINT));
         final PointPayRequest pointPayRequest = new PointPayRequest(orderId);
 
         // when
@@ -68,7 +63,7 @@ class PointPayIntegrationTest {
         final List<OrderHistoryResponse> orderHistoryResponses = getOrderHistory(accessToken);
         assertThat(orderHistoryResponses).hasSize(1);
         assertThat(orderHistoryResponses).extracting(OrderHistoryResponse::getOrderId)
-                                         .containsExactly(orderId);
+                .containsExactly(orderId);
     }
 
     @Test

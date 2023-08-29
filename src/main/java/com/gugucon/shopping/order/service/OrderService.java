@@ -7,7 +7,6 @@ import com.gugucon.shopping.item.domain.entity.CartItem;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
-import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
@@ -80,7 +79,7 @@ public class OrderService {
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
 
         order.validateNotCanceled();
-        order.startPay(PayType.from(orderPayRequest.getPayType()));
+        order.startPay(orderPayRequest.getPayType());
         decreaseStock(order);
         return OrderPayResponse.from(order);
     }
