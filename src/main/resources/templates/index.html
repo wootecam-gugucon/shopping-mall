@@ -13,8 +13,6 @@
   <div th:replace="~{layouts/searchbar :: searchbar}"></div>
 
   <section class="product-container">
-    <div class="product-list">
-    </div>
   </section>
   <div class="pagination"></div>
 </div>
@@ -57,7 +55,7 @@
             }
 
             pagination(currentPage, totalPage, size, '.pagination', "");
-            document.querySelector('.product-list').innerHTML = element;
+            document.querySelector('.product-container').innerHTML = element;
         }).catch((error) => {
             console.error(error);
         });

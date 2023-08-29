@@ -3,8 +3,8 @@
   justify-content: center;
 
   flex-wrap: wrap;
-  gap: 20px;
-  padding: 50px 100px;
+  gap: 30px;
+  padding: 50px 250px;
 }
 
 .product-image {
@@ -17,10 +17,11 @@
 }
 
 .product-info__name {
-  font-size: 12px;
+  font-size: 1.25em;
 }
 
 .product-info__price {
+  font-size: 1em;
 }
 
 .product-detail-container {
@@ -74,4 +75,8 @@
 
 :disabled {
   background: #ccc;
+}
+
+.product-item {
+  width: min-content;
 }

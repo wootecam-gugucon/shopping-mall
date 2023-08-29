@@ -86,7 +86,7 @@
           for (let i = 0; i < Math.min(size, data.contents.length); i++) {
             let product = data.contents[i];
             element += `
-              <div>
+              <div class="product-item">
                 <a href="/product/${product.id}">
                   <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
                 </a>
@@ -104,7 +104,7 @@
           }
 
           pagination(currentPage, totalPage, size, '.pagination', urlParams);
-          document.querySelector('.product-list').innerHTML = element;
+          document.querySelector('.product-container').innerHTML = element;
         }).catch((error) => {
           console.error(error);
         });
