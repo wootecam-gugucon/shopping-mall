@@ -44,7 +44,7 @@ public class PayService {
         final Long orderId = pointPayRequest.getOrderId();
         final Long memberId = principal.getId();
         final Order order = findOrderByExclusively(orderId, memberId);
-        order.validateCanceled();
+        order.validateNotCanceled();
 
         final Point point = findPointBy(memberId);
         point.use(order.calculateTotalPrice());
@@ -55,12 +55,12 @@ public class PayService {
 
     private Point findPointBy(final Long memberId) {
         return pointRepository.findByMemberId(memberId)
-                              .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
+                .orElseThrow(() -> new ShoppingException(ErrorCode.POINT_NOT_ENOUGH));
     }
 
     public TossPayInfoResponse getTossInfo(final Long orderId, final Long memberId) {
         final Order order = findOrderBy(orderId, memberId);
-        order.validateCanceled();
+        order.validateNotCanceled();
 
         return TossPayInfoResponse.from(tossPayProvider.encodeOrderId(order.getId(), order.createOrderName()),
                                         order,
@@ -75,7 +75,7 @@ public class PayService {
         final Long memberId = principal.getId();
         final Order order = findOrderByExclusively(orderId, memberId);
 
-        order.validateCanceled();
+        order.validateNotCanceled();
         order.validateMoney(Money.from(tossPayRequest.getAmount()));
         order.getOrderItems().forEach(orderItem -> updateOrderStatBy(principal, orderItem));
         tossPayProvider.validatePayment(tossPayRequest);
@@ -98,12 +98,12 @@ public class PayService {
 
     private Order findOrderByExclusively(final Long orderId, final Long memberId) {
         return orderRepository.findByIdAndMemberIdExclusively(orderId, memberId)
-            .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
     }
 
     private Order findOrderBy(final Long orderId, final Long memberId) {
         return orderRepository.findByIdAndMemberId(orderId, memberId)
-                              .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
     }
 
     public TossPayFailResponse decodeOrderId(final TossPayFailRequest tossPayFailRequest) {
