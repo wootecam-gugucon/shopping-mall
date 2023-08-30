@@ -14,6 +14,7 @@ public class ProductDetailResponse {
     private Long id;
     private String name;
     private String imageFileName;
+    private int stock;
     private String description;
     private long price;
 
@@ -22,6 +23,7 @@ public class ProductDetailResponse {
             product.getId(),
             product.getName(),
             product.getImageFileName(),
+            product.getStock().getValue(),
             product.getDescription(),
             product.getPrice().getValue()
         );
