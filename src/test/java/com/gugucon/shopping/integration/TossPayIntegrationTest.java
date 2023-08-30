@@ -1,23 +1,12 @@
 package com.gugucon.shopping.integration;
 
-import static com.gugucon.shopping.utils.ApiUtils.getPaymentInfo;
-import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
-import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
-import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
-import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
-import static com.gugucon.shopping.utils.ApiUtils.putOrder;
-import static com.gugucon.shopping.utils.ApiUtils.validatePayment;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
 import com.gugucon.shopping.item.domain.entity.Product;
 import com.gugucon.shopping.item.dto.request.CartItemInsertRequest;
 import com.gugucon.shopping.item.repository.ProductRepository;
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.pay.dto.request.TossPayFailRequest;
 import com.gugucon.shopping.pay.dto.request.TossPayRequest;
@@ -38,6 +27,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
+import static com.gugucon.shopping.utils.ApiUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @IntegrationTest
 @DisplayName("토스 결제 기능 통합 테스트")
@@ -61,7 +56,7 @@ class TossPayIntegrationTest {
 
         addProductToCart(accessToken, "치킨");
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.TOSS));
 
         // when
         final ExtractableResponse<Response> response = RestAssured
@@ -91,7 +86,7 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.TOSS));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
 
         mockServerSuccess(restTemplate, 1);
@@ -126,7 +121,7 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.TOSS));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
                                                                  tossPayInfoResponse.getEncodedOrderId(),
@@ -163,7 +158,7 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.TOSS));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
                                                                  tossPayInfoResponse.getEncodedOrderId(),
@@ -202,7 +197,7 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.TOSS));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
                                                                  tossPayInfoResponse.getEncodedOrderId(),
@@ -241,7 +236,7 @@ class TossPayIntegrationTest {
         addProductToCart(accessToken, "testProduct");
 
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.TOSS));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayFailRequest tossPayFailRequest = new TossPayFailRequest("PAY_PROCESS_CANCELED",
                                                                              "사용자에 의해 결제가 취소되었습니다.",

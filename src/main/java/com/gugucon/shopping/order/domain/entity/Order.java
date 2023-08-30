@@ -50,11 +50,18 @@ public class Order extends BaseTimeEntity {
     private PayType payType;
 
     public static Order from(final Long memberId, final List<CartItem> cartItems) {
+        validateNotEmpty(cartItems);
         final Order order = new Order(null, memberId, OrderStatus.CREATED, PayType.NONE);
         cartItems.stream()
                 .map(OrderItem::from)
                 .forEach(order::addOrderItem);
         return order;
+    }
+
+    private static void validateNotEmpty(final List<CartItem> cartItems) {
+        if (cartItems.isEmpty()) {
+            throw new ShoppingException(ErrorCode.EMPTY_CART);
+        }
     }
 
     public static void validateTotalPrice(final List<CartItem> cartItems) {
@@ -95,7 +102,7 @@ public class Order extends BaseTimeEntity {
 
     private OrderItem findFirstOrderItem() {
         return orderItems.stream()
-                .min(Comparator.comparingLong(OrderItem::getId))
+                .min(Comparator.comparing(OrderItem::getName))
                 .orElseThrow(() -> new ShoppingException(ErrorCode.UNKNOWN_ERROR));
     }
 

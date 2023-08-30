@@ -10,7 +10,6 @@ import com.gugucon.shopping.item.repository.CartItemRepository;
 import com.gugucon.shopping.item.repository.OrderStatRepository;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
-import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.domain.entity.Order;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
@@ -41,10 +40,7 @@ public class OrderService {
     @Transactional
     public OrderResponse order(final Long memberId) {
         final List<CartItem> cartItems = cartItemRepository.findAllByMemberIdWithProduct(memberId);
-
-        validateNotEmpty(cartItems);
         Order.validateTotalPrice(cartItems);
-
         final Order order = Order.from(memberId, cartItems);
         return OrderResponse.from(orderRepository.save(order));
     }
@@ -100,19 +96,13 @@ public class OrderService {
         order.cancel();
     }
 
-    private void validateNotEmpty(final List<CartItem> cartItems) {
-        if (cartItems.isEmpty()) {
-            throw new ShoppingException(ErrorCode.EMPTY_CART);
-        }
-    }
-
     @Transactional
     public OrderPayResponse requestPay(final OrderPayRequest orderPayRequest, final Long memberId) {
         final Order order = orderRepository.findByIdAndMemberIdExclusively(orderPayRequest.getOrderId(), memberId)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_ORDER));
 
         order.validateNotCanceled();
-        order.startPay(PayType.from(orderPayRequest.getPayType()));
+        order.startPay(orderPayRequest.getPayType());
         decreaseStock(order);
         return OrderPayResponse.from(order);
     }

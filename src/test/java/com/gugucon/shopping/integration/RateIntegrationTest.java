@@ -1,5 +1,25 @@
 package com.gugucon.shopping.integration;
 
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.EARLY_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.LATE_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.MID_TWENTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.OVER_FORTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.THIRTIES;
+import static com.gugucon.shopping.member.domain.vo.BirthYearRange.UNDER_TEENS;
+import static com.gugucon.shopping.utils.ApiUtils.buyProduct;
+import static com.gugucon.shopping.utils.ApiUtils.buyProductWithSuccess;
+import static com.gugucon.shopping.utils.ApiUtils.chargePoint;
+import static com.gugucon.shopping.utils.ApiUtils.createRateToOrderedItem;
+import static com.gugucon.shopping.utils.ApiUtils.getFirstOrderItem;
+import static com.gugucon.shopping.utils.ApiUtils.insertCartItem;
+import static com.gugucon.shopping.utils.ApiUtils.loginAfterSignUp;
+import static com.gugucon.shopping.utils.ApiUtils.mockServerSuccess;
+import static com.gugucon.shopping.utils.ApiUtils.payOrderByPoint;
+import static com.gugucon.shopping.utils.ApiUtils.placeOrder;
+import static com.gugucon.shopping.utils.ApiUtils.putOrder;
+import static com.gugucon.shopping.utils.StatsUtils.createInitialRateStat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.gugucon.shopping.common.exception.ErrorCode;
 import com.gugucon.shopping.common.exception.ErrorResponse;
 import com.gugucon.shopping.integration.config.IntegrationTest;
@@ -10,6 +30,7 @@ import com.gugucon.shopping.item.repository.RateStatRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.pay.dto.request.PointPayRequest;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
@@ -32,11 +53,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-
-import static com.gugucon.shopping.member.domain.vo.BirthYearRange.*;
-import static com.gugucon.shopping.utils.ApiUtils.*;
-import static com.gugucon.shopping.utils.StatsUtils.createInitialRateStat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @DisplayName("별점 기능 통합 테스트")
@@ -242,9 +258,9 @@ class RateIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final RateResponse rateResponse = response.as(RateResponse.class);
-        final double roundedAverageRate = Double.parseDouble(String.format("%.2f", averageRate));
+
         assertThat(rateResponse.getRateCount()).isEqualTo(rateCount);
-        assertThat(rateResponse.getAverageRate()).isEqualTo(Double.valueOf(roundedAverageRate));
+        assertThat(rateResponse.getAverageRate()).isEqualTo(Math.floor(averageRate * 100) / 100.0);
     }
 
     @Test
@@ -560,7 +576,7 @@ class RateIntegrationTest {
         insertCartItem(accessToken, new CartItemInsertRequest(productId));
         chargePoint(accessToken, 1000000L);
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.POINT));
         payOrderByPoint(accessToken, new PointPayRequest(orderId));
         final long orderItemId = getFirstOrderItem(accessToken, orderId).getId();
         createRateToOrderedItem(accessToken, new RateCreateRequest(orderItemId, (short) score));

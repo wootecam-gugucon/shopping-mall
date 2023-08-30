@@ -12,52 +12,48 @@
 <div class="root">
   <div th:replace="~{layouts/header :: header}"></div>
 
-  <section class="product-section">
-    <div class="flex">
-      <div class="product-detail-container">
-        <hr class="divide-line-thin"/>
-        <div class="product-right-section__bottom">
-          <div class="flex justify-between p-20 mt-20">
-            <h3 class="highlight-text">상품이름</h3>
-            <span class="highlight-text product-name"></span>
-          </div>
-          <div class="flex justify-between p-20 mt-20">
-            <img class="product-image"/>
-          </div>
-          <div class="flex justify-between p-20 mt-20">
-            <span class="highlight-text">상품금액</span>
-            <span class="highlight-text product-price"></span>
-          </div>
-          <div class="flex justify-between p-20 mt-20">
-            <p class="highlight-text">상품설명</p>
-            <p class="product-description" style="font-size:1.5em"></p>
-          </div>
-        </div>
-        <div>
-          <div class="flex justify-between p-20 mt-20">
-            <h3 class="highlight-text">별점</h3>
-            <span class="highlight-text rate"></span>
-          </div>
-          <div class="flex justify-between p-20 mt-20 custom-rate-box" style="display: none">
-            <h3 class="highlight-text">사용자와 비슷한 사람들이 남긴 별점</h3>
-            <span class="highlight-text custom-rate"></span>
-          </div>
-          <div class="p-20 mt-20">
-            <h3 class="highlight-text">성별 및 나이대별 평균 별점</h3>
-            <canvas id="rate-chart" width="400px" height="300px"></canvas>
-          </div>
-        </div>
-        <div class="flex justify-between p-20 mt-20">
-          <h3 class="highlight-text">추천상품 상위 30개</h3>
-          <p class="product-recommend-page" style="padding-left:20px"></p>
-        </div>
-        <div class="flex justify-between p-20 mt-20" style="width:60%">
-          <section class="product-recommend-list" style="display:grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
-          </section>
-        </div>
-        <div class="pagination" style="width:60%; margin-top:20px">
-        </div>
+  <section class="product-detail-container">
+    <hr class="divide-line-thin"/>
+    <div class="product-right-section__bottom">
+      <div class="flex justify-between p-20 mt-20">
+        <h3 class="highlight-text">상품이름</h3>
+        <span class="highlight-text product-name"></span>
       </div>
+      <div class="flex justify-between p-20 mt-20">
+        <img class="product-image"/>
+      </div>
+      <div class="flex justify-between p-20 mt-20">
+        <span class="highlight-text">상품금액</span>
+        <span class="highlight-text product-price"></span>
+      </div>
+      <div class="flex justify-between p-20 mt-20">
+        <p class="highlight-text">상품설명</p>
+        <p class="product-description" style="font-size:1.5em"></p>
+      </div>
+    </div>
+    <div>
+      <div class="flex justify-between p-20 mt-20">
+        <h3 class="highlight-text">별점</h3>
+        <span class="highlight-text rate"></span>
+      </div>
+      <div class="flex justify-between p-20 mt-20 custom-rate-box" style="display: none">
+        <h3 class="highlight-text">사용자와 비슷한 사람들이 남긴 별점</h3>
+        <span class="highlight-text custom-rate"></span>
+      </div>
+      <div class="p-20 mt-20">
+        <h3 class="highlight-text">성별 및 나이대별 평균 별점</h3>
+        <canvas id="rate-chart" width="400px" height="300px"></canvas>
+      </div>
+    </div>
+    <div class="flex justify-between p-20 mt-20">
+      <h3 class="highlight-text">추천상품 상위 30개</h3>
+      <p class="product-recommend-page" style="padding-left:20px"></p>
+    </div>
+    <div class="flex justify-between p-20 mt-20" style="width:60%">
+      <section class="product-recommend-list" style="display:grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
+      </section>
+    </div>
+    <div class="pagination" style="width:60%; margin-top:20px">
     </div>
   </section>
 </div>
@@ -118,51 +114,50 @@
                 document.querySelector('.custom-rate-box').style.display = 'block';
             });
         }
+    });
 
-        fetch(`/api/v1/rate/product/${productId}/all`, {
-            method: 'GET',
-        }).then((response) => {
-            if (response.ok) {
-                return response.json();
-            }
-            response.json().then((data) => alert(data.message));
-            window.location.href = "/";
-        }).then((data) => {
-            let chartData = [];
-            data.forEach(d => chartData.push(d.rate.averageRate));
-            let rateChart = document.getElementById('rate-chart').getContext('2d');
-            let massPopChart = new Chart(rateChart, {
-                type: 'bar',
-                data: {
-                    labels: ['10대 이하 남자', '10대 이하 여자', '20대 남자', '20대 여자', '30대 남자', '30대 여자', '40대 이상 남자', '40대 이상 여자'],
-                    datasets: [{
-                        label: '성별 및 나이대별 별점',
-                        data: chartData,
-                        backgroundColor: '#2ac1bc',
-                        barThickness: 10,
-                    }]
+    fetch(`/api/v1/rate/product/${productId}/all`, {
+        method: 'GET',
+    }).then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        response.json().then((data) => alert(data.message));
+        window.location.href = "/";
+    }).then((data) => {
+        let chartData = [];
+        data.forEach(d => chartData.push(d.rate.averageRate));
+        let rateChart = document.getElementById('rate-chart').getContext('2d');
+        let massPopChart = new Chart(rateChart, {
+            type: 'bar',
+            data: {
+                labels: ['10대 이하 남자', '10대 이하 여자', '20대 남자', '20대 여자', '30대 남자', '30대 여자', '40대 이상 남자', '40대 이상 여자'],
+                datasets: [{
+                    label: '성별 및 나이대별 별점',
+                    data: chartData,
+                    backgroundColor: '#2ac1bc',
+                    barThickness: 10,
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
-                options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
+                scales: {
+                    yAxis: {
+                        max: 5,
+                        min: 0,
+                        ticks: {
+                            stepSize: 1
                         }
                     },
-                    scales: {
-                        yAxis: {
-                            max: 5,
-                            min: 0,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        },
-                    }
                 }
-            });
+            }
         });
-
     });
 
     function onNextClick() {

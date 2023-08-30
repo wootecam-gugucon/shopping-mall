@@ -104,17 +104,18 @@ CREATE TABLE IF NOT EXISTS order_stats
     `last_modified_at` datetime              NOT NULL
 );
 
+create index idx_2 on orders (last_modified_at);
 create index idx_member_orders on orders (member_id);
+
+create index idx_1 on order_items (product_id, quantity);
 create index idx_order_order_items on order_items (order_id);
-create index idx_product_order_items on order_items (product_id);
+
 create index idx_member_cart_items on cart_items (member_id);
 create index idx_product_cart_items on cart_items (product_id);
+
 create index idx_order_pays on pays (order_id);
 create index idx_member_points on points (member_id);
 create index idx_order_item_rates on rates (order_item_id);
-
-create index idx_1 on order_items (product_id, quantity);
-create index idx_2 on orders (last_modified_at);
 
 create index idx_product_order_stats on order_stats (product_id);
 create index idx_product_rate_stats on rate_stats (product_id);

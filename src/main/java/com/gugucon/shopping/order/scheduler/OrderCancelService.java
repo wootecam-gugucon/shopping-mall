@@ -34,10 +34,6 @@ public class OrderCancelService {
         log.info("cancelling started.");
         final LocalDateTime scanStartTime = lastScanTime == null ? DEFAULT_SCAN_START_TIME : lastScanTime;
         final LocalDateTime scanEndTime = LocalDateTime.now().minus(CANCEL_INTERVAL);
-        if (scanStartTime.isAfter(scanEndTime)) {
-            log.warn("scan start time is after scan end time. schedule is cancelled.");
-            return;
-        }
 
         final List<Order> incompleteOrders = orderRepository.findAllByStatusInAndLastModifiedAtBetweenWithOrderItems(
                 INCOMPLETE_STATUSES,
