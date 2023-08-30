@@ -17,6 +17,14 @@ spring:
   messages:
     basename: messages, errors
 
+management:
+  server:
+    port: 9098
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   expiration: ${JWT_EXPIRATION}
