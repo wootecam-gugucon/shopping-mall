@@ -11,6 +11,7 @@
 <body>
 <div class="root">
   <div th:replace="~{layouts/header :: header}"></div>
+  <div th:replace="~{layouts/searchbar :: searchbar}"></div>
 
   <section class="product-detail-container">
     <hr class="divide-line-thin"/>
@@ -248,5 +249,6 @@
     }
 </script>
 <script th:src="@{/js/cart.js}"></script>
+<script th:src="@{/js/search.js}"></script>
 </body>
 </html>
