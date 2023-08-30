@@ -11,13 +11,18 @@ import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.rate.domain.entity.Rate;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
+import com.gugucon.shopping.rate.dto.response.GroupRateResponse;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
 import com.gugucon.shopping.rate.repository.RateRepository;
 import com.gugucon.shopping.rate.repository.dto.AverageRateDto;
+import com.gugucon.shopping.rate.repository.dto.GroupAverageRateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -74,7 +79,18 @@ public class RateService {
         return new RateResponse(rates.getCount(), averageRate);
     }
 
+    public List<GroupRateResponse> getGroupRates(final Long productId) {
+        return rateRepository.findAllGroupsOfMemberGenderAndMemberBirthYear(productId).stream()
+                .sorted(Comparator.comparing(o -> o.getBirthYearRange().getStartDate(), Comparator.reverseOrder()))
+                .map(rateDto -> GroupRateResponse.of(rateDto, calculateAverageOf(rateDto)))
+                .toList();
+    }
+
     private double calculateAverageOf(final AverageRateDto averageRateDto) {
+        return roundDownAverage((double) averageRateDto.getTotalScore() / averageRateDto.getCount());
+    }
+
+    private double calculateAverageOf(final GroupAverageRateDto averageRateDto) {
         return roundDownAverage((double) averageRateDto.getTotalScore() / averageRateDto.getCount());
     }
 

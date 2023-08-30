@@ -5,6 +5,7 @@
   <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link rel="stylesheet" th:href="@{/css/index.css}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <title>Shopping</title>
 </head>
 <body>
@@ -39,6 +40,10 @@
         <h3 class="highlight-text">사용자와 비슷한 사람들이 남긴 별점</h3>
         <span class="highlight-text custom-rate"></span>
       </div>
+      <div class="p-20 mt-20">
+        <h3 class="highlight-text">성별 및 나이대별 평균 별점</h3>
+        <canvas id="rate-chart" width="400px" height="300px"></canvas>
+      </div>
     </div>
     <div class="flex justify-between p-20 mt-20">
       <h3 class="highlight-text">추천상품 상위 30개</h3>
@@ -54,92 +59,136 @@
 </div>
 <script th:inline="javascript">
 
-  let recommendationPage = 0;
-  const productId = [[${productId}]];
+    let recommendationPage = 0;
+    const productId = [[${productId}]];
 
-  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    fetch(`/api/v1/products/${productId}`, {
-      method: 'GET',
-    }).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      response.json().then((data) => alert(data.message));
-      window.location.href = "/";
-    }).then((data) => {
-      document.querySelector('.product-name').innerHTML = `${data.name}`;
-      document.querySelector('.product-price').innerText = `${data.price} 원`;
-      document.querySelector('.product-description').innerText = `${data.description}`;
-      document.querySelector('.product-image').src = `/assets/${data.imageFileName}`;
-    }).catch((error) => {
-      console.error(error);
+        fetch(`/api/v1/products/${productId}`, {
+            method: 'GET',
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            response.json().then((data) => alert(data.message));
+            window.location.href = "/";
+        }).then((data) => {
+            document.querySelector('.product-name').innerHTML = `${data.name}`;
+            document.querySelector('.product-price').innerText = `${data.price} 원`;
+            document.querySelector('.product-description').innerText = `${data.description}`;
+            document.querySelector('.product-image').src = `/assets/${data.imageFileName}`;
+        }).catch((error) => {
+            console.error(error);
+        });
+
+        fetch(`/api/v1/rate/product/${productId}`, {
+            method: 'GET'
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            response.json().then((data) => alert(data.message));
+            window.location.href = "/";
+        }).then((data) => {
+            document.querySelector('.rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
+        })
+
+        updateRecommendation(productId, 0);
+        slidePagination(5, ".pagination")
+
+        if (localStorage.getItem("accessToken")) {
+            fetch(`/api/v1/rate/product/${productId}/custom`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
+                    'Content-Type': 'application/json'
+                },
+            }).then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                response.json().then((data) => alert(data.message));
+                window.location.href = "/";
+            }).then((data) => {
+                document.querySelector('.custom-rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
+                document.querySelector('.custom-rate-box').style.display = 'block';
+            });
+        }
     });
 
-    fetch(`/api/v1/rate/product/${productId}`, {
-      method: 'GET'
-    }).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      response.json().then((data) => alert(data.message));
-      window.location.href = "/";
-    }).then((data) => {
-      document.querySelector('.rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
-    })
-
-    updateRecommendation(productId, 0);
-    slidePagination(5, ".pagination")
-
-    if (localStorage.getItem("accessToken")) {
-      fetch(`/api/v1/rate/product/${productId}/custom`, {
+    fetch(`/api/v1/rate/product/${productId}/all`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
-          'Content-Type': 'application/json'
-        },
-      }).then((response) => {
+    }).then((response) => {
         if (response.ok) {
-          return response.json();
+            return response.json();
         }
         response.json().then((data) => alert(data.message));
         window.location.href = "/";
-      }).then((data) => {
-        document.querySelector('.custom-rate').innerText = `${data.averageRate} / 5.0 (${data.rateCount})`;
-        document.querySelector('.custom-rate-box').style.display = 'block';
-      });
-    }
-  });
-
-  function onNextClick() {
-    recommendationPage += 1;
-    updateRecommendation(productId, recommendationPage);
-  }
-
-  function onPrevClick() {
-    recommendationPage -= 1;
-    updateRecommendation(productId, recommendationPage);
-  }
-
-  const updateRecommendation = (productId, page) => {
-    fetch(`/api/v1/products/${productId}/recommend?page=${page}`, {
-      method: 'GET'
-    }).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      response.json().then((data) => alert(data.message));
-      window.location.href = "/";
     }).then((data) => {
-      const size = data.size;
-      const currentPage = data.currentPage;
-      const hasNextPage = data.hasNextPage;
+        let chartData = [];
+        data.forEach(d => chartData.push(d.rate.averageRate));
+        let rateChart = document.getElementById('rate-chart').getContext('2d');
+        let massPopChart = new Chart(rateChart, {
+            type: 'bar',
+            data: {
+                labels: ['10대 이하 남자', '10대 이하 여자', '20대 남자', '20대 여자', '30대 남자', '30대 여자', '40대 이상 남자', '40대 이상 여자'],
+                datasets: [{
+                    label: '성별 및 나이대별 별점',
+                    data: chartData,
+                    backgroundColor: '#2ac1bc',
+                    barThickness: 10,
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    yAxis: {
+                        max: 5,
+                        min: 0,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                }
+            }
+        });
+    });
 
-      let element = '';
-      for (let i = 0; i < Math.min(size, data.contents.length); i++) {
-        let recommendedProduct = data.contents[i];
+    function onNextClick() {
+        recommendationPage += 1;
+        updateRecommendation(productId, recommendationPage);
+    }
 
-        element += `
+    function onPrevClick() {
+        recommendationPage -= 1;
+        updateRecommendation(productId, recommendationPage);
+    }
+
+    const updateRecommendation = (productId, page) => {
+        fetch(`/api/v1/products/${productId}/recommend?page=${page}`, {
+            method: 'GET'
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            response.json().then((data) => alert(data.message));
+            window.location.href = "/";
+        }).then((data) => {
+            const size = data.size;
+            const currentPage = data.currentPage;
+            const hasNextPage = data.hasNextPage;
+
+            let element = '';
+            for (let i = 0; i < Math.min(size, data.contents.length); i++) {
+                let recommendedProduct = data.contents[i];
+
+                element += `
           <div class="product-recommend-item">
             <a href="/product/${recommendedProduct.id}">
               <img src='/assets/${recommendedProduct.imageFileName}' />
@@ -148,45 +197,45 @@
             <p>${recommendedProduct.price} 원</p>
           </div>
         `
-      }
-      document.querySelector('.product-recommend-page').innerText = `${currentPage + 1} 페이지`;
-      document.querySelector('.product-recommend-list').innerHTML = element;
-      updatePaginationButton(currentPage, hasNextPage);
+            }
+            document.querySelector('.product-recommend-page').innerText = `${currentPage + 1} 페이지`;
+            document.querySelector('.product-recommend-list').innerHTML = element;
+            updatePaginationButton(currentPage, hasNextPage);
 
-    }).catch((error) => {
-      console.error(error);
-    })
-  }
-
-  const updatePaginationButton = (currentPage, hasNextPage) => {
-    const next = document.getElementById(`page-next`);
-    const prev = document.getElementById(`page-prev`);
-
-    if (!hasNextPage || currentPage >= 5) {
-      next.setAttribute("disabled", true);
-    } else {
-      next.removeAttribute("disabled");
+        }).catch((error) => {
+            console.error(error);
+        })
     }
 
-    if (currentPage === 0) {
-      prev.setAttribute("disabled", true);
-    } else {
-      prev.removeAttribute("disabled");
+    const updatePaginationButton = (currentPage, hasNextPage) => {
+        const next = document.getElementById(`page-next`);
+        const prev = document.getElementById(`page-prev`);
+
+        if (!hasNextPage || currentPage >= 5) {
+            next.setAttribute("disabled", true);
+        } else {
+            next.removeAttribute("disabled");
+        }
+
+        if (currentPage === 0) {
+            prev.setAttribute("disabled", true);
+        } else {
+            prev.removeAttribute("disabled");
+        }
     }
-  }
 
-  const slidePagination = (size, className) => {
-    let pages = '';
+    const slidePagination = (size, className) => {
+        let pages = '';
 
-    pages += `
+        pages += `
           <button id="page-prev" onclick='onPrevClick()'>\t&lt;</button>
         `;
-    pages += `
+        pages += `
           <button id="page-next" onclick='onNextClick()'>\t&gt;</button>
         `;
 
-    document.querySelector(className).innerHTML = pages;
-  }
+        document.querySelector(className).innerHTML = pages;
+    }
 </script>
 </body>
 </html>
