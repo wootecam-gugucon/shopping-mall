@@ -42,5 +42,5 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
             "(rs.gender, rs.birthYearRange, rs.count, rs.totalScore) " +
             "FROM RateStat rs " +
             "WHERE rs.productId = :productId")
-    List<GroupAverageRateDto> findAllScoresByMemberGenderAndMemberBirthYear(final Long productId);
+    List<GroupAverageRateDto> findAllGroupsOfMemberGenderAndMemberBirthYear(final Long productId);
 }

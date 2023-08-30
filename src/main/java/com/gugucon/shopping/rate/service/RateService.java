@@ -80,7 +80,7 @@ public class RateService {
     }
 
     public List<GroupRateResponse> getGroupRates(final Long productId) {
-        return rateRepository.findAllScoresByMemberGenderAndMemberBirthYear(productId).stream()
+        return rateRepository.findAllGroupsOfMemberGenderAndMemberBirthYear(productId).stream()
                 .sorted(Comparator.comparing(o -> o.getBirthYearRange().getStartDate(), Comparator.reverseOrder()))
                 .map(rateDto -> GroupRateResponse.of(rateDto, calculateAverageOf(rateDto)))
                 .toList();
