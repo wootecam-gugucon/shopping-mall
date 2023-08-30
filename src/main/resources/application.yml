@@ -1,0 +1,37 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  datasource:
+    url: jdbc:mariadb://localhost:3306/shopping
+    username: root
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  thymeleaf:
+    cache: false
+
+  messages:
+    basename: messages, errors
+
+management:
+  server:
+    port: 9098
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration: ${JWT_EXPIRATION}
+
+pay:
+  callback:
+    fail-url: ${PAY_CALLBACK_FAIL_URL}
+    success-url: ${PAY_CALLBACK_SUCCESS_URL}
+  toss:
+    secret-key: ${PAY_TOSS_SECRET_KEY}

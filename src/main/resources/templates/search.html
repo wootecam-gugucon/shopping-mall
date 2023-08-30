@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>ZI구ZA구</title>
+</head>
+<body>
+<div class="root">
+  <div th:replace="~{layouts/header :: header}"></div>
+  <div th:replace="~{layouts/searchbar :: searchbar}"></div>
+
+  <section class="product-container">
+  </section>
+  <div class="pagination"></div>
+</div>
+</body>
+</html>

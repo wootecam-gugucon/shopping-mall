@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>ZI구ZA구</title>
+</head>
+<body>
+<div class="root">
+  <div th:replace="~{layouts/header :: header}"></div>
+
+  <section class="form-container">
+    <form class="mt-40" id="login-form">
+      <label for="email">이메일</label>
+      <input class="text-input mb-10" id="email" name="email" required type="text">
+
+      <label for="password">비밀번호</label>
+      <input class="text-input mb-10" id="password" name="password" required type="password">
+
+      <button class="primary-button-small form-submit-button" type="submit">Login</button>
+    </form>
+  </section>
+</div>
+<script th:src="@{/js/login.js}"></script>
+</body>
+</html>

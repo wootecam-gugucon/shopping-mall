@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <title>ZI구ZA구</title>
+</head>
+<body>
+<div class="root">
+    <div th:replace="~{layouts/header :: header}"></div>
+
+    <section class="order-history-list order-section">
+    </section>
+    <div class="pagination"></div>
+</div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const credentials = localStorage.getItem('accessToken');
+        if (!credentials) {
+            alert('사용자 정보가 없습니다.');
+            window.location.href = '/login';
+            return;
+        }
+
+        fetch('/api/v1/order-history?' + urlParams, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${credentials}`,
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            const currentPage = data.currentPage;
+            const totalPage = data.totalPage;
+            const size = data.size;
+
+            let element = '';
+            for (let i = 0; i < Math.min(size, data.contents.length); i++) {
+                let order = data.contents[i];
+                let itemElement = '';
+
+                order.orderItems.forEach((orderItem) => {
+                    itemElement += `
+                        <div class="order-list-item">
+                          <div class="flex gap-15 mt-10">
+                            <a href="/product/${orderItem.productId}">
+                              <img class="w-144 h-144" src="/assets/${orderItem.imageFileName}"/>
+                            </a>
+                            <div class="flex-col gap-15">
+                              <span class="order-name">${orderItem.name}</span>
+                              <span class="order-info">${orderItem.price}원 / 수량: ${orderItem.quantity}개</span>
+                            </div>
+                          </div>
+                        </div>
+
+                    `;
+                });
+
+                element += `
+                    <div class="order-list">
+                      <div class="order-list__header">
+                        <span>주문 번호: ${order.orderId}</span>
+                        <a href="/order-history/${order.orderId}">상세보기 ></a>
+                      </div>
+                      ${itemElement}
+                    </div>
+                    `;
+            }
+
+            pagination(currentPage, totalPage, size, '.pagination', "");
+            document.querySelector('.order-history-list').innerHTML = element;
+        }).catch((error) => {
+            console.error(error);
+        });
+    });
+
+</script>
+<script th:src="@{/js/pagination.js}"></script>
+</html>

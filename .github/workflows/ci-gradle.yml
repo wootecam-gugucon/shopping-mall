@@ -1,0 +1,72 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Gradle로 CI 구축
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    environment: shopping-mall-secrets
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: JDK 17 설정
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: gradlew에 실행 권한 부여
+      run: chmod +x ./gradlew
+
+    - name: 프로젝트 빌드 및 테스트
+      run: ./gradlew clean build
+
+    - name: 테스트 결과를 PR에 코멘트로 등록
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: always()
+      with:
+        files: '**/build/test-results/test/TEST-*.xml'
+
+    - name: 테스트 커버리지를 PR에 코멘트로 등록합니다
+      if: always()
+      id: jacoco
+      uses: madrapps/jacoco-report@v1.2
+      with:
+        title: 📝 테스트 커버리지 리포트입니다
+        paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 테스트 실패 시, 실패한 코드 라인에 Check 코멘트를 등록
+      uses: mikepenz/action-junit-report@v3
+      if: always()
+      with:
+        report_paths: '**/build/test-results/test/TEST-*.xml'
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 빌드 실패 시 Slack으로 알림
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        author_name: 빌드 실패 알림
+        fields: repo, message, commit, author, action, eventName, ref, workflow, job, took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: failure()

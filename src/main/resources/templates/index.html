@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>ZI구ZA구</title>
+</head>
+<body>
+<div class="root">
+  <div th:replace="~{layouts/header :: header}"></div>
+  <div th:replace="~{layouts/searchbar :: searchbar}"></div>
+
+  <section class="product-container">
+  </section>
+  <div class="pagination"></div>
+</div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        fetch('/api/v1/products?' + urlParams, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            const currentPage = data.currentPage;
+            const totalPage = data.totalPage;
+            const size = data.size;
+
+            let element = '';
+            for (let i = 0; i < Math.min(size, data.contents.length); i++) {
+                let product = data.contents[i];
+                element += `
+              <div>
+                <a href="/product/${product.id}">
+                  <img class="w-280 h-280 cover-image" src="assets/${product.imageFileName}"/>
+                </a>
+                <div class="flex justify-between w-280 p-5">
+                <div class="product-info">
+                  <span class="product-info__name">${product.name}</span>
+                  <span class="product-info__price">${product.price}</span>
+                </div>
+                <button type="submit" class="product-btn" ${product.stock <= 0 ? 'disabled' : ''} onclick="addCartItem(${product.id})">
+                  <img src="assets/svgs/cart.svg" alt="장바구니"/>
+                </button>
+                </div>
+              </div>
+              `;
+            }
+
+            pagination(currentPage, totalPage, size, '.pagination', "");
+            document.querySelector('.product-container').innerHTML = element;
+        }).catch((error) => {
+            console.error(error);
+        });
+
+    });
+</script>
+<script th:src="@{/js/pagination.js}"></script>
+<script th:src="@{/js/cart.js}"></script>
+<script th:src="@{/js/search.js}"></script>
+</html>

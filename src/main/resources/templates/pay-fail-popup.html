@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 실패</title>
+</head>
+<body>
+<span>결제에 실패하였습니다.</span>
+
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const message = urlParams.get('message');
+        const orderId = urlParams.get('orderId');
+        let status;
+
+        const credentials = localStorage.getItem('accessToken');
+        if (!credentials) {
+            alert('사용자 정보가 없습니다.');
+            window.location.href = '/login';
+        }
+
+        if (orderId === null) {
+            failToFindOrderId();
+        }
+
+        fetch('/api/v1/pay/fail', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${credentials}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "code": code,
+                "message": message,
+                "orderId": orderId,
+            })
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            else {
+                failToFindOrderId();
+            }
+        }).then((data) => {
+            alert("결제가 승인되지 않았습니다. 주문 화면으로 돌아갑니다.");
+            top.opener.location.href = `/order/${data.orderId}`;
+            self.close();
+        }).catch((error) => {
+            console.error(error);
+        });
+    })
+
+    const failToFindOrderId = () => {
+        alert('주문 정보를 찾을 수 없습니다. 장바구니 화면으로 돌아갑니다.');
+        top.opener.location.href = '/cart';
+        self.close();
+    }
+</script>
+</html>

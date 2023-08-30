@@ -1,0 +1,14 @@
+.primary-button {
+  background: #FF1B66;
+  font-size: 24px;
+  color: white;
+  width: 100%;
+  padding: 20px;
+}
+
+.primary-button-small {
+  background: #FF1B66;
+  font-size: 20px;
+  color: white;
+  padding: 14px 28px;
+}

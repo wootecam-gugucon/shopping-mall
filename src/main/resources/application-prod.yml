@@ -1,0 +1,28 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+
+  datasource:
+    url: jdbc:mariadb://${DB_PROD_ADDRESS}:3306/shopping
+    username: ${DB_PROD_USERNAME}
+    password: ${DB_PROD_PASSWORD}
+
+  thymeleaf:
+    cache: false
+
+  messages:
+    basename: messages, errors
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration: ${JWT_EXPIRATION}
+
+pay:
+  callback:
+    fail-url: ${PAY_CALLBACK_FAIL_URL}
+    success-url: ${PAY_CALLBACK_SUCCESS_URL}
+  toss:
+    secret-key: ${PAY_TOSS_SECRET_KEY}

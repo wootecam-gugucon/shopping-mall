@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <title>ZI구ZA구</title>
+</head>
+<body>
+<div class="root">
+    <div th:replace="~{layouts/header :: header}"></div>
+
+    <section class="cart-section">
+        <div class="cart-list">
+        </div>
+        <div class="flex justify-between items-center mt-30">
+            <button class="primary-button flex-center" onclick="requestOrder()">주문하기</button>
+        </div>
+    </section>
+</div>
+<script th:src="@{/js/cart.js}"></script>
+<script th:src="@{/js/order.js}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const credentials = localStorage.getItem('accessToken');
+        if (!credentials) {
+            alert('사용자 정보가 없습니다.');
+            window.location.href = '/login';
+            return;
+        }
+
+        fetch('/api/v1/cart/items', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${credentials}`,
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let element = '<hr class="divide-line-gray mt-10" />';
+            data.forEach(cartItem => {
+                element += `
+                    <div class="cart-container">
+                      <div class="flex gap-15 mt-10">
+                        <a href="/product/${cartItem.productId}">
+                          <img class="w-144 h-144 cover-image" src="assets/${cartItem.imageFileName}"/>
+                        </a>
+                        <span class="cart-name">${cartItem.name}</span><br>
+                        <span style="display:${cartItem.soldOut ? 'block': 'none'}">현재 품절된 상품입니다.</span>
+                      </div>
+                      <div class="flex-col-center justify-around gap-15">
+                        <button class="cart-trash-svg" onclick="removeCartItem(${cartItem.cartItemId})">
+                            <img src="./assets/svgs/trash.svg" alt="삭제" />
+                        </button>
+                        <div class="number-input-container">
+                          <input type="number" class="number-input" value="${cartItem.quantity}" />
+                          <div>
+                            <button class="number-input-button" onclick="updateCartItemQuantity(${cartItem.cartItemId}, ${cartItem.quantity} + 1)">▲</button>
+                            <button class="number-input-button" onclick="updateCartItemQuantity(${cartItem.cartItemId}, ${cartItem.quantity} - 1)">▼</button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <hr class="divide-line-thin mt-10"/>
+                    `;
+            });
+
+            document.querySelector('.cart-list').innerHTML = element;
+        }).catch((error) => {
+            console.error(error);
+        });
+
+    });
+</script>
+</body>
+</html>

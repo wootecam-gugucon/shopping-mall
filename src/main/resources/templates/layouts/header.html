@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+  <title>Shopping</title>
+</head>
+<body>
+  <nav th:fragment="header" class="nav flex justify-end">
+    <div class="flex items-center gap-15">
+      <a href="/" class="nav-button">상품</a>
+      <a href="/cart" class="nav-button">장바구니</a>
+      <a href="/order-history" class="nav-button">주문목록</a>
+      <a id="login-nav" href="/login" class="nav-button">로그인</a>
+      <a id="signup-nav" href="/signup" class="nav-button">회원가입</a>
+      <a id="logout-nav" href="/logout" class="nav-button">로그아웃</a>
+      <a href="/point-charge" class="nav-button">충전</a>
+    </div>
+    <script>
+      document.getElementById("logout-nav").addEventListener("click", function (e) {
+        e.preventDefault();
+        localStorage.removeItem('accessToken');
+        window.location.reload();
+      })
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const credentials = localStorage.getItem('accessToken');
+        if (!credentials) {
+          document.getElementById("login-nav").style.display = "block";
+          document.getElementById("signup-nav").style.display = "block";
+          document.getElementById("logout-nav").style.display = "none";
+        } else {
+          document.getElementById("login-nav").style.display = "none";
+          document.getElementById("signup-nav").style.display = "none";
+          document.getElementById("logout-nav").style.display = "block";
+        }
+      });
+    </script>
+  </nav>
+</body>
+</html>
