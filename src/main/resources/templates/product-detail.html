@@ -18,6 +18,9 @@
       <div class="flex justify-between p-20 mt-20">
         <h3 class="highlight-text">상품이름</h3>
         <span class="highlight-text product-name"></span>
+        <button type="submit" class="product-btn">
+          <img src="/assets/svgs/cart.svg" alt="장바구니"/>
+        </button>
       </div>
       <div class="flex justify-between p-20 mt-20">
         <img class="product-image"/>
@@ -73,6 +76,13 @@
             response.json().then((data) => alert(data.message));
             window.location.href = "/";
         }).then((data) => {
+            const btn = document.querySelector('.product-btn');
+            btn.onclick = () => addCartItem(productId);
+            if (data.stock <= 0) {
+              btn.setAttribute('disabled', true);
+            } else {
+              btn.removeAttribute('disabled');
+            }
             document.querySelector('.product-name').innerHTML = `${data.name}`;
             document.querySelector('.product-price').innerText = `${data.price} 원`;
             document.querySelector('.product-description').innerText = `${data.description}`;
@@ -237,5 +247,6 @@
         document.querySelector(className).innerHTML = pages;
     }
 </script>
+<script th:src="@{/js/cart.js}"></script>
 </body>
 </html>
