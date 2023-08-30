@@ -6,11 +6,13 @@ import com.gugucon.shopping.common.exception.ShoppingException;
 import com.gugucon.shopping.item.repository.ProductRepository;
 import com.gugucon.shopping.item.repository.RateStatRepository;
 import com.gugucon.shopping.member.domain.vo.BirthYearRange;
+import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.order.domain.entity.Order.OrderStatus;
 import com.gugucon.shopping.order.domain.entity.OrderItem;
 import com.gugucon.shopping.order.repository.OrderItemRepository;
 import com.gugucon.shopping.rate.domain.entity.Rate;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
+import com.gugucon.shopping.rate.dto.response.GroupRateResponse;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
 import com.gugucon.shopping.rate.repository.RateRepository;
@@ -18,6 +20,9 @@ import com.gugucon.shopping.rate.repository.dto.AverageRateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -72,6 +77,20 @@ public class RateService {
                                                                                                birthYearRange);
         final double averageRate = calculateAverageOf(rates);
         return new RateResponse(rates.getCount(), averageRate);
+    }
+
+    public List<GroupRateResponse> getGroupRates(final Long productId) {
+        final List<GroupRateResponse> responses = new ArrayList<>();
+        for (final BirthYearRange birthYearRange : BirthYearRange.values()) {
+            for (final Gender gender : Gender.values()) {
+                final AverageRateDto rates = rateRepository.findScoresByMemberGenderAndMemberBirthYear(productId,
+                                                                                                       gender,
+                                                                                                       birthYearRange);
+                final double averageRate = calculateAverageOf(rates);
+                responses.add(GroupRateResponse.of(gender, birthYearRange, rates.getCount(), averageRate));
+            }
+        }
+        return responses;
     }
 
     private double calculateAverageOf(final AverageRateDto averageRateDto) {

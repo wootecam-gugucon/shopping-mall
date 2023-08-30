@@ -2,6 +2,7 @@ package com.gugucon.shopping.rate.controller.api;
 
 import com.gugucon.shopping.auth.dto.MemberPrincipal;
 import com.gugucon.shopping.rate.dto.request.RateCreateRequest;
+import com.gugucon.shopping.rate.dto.response.GroupRateResponse;
 import com.gugucon.shopping.rate.dto.response.RateDetailResponse;
 import com.gugucon.shopping.rate.dto.response.RateResponse;
 import com.gugucon.shopping.rate.service.RateService;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/rate")
@@ -43,5 +46,11 @@ public class RateController {
     public RateResponse getCustomRate(@PathVariable final Long productId,
                                       @AuthenticationPrincipal final MemberPrincipal principal) {
         return rateService.getCustomRate(productId, principal);
+    }
+
+    @GetMapping("/product/{productId}/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GroupRateResponse> getGroupRates(@PathVariable final Long productId) {
+        return rateService.getGroupRates(productId);
     }
 }
