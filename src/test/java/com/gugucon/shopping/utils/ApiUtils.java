@@ -8,6 +8,7 @@ import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.member.dto.request.LoginRequest;
 import com.gugucon.shopping.member.dto.request.SignupRequest;
 import com.gugucon.shopping.member.dto.response.LoginResponse;
+import com.gugucon.shopping.order.domain.PayType;
 import com.gugucon.shopping.order.dto.request.OrderPayRequest;
 import com.gugucon.shopping.order.dto.response.OrderDetailResponse;
 import com.gugucon.shopping.order.dto.response.OrderHistoryResponse;
@@ -210,7 +211,7 @@ public class ApiUtils {
         final List<CartItemResponse> cartItemResponses = readCartItems(accessToken);
         updateCartItem(accessToken, cartItemResponses.get(0).getCartItemId(), new CartItemUpdateRequest(quantity));
         final Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "TOSS"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.TOSS));
         final TossPayInfoResponse tossPayInfoResponse = getPaymentInfo(accessToken, orderId);
         final TossPayRequest tossPayRequest = new TossPayRequest("mockPaymentKey",
                                                                  tossPayInfoResponse.getEncodedOrderId(),
@@ -272,7 +273,7 @@ public class ApiUtils {
         chargePoint(accessToken, point);
         productIds.forEach(productId -> insertCartItem(accessToken, new CartItemInsertRequest(productId)));
         Long orderId = placeOrder(accessToken);
-        putOrder(accessToken, new OrderPayRequest(orderId, "POINT"));
+        putOrder(accessToken, new OrderPayRequest(orderId, PayType.POINT));
         payOrderByPoint(accessToken, new PointPayRequest(orderId));
         return getOrderDetail(accessToken, orderId);
     }

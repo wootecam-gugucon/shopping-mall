@@ -413,7 +413,7 @@ class ProductIntegrationTest {
         final Long orderId = placeOrder(accessToken);
         chargePoint(accessToken, 1_000_000L);
         final OrderPayResponse orderPayResponse = putOrder(accessToken,
-                                                           new OrderPayRequest(orderId, PayType.POINT.name()));
+                                                           new OrderPayRequest(orderId, PayType.POINT));
         payOrderByPoint(accessToken, new PointPayRequest(orderPayResponse.getOrderId()));
 
         // when
