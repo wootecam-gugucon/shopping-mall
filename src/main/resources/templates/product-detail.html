@@ -5,6 +5,7 @@
   <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link rel="stylesheet" th:href="@{/css/index.css}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <title>Shopping</title>
 </head>
 <body>
@@ -40,6 +41,10 @@
           <div class="flex justify-between p-20 mt-20 custom-rate-box" style="display: none">
             <h3 class="highlight-text">사용자와 비슷한 사람들이 남긴 별점</h3>
             <span class="highlight-text custom-rate"></span>
+          </div>
+          <div class="p-20 mt-20">
+            <h3 class="highlight-text">성별 및 나이대별 평균 별점</h3>
+            <canvas id="rate-chart" width="400px" height="300px"></canvas>
           </div>
         </div>
         <div class="flex justify-between p-20 mt-20">
@@ -113,6 +118,51 @@
                 document.querySelector('.custom-rate-box').style.display = 'block';
             });
         }
+
+        fetch(`/api/v1/rate/product/${productId}/all`, {
+            method: 'GET',
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            response.json().then((data) => alert(data.message));
+            window.location.href = "/";
+        }).then((data) => {
+            let chartData = [];
+            data.forEach(d => chartData.push(d.rate.averageRate));
+            let rateChart = document.getElementById('rate-chart').getContext('2d');
+            let massPopChart = new Chart(rateChart, {
+                type: 'bar',
+                data: {
+                    labels: ['10대 이하 남자', '10대 이하 여자', '20대 남자', '20대 여자', '30대 남자', '30대 여자', '40대 이상 남자', '40대 이상 여자'],
+                    datasets: [{
+                        label: '성별 및 나이대별 별점',
+                        data: chartData,
+                        backgroundColor: '#2ac1bc',
+                        barThickness: 10,
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        yAxis: {
+                            max: 5,
+                            min: 0,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                    }
+                }
+            });
+        });
+
     });
 
     function onNextClick() {

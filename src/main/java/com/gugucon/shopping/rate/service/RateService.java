@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -80,6 +81,7 @@ public class RateService {
 
     public List<GroupRateResponse> getGroupRates(final Long productId) {
         return rateRepository.findAllScoresByMemberGenderAndMemberBirthYear(productId).stream()
+                .sorted(Comparator.comparing(o -> o.getBirthYearRange().getStartDate(), Comparator.reverseOrder()))
                 .map(rateDto -> GroupRateResponse.of(rateDto, calculateAverageOf(rateDto)))
                 .toList();
     }

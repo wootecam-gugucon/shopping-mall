@@ -41,7 +41,6 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
     @Query("SELECT new com.gugucon.shopping.rate.repository.dto.GroupAverageRateDto" +
             "(rs.gender, rs.birthYearRange, rs.count, rs.totalScore) " +
             "FROM RateStat rs " +
-            "WHERE rs.productId = :productId " +
-            "order by rs.birthYearRange")
+            "WHERE rs.productId = :productId")
     List<GroupAverageRateDto> findAllScoresByMemberGenderAndMemberBirthYear(final Long productId);
 }
