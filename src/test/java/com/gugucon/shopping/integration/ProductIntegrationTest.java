@@ -594,6 +594,7 @@ class ProductIntegrationTest {
         final ProductDetailResponse result = response.as(ProductDetailResponse.class);
         assertThat(result.getId()).isEqualTo(productId);
         assertThat(result.getName()).isEqualTo(name);
+        assertThat(result.getStock()).isEqualTo(10);
         assertThat(result.getDescription()).isEqualTo("test_description");
         assertThat(result.getImageFileName()).isEqualTo("image_file_" + name);
         assertThat(result.getPrice()).isEqualTo(price);
