@@ -4,10 +4,13 @@ import com.gugucon.shopping.member.domain.vo.BirthYearRange;
 import com.gugucon.shopping.member.domain.vo.Gender;
 import com.gugucon.shopping.rate.domain.entity.Rate;
 import com.gugucon.shopping.rate.repository.dto.AverageRateDto;
-import java.util.Optional;
+import com.gugucon.shopping.rate.repository.dto.GroupAverageRateDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RateRepository extends JpaRepository<Rate, Long> {
@@ -34,4 +37,11 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
     AverageRateDto findScoresByMemberGenderAndMemberBirthYear(final Long productId,
                                                               final Gender gender,
                                                               final BirthYearRange birthYearRange);
+
+    @Query("SELECT new com.gugucon.shopping.rate.repository.dto.GroupAverageRateDto" +
+            "(rs.gender, rs.birthYearRange, rs.count, rs.totalScore) " +
+            "FROM RateStat rs " +
+            "WHERE rs.productId = :productId " +
+            "order by rs.birthYearRange")
+    List<GroupAverageRateDto> findAllScoresByMemberGenderAndMemberBirthYear(final Long productId);
 }
