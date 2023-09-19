@@ -20,7 +20,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findAllByMemberIdAndStatus(final Long memberId, final OrderStatus status, final Pageable pageable);
 
     @Query("SELECT o FROM Order o " +
-            "WHERE o.id = :id AND o.memberId = :memberId")
+            "JOIN FETCH o.orderItems oi " +
+            "WHERE o.id = :id AND o.memberId = :memberId " +
+            "ORDER BY oi.productId")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Order> findByIdAndMemberIdExclusively(final Long id, final Long memberId);
 
